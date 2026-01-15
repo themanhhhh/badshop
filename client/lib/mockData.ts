@@ -203,3 +203,100 @@ export const formatPrice = (price: number): string => {
     currency: "VND",
   }).format(price);
 };
+
+export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  totalOrders: number;
+  totalSpent: number;
+  status: "active" | "inactive";
+  joinedDate: string;
+  lastOrderDate: string;
+}
+
+export const customers: Customer[] = [
+  {
+    id: "CUS-001",
+    name: "Nguyễn Văn A",
+    email: "nguyenvana@email.com",
+    phone: "0901234567",
+    totalOrders: 12,
+    totalSpent: 45850000,
+    status: "active",
+    joinedDate: "2025-06-15",
+    lastOrderDate: "2026-01-13",
+  },
+  {
+    id: "CUS-002",
+    name: "Trần Thị B",
+    email: "tranthib@email.com",
+    phone: "0912345678",
+    totalOrders: 8,
+    totalSpent: 28600000,
+    status: "active",
+    joinedDate: "2025-08-20",
+    lastOrderDate: "2026-01-12",
+  },
+  {
+    id: "CUS-003",
+    name: "Lê Văn C",
+    email: "levanc@email.com",
+    phone: "0923456789",
+    totalOrders: 5,
+    totalSpent: 16750000,
+    status: "active",
+    joinedDate: "2025-10-01",
+    lastOrderDate: "2026-01-12",
+  },
+  {
+    id: "CUS-004",
+    name: "Phạm Thị D",
+    email: "phamthid@email.com",
+    phone: "0934567890",
+    totalOrders: 3,
+    totalSpent: 9600000,
+    status: "active",
+    joinedDate: "2025-11-15",
+    lastOrderDate: "2026-01-13",
+  },
+  {
+    id: "CUS-005",
+    name: "Hoàng Văn E",
+    email: "hoangvane@email.com",
+    phone: "0945678901",
+    totalOrders: 1,
+    totalSpent: 1200000,
+    status: "inactive",
+    joinedDate: "2025-12-01",
+    lastOrderDate: "2026-01-11",
+  },
+  {
+    id: "CUS-006",
+    name: "Võ Thị F",
+    email: "vothif@email.com",
+    phone: "0956789012",
+    totalOrders: 15,
+    totalSpent: 52300000,
+    status: "active",
+    joinedDate: "2025-05-10",
+    lastOrderDate: "2026-01-10",
+  },
+];
+
+export const monthlyRevenue = [
+  { month: "T1", revenue: 85000000, orders: 156 },
+  { month: "T2", revenue: 92000000, orders: 178 },
+  { month: "T3", revenue: 78000000, orders: 142 },
+  { month: "T4", revenue: 105000000, orders: 198 },
+  { month: "T5", revenue: 118000000, orders: 224 },
+  { month: "T6", revenue: 135000000, orders: 267 },
+  { month: "T7", revenue: 142000000, orders: 289 },
+  { month: "T8", revenue: 128000000, orders: 256 },
+  { month: "T9", revenue: 115000000, orders: 218 },
+  { month: "T10", revenue: 138000000, orders: 276 },
+  { month: "T11", revenue: 155000000, orders: 312 },
+  { month: "T12", revenue: 168000000, orders: 342 },
+];
+
