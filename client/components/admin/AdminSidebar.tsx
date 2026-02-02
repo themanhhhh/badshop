@@ -10,6 +10,7 @@ import {
   Settings,
   BarChart3,
   LogOut,
+  Megaphone,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -22,7 +23,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
 } from '@/components/ui/sidebar';
 
 const menuItems = [
@@ -30,6 +30,7 @@ const menuItems = [
   { icon: Package, label: 'Sản phẩm', href: '/admin/products' },
   { icon: ShoppingCart, label: 'Đơn hàng', href: '/admin/orders' },
   { icon: Users, label: 'Khách hàng', href: '/admin/customers' },
+  { icon: Megaphone, label: 'Chiến dịch', href: '/admin/campaigns' },
   { icon: BarChart3, label: 'Báo cáo', href: '/admin/reports' },
   { icon: Settings, label: 'Cài đặt', href: '/admin/settings' },
 ];
@@ -38,7 +39,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" className="border-r-0" {...props}>
       {/* Header with Logo */}
       <SidebarHeader className="border-b border-sidebar-border pb-4">
         <Link href="/admin" className="flex items-center gap-3 px-2">
@@ -69,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       tooltip={item.label}
                     >
                       <Link href={item.href}>
-                        <item.icon />
+                        <item.icon aria-hidden="true" />
                         <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -97,14 +98,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Đăng xuất">
-              <LogOut />
+              <LogOut aria-hidden="true" />
               <span>Đăng xuất</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-
-      <SidebarRail />
     </Sidebar>
   );
 }

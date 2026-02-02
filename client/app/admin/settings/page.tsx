@@ -39,13 +39,13 @@ export default function AdminSettingsPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring ${
                   activeTab === tab.id
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <tab.icon className="h-5 w-5" />
+                <tab.icon className="h-5 w-5" aria-hidden="true" />
                 {tab.label}
               </button>
             ))}
@@ -66,8 +66,8 @@ export default function AdminSettingsPage() {
                     <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-2xl font-bold">
                       BP
                     </div>
-                    <button className="px-4 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors flex items-center gap-2">
-                      <Upload className="h-4 w-4" />
+                    <button className="px-4 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-ring">
+                      <Upload className="h-4 w-4" aria-hidden="true" />
                       Tải lên
                     </button>
                   </div>
@@ -123,8 +123,8 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="pt-4 border-t border-border flex justify-end">
-                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-                  <Save className="h-4 w-4" />
+                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <Save className="h-4 w-4" aria-hidden="true" />
                   Lưu thay đổi
                 </button>
               </div>
@@ -154,8 +154,8 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="pt-4 border-t border-border flex justify-end">
-                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-                  <Save className="h-4 w-4" />
+                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <Save className="h-4 w-4" aria-hidden="true" />
                   Lưu thay đổi
                 </button>
               </div>
@@ -199,8 +199,8 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="pt-4 border-t border-border flex justify-end">
-                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-                  <Save className="h-4 w-4" />
+                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <Save className="h-4 w-4" aria-hidden="true" />
                   Lưu thay đổi
                 </button>
               </div>
@@ -233,8 +233,8 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="pt-4 border-t border-border flex justify-end">
-                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-                  <Save className="h-4 w-4" />
+                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <Save className="h-4 w-4" aria-hidden="true" />
                   Lưu thay đổi
                 </button>
               </div>
@@ -285,8 +285,8 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="pt-4 border-t border-border flex justify-end">
-                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-                  <Save className="h-4 w-4" />
+                <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <Save className="h-4 w-4" aria-hidden="true" />
                   Cập nhật mật khẩu
                 </button>
               </div>

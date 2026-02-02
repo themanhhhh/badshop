@@ -3,10 +3,10 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { type Product, formatPrice } from '@/lib/mockData';
+import { type DisplayProduct, formatPrice } from '@/lib/productMapper';
 
 interface ProductCarouselProps {
-  products: Product[];
+  products: DisplayProduct[];
   title: string;
   subtitle?: string;
   viewAllHref?: string;
@@ -58,24 +58,26 @@ export function ProductCarousel({ products, title, subtitle, viewAllHref }: Prod
               <button
                 onClick={() => scroll('left')}
                 disabled={!canScrollLeft}
-                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
+                aria-label="Cuộn sang trái"
+                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
                   canScrollLeft
                     ? 'border-black text-black hover:bg-black hover:text-white'
                     : 'border-gray-200 text-gray-300 cursor-not-allowed'
                 }`}
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
               <button
                 onClick={() => scroll('right')}
                 disabled={!canScrollRight}
-                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
+                aria-label="Cuộn sang phải"
+                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
                   canScrollRight
                     ? 'border-black text-black hover:bg-black hover:text-white'
                     : 'border-gray-200 text-gray-300 cursor-not-allowed'
                 }`}
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
 
@@ -85,7 +87,7 @@ export function ProductCarousel({ products, title, subtitle, viewAllHref }: Prod
                 className="hidden sm:inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium hover:opacity-60 transition-opacity"
               >
                 View All
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             )}
           </div>
@@ -111,7 +113,7 @@ export function ProductCarousel({ products, title, subtitle, viewAllHref }: Prod
               className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium"
             >
               View All
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         )}
@@ -120,7 +122,7 @@ export function ProductCarousel({ products, title, subtitle, viewAllHref }: Prod
   );
 }
 
-function ProductCarouselCard({ product }: { product: Product }) {
+function ProductCarouselCard({ product }: { product: DisplayProduct }) {
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;

@@ -7,12 +7,34 @@ import { CategoryGrid } from '@/components/shop/CategoryGrid';
 import { AthleteSpotlight } from '@/components/shop/AthleteSpotlight';
 import { TechShowcase } from '@/components/shop/TechShowcase';
 import { ProductCarousel } from '@/components/shop/ProductCarousel';
-import { products } from '@/lib/mockData';
+import { useProducts } from '@/hooks/useApi';
+import { mapProductsForDisplay } from '@/lib/productMapper';
+import { Loader2 } from 'lucide-react';
 
 export default function HomePage() {
+  const { data: apiProducts, loading, error } = useProducts();
+  
+  // Map API products to display format
+  const products = apiProducts ? mapProductsForDisplay(apiProducts) : [];
+  
   const newProducts = products.filter(p => p.badge === 'new' || !p.badge).slice(0, 8);
   const bestProducts = products.filter(p => p.badge === 'hot' || p.rating >= 4.7).slice(0, 8);
   const saleProducts = products.filter(p => p.badge === 'sale' || p.originalPrice).slice(0, 8);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen bg-white flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-10 w-10 animate-spin text-gray-400" />
+            <p className="text-gray-500 text-sm">Đang tải sản phẩm...</p>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -25,12 +47,14 @@ export default function HomePage() {
         <CategoryGrid />
 
         {/* New Arrivals Carousel */}
-        <ProductCarousel 
-          products={newProducts}
-          title="New Arrivals"
-          subtitle="Mới nhất"
-          viewAllHref="/products"
-        />
+        {newProducts.length > 0 && (
+          <ProductCarousel 
+            products={newProducts}
+            title="New Arrivals"
+            subtitle="Mới nhất"
+            viewAllHref="/products"
+          />
+        )}
 
         {/* Pro Player / Athlete Spotlight */}
         <AthleteSpotlight />
@@ -39,12 +63,14 @@ export default function HomePage() {
         <TechShowcase />
 
         {/* Best Sellers Carousel */}
-        <ProductCarousel 
-          products={bestProducts}
-          title="Best Sellers"
-          subtitle="Bán chạy nhất"
-          viewAllHref="/products?sort=bestselling"
-        />
+        {bestProducts.length > 0 && (
+          <ProductCarousel 
+            products={bestProducts}
+            title="Best Sellers"
+            subtitle="Bán chạy nhất"
+            viewAllHref="/products?sort=bestselling"
+          />
+        )}
 
         {/* Sale Section */}
         {saleProducts.length > 0 && (

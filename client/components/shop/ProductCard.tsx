@@ -1,16 +1,46 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { type Product, formatPrice } from '@/lib/mockData';
+import { ShoppingCart, Check } from 'lucide-react';
+import { type DisplayProduct, formatPrice } from '@/lib/productMapper';
+import { Button } from '@/components/ui/button';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductCardProps {
-  product: Product;
+  product: DisplayProduct;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
+  const [isAdding, setIsAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsAdding(true);
+    
+    await addToCart({
+      productId: product.id,
+      name: product.name,
+      brand: product.brand,
+      price: product.price,
+      image: product.image || '/products/placeholder.jpg',
+      quantity: 1,
+    });
+    
+    setIsAdding(false);
+    setAdded(true);
+    
+    // Reset after 2 seconds
+    setTimeout(() => setAdded(false), 2000);
+  };
 
   return (
     <div className="group relative">
@@ -26,6 +56,23 @@ export function ProductCard({ product }: ProductCardProps) {
            `-${discount}%`}
         </div>
       )}
+
+      {/* Add to Cart Button - appears on hover */}
+      <Button
+        size="icon"
+        variant={added ? "default" : "secondary"}
+        className={`absolute top-3 right-3 z-10 h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
+          added ? 'bg-green-600 hover:bg-green-700' : ''
+        }`}
+        onClick={handleAddToCart}
+        disabled={isAdding}
+      >
+        {added ? (
+          <Check className="h-4 w-4" />
+        ) : (
+          <ShoppingCart className="h-4 w-4" />
+        )}
+      </Button>
 
       {/* Image */}
       <Link href={`/products/${product.id}`} className="block">

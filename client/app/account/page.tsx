@@ -1,23 +1,59 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login, isAuthenticated, loading: authLoading } = useAuth();
+  
   const [formData, setFormData] = useState({
-    phone: '',
+    email: '',
     password: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      router.push('/');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login
-    alert('Đăng nhập thành công!');
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await login(formData);
+      
+      if (result.success) {
+        router.push('/');
+      } else {
+        setError(result.message || 'Đăng nhập thất bại');
+      }
+    } catch {
+      setError('Có lỗi xảy ra. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-white flex flex-col">
@@ -41,18 +77,25 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                  {error}
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label htmlFor="phone">
-                  Số điện thoại <span className="text-red-500">*</span>
+                <Label htmlFor="email">
+                  Email <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="phone"
-                  type="tel"
+                  id="email"
+                  type="email"
                   required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="Số điện thoại"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="email@example.com"
                   className="h-12 bg-gray-50"
+                  disabled={loading}
                 />
               </div>
 
@@ -68,6 +111,7 @@ export default function LoginPage() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Mật khẩu"
                   className="h-12 bg-gray-50"
+                  disabled={loading}
                 />
               </div>
 
@@ -80,8 +124,8 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full h-12">
-                Đăng nhập
+              <Button type="submit" className="w-full h-12" disabled={loading}>
+                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </Button>
             </form>
 

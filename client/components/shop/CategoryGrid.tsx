@@ -77,7 +77,7 @@ export function CategoryGrid() {
                     {category.description}
                   </p>
                   <div className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center group-hover:bg-white group-hover:border-white transition-all duration-300">
-                    <ArrowUpRight className="h-5 w-5 text-white group-hover:text-black transition-colors" />
+                    <ArrowUpRight className="h-5 w-5 text-white group-hover:text-black transition-colors" aria-hidden="true" />
                   </div>
                 </div>
               </div>

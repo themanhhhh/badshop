@@ -75,7 +75,7 @@ export function AthleteSpotlight() {
                 className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white text-xs uppercase tracking-widest font-medium hover:bg-gray-900 transition-colors"
               >
                 Explore Now
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -111,7 +111,7 @@ export function AthleteSpotlight() {
                 <span className="text-xs uppercase tracking-wider text-gray-400">
                   View Collection
                 </span>
-                <ArrowRight className="h-4 w-4 text-gray-400" />
+                <ArrowRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
               </div>
             </div>
           ))}

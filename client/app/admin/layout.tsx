@@ -9,9 +9,9 @@ function AdminContent({ children }: { children: React.ReactNode }) {
   
   return (
     <div
-      className="flex-1 flex flex-col transition-[margin-left] duration-200 ease-linear"
+      className="flex-1 flex flex-col min-h-screen transition-[margin-left] duration-200 ease-linear"
       style={{
-        marginLeft: state === 'collapsed' ? 'var(--sidebar-width-icon)' : 'var(--sidebar-width)',
+        marginLeft: state === 'collapsed' ? 'calc(var(--sidebar-width-icon) - 1.5rem)' : 'calc(var(--sidebar-width) - 1.5rem)',
       }}
     >
       <AdminHeader />

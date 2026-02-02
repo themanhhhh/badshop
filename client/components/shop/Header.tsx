@@ -34,13 +34,17 @@ export function Header() {
               {/* Left - Menu */}
               <div className="flex items-center gap-4">
                 <button
-                  className="p-2 hover:opacity-60 transition-opacity"
+                  className="p-2 hover:opacity-60 transition-opacity focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                   onClick={() => setIsSidebarOpen(true)}
+                  aria-label="Mở menu"
                 >
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-5 w-5" aria-hidden="true" />
                 </button>
-                <button className="p-2 hover:opacity-60 transition-opacity hidden sm:block">
-                  <Search className="h-5 w-5" />
+                <button 
+                  className="p-2 hover:opacity-60 transition-opacity hidden sm:block focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  aria-label="Tìm kiếm"
+                >
+                  <Search className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
 
@@ -53,16 +57,27 @@ export function Header() {
 
               {/* Right - Actions */}
               <div className="flex items-center gap-2">
-                <button className="p-2 hover:opacity-60 transition-opacity sm:hidden">
-                  <Search className="h-5 w-5" />
+                <button 
+                  className="p-2 hover:opacity-60 transition-opacity sm:hidden focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  aria-label="Tìm kiếm"
+                >
+                  <Search className="h-5 w-5" aria-hidden="true" />
                 </button>
-                <Link href="/account" className="p-2 hover:opacity-60 transition-opacity hidden sm:block">
-                  <User className="h-5 w-5" />
+                <Link 
+                  href="/account" 
+                  className="p-2 hover:opacity-60 transition-opacity hidden sm:block focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  aria-label="Tài khoản"
+                >
+                  <User className="h-5 w-5" aria-hidden="true" />
                 </Link>
-                <Link href="/cart" className="relative p-2 hover:opacity-60 transition-opacity">
-                  <ShoppingBag className="h-5 w-5" />
+                <Link 
+                  href="/cart" 
+                  className="relative p-2 hover:opacity-60 transition-opacity focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  aria-label={`Giỏ hàng${cartCount > 0 ? `, ${cartCount} sản phẩm` : ''}`}
+                >
+                  <ShoppingBag className="h-5 w-5" aria-hidden="true" />
                   {cartCount > 0 && (
-                    <span className="absolute top-0 right-0 h-4 w-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
+                    <span className="absolute top-0 right-0 h-4 w-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center" aria-hidden="true">
                       {cartCount}
                     </span>
                   )}

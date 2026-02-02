@@ -1,34 +1,81 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { register, isAuthenticated, loading: authLoading } = useAuth();
+  
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
-    birthday: '',
-    gender: '',
     password: '',
+    confirmPassword: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      router.push('/');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle register
-    alert('Đăng ký thành công!');
+    setLoading(true);
+    setError('');
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError('Mật khẩu xác nhận không khớp');
+      setLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await register({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        phone: formData.phone || undefined,
+      });
+      
+      if (result.success) {
+        router.push('/');
+      } else {
+        setError(result.message || 'Đăng ký thất bại');
+      }
+    } catch {
+      setError('Có lỗi xảy ra. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-white flex flex-col">
@@ -52,6 +99,12 @@ export default function RegisterPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                  {error}
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="name">
                   Họ và tên <span className="text-red-500">*</span>
@@ -64,21 +117,22 @@ export default function RegisterPage() {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Nhập họ tên tại đây"
                   className="h-12 bg-gray-50"
+                  disabled={loading}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="phone">
-                  Số điện thoại <span className="text-red-500">*</span>
+                  Số điện thoại
                 </Label>
                 <Input
                   id="phone"
                   type="tel"
-                  required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="Nhập số điện thoại tại đây"
+                  placeholder="Nhập số điện thoại (không bắt buộc)"
                   className="h-12 bg-gray-50"
+                  disabled={loading}
                 />
               </div>
 
@@ -92,40 +146,10 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="Thông tin này cần bắt buộc"
+                  placeholder="email@example.com"
                   className="h-12 bg-gray-50"
+                  disabled={loading}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="birthday">
-                  Ngày sinh <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="birthday"
-                  type="date"
-                  required
-                  value={formData.birthday}
-                  onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
-                  className="h-12 bg-gray-50"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Giới tính</Label>
-                <Select
-                  value={formData.gender}
-                  onValueChange={(value) => setFormData({ ...formData, gender: value })}
-                >
-                  <SelectTrigger className="h-12 bg-gray-50">
-                    <SelectValue placeholder="Chọn giới tính" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Nam</SelectItem>
-                    <SelectItem value="female">Nữ</SelectItem>
-                    <SelectItem value="other">Khác</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="space-y-2">
@@ -138,13 +162,30 @@ export default function RegisterPage() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Mật khẩu"
+                  placeholder="Ít nhất 6 ký tự"
                   className="h-12 bg-gray-50"
+                  disabled={loading}
                 />
               </div>
 
-              <Button type="submit" className="w-full h-12">
-                Đăng ký
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">
+                  Xác nhận mật khẩu <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  placeholder="Nhập lại mật khẩu"
+                  className="h-12 bg-gray-50"
+                  disabled={loading}
+                />
+              </div>
+
+              <Button type="submit" className="w-full h-12" disabled={loading}>
+                {loading ? 'Đang đăng ký...' : 'Đăng ký'}
               </Button>
             </form>
 

@@ -21,16 +21,16 @@ export function StatsCard({ title, value, change, icon: Icon, iconColor, iconBg 
           <h3 className="text-2xl font-bold text-foreground">{value}</h3>
           <div className={`flex items-center gap-1 mt-2 text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
             {isPositive ? (
-              <TrendingUp className="h-4 w-4" />
+              <TrendingUp className="h-4 w-4" aria-hidden="true" />
             ) : (
-              <TrendingDown className="h-4 w-4" />
+              <TrendingDown className="h-4 w-4" aria-hidden="true" />
             )}
             <span className="font-medium">{isPositive ? '+' : ''}{change}%</span>
             <span className="text-muted-foreground">so với tháng trước</span>
           </div>
         </div>
         <div className={`p-4 rounded-2xl ${iconBg}`}>
-          <Icon className={`h-6 w-6 ${iconColor}`} />
+          <Icon className={`h-6 w-6 ${iconColor}`} aria-hidden="true" />
         </div>
       </div>
     </div>

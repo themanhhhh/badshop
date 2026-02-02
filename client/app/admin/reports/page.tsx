@@ -30,12 +30,15 @@ export default function AdminReportsPage() {
           <p className="text-muted-foreground">Tổng quan hoạt động kinh doanh</p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="h-10 px-4 border border-input rounded-lg bg-background text-sm">
-            <option>Năm 2026</option>
-            <option>Năm 2025</option>
-          </select>
-          <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-white hover:bg-gray-50 font-medium rounded-lg transition-colors">
-            <Download className="h-4 w-4" />
+          <div>
+            <label htmlFor="report-year" className="sr-only">Năm báo cáo</label>
+            <select id="report-year" className="h-10 px-4 border border-input rounded-lg bg-background text-sm focus-visible:ring-2 focus-visible:ring-ring">
+              <option>Năm 2026</option>
+              <option>Năm 2025</option>
+            </select>
+          </div>
+          <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-white hover:bg-gray-50 font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring">
+            <Download className="h-4 w-4" aria-hidden="true" />
             Xuất báo cáo
           </button>
         </div>
@@ -46,10 +49,10 @@ export default function AdminReportsPage() {
         <div className="bg-white rounded-xl p-5 border border-border">
           <div className="flex items-center justify-between mb-3">
             <div className="p-2 bg-green-100 rounded-lg">
-              <DollarSign className="h-5 w-5 text-green-600" />
+              <DollarSign className="h-5 w-5 text-green-600" aria-hidden="true" />
             </div>
             <div className={`flex items-center gap-1 text-sm ${stats.revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {stats.revenueGrowth >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+              {stats.revenueGrowth >= 0 ? <TrendingUp className="h-4 w-4" aria-hidden="true" /> : <TrendingDown className="h-4 w-4" aria-hidden="true" />}
               {stats.revenueGrowth}%
             </div>
           </div>
@@ -60,10 +63,10 @@ export default function AdminReportsPage() {
         <div className="bg-white rounded-xl p-5 border border-border">
           <div className="flex items-center justify-between mb-3">
             <div className="p-2 bg-blue-100 rounded-lg">
-              <ShoppingCart className="h-5 w-5 text-blue-600" />
+              <ShoppingCart className="h-5 w-5 text-blue-600" aria-hidden="true" />
             </div>
             <div className={`flex items-center gap-1 text-sm ${stats.ordersGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {stats.ordersGrowth >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+              {stats.ordersGrowth >= 0 ? <TrendingUp className="h-4 w-4" aria-hidden="true" /> : <TrendingDown className="h-4 w-4" aria-hidden="true" />}
               {stats.ordersGrowth}%
             </div>
           </div>
@@ -74,10 +77,10 @@ export default function AdminReportsPage() {
         <div className="bg-white rounded-xl p-5 border border-border">
           <div className="flex items-center justify-between mb-3">
             <div className="p-2 bg-purple-100 rounded-lg">
-              <Users className="h-5 w-5 text-purple-600" />
+              <Users className="h-5 w-5 text-purple-600" aria-hidden="true" />
             </div>
             <div className={`flex items-center gap-1 text-sm ${stats.customersGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {stats.customersGrowth >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+              {stats.customersGrowth >= 0 ? <TrendingUp className="h-4 w-4" aria-hidden="true" /> : <TrendingDown className="h-4 w-4" aria-hidden="true" />}
               {stats.customersGrowth}%
             </div>
           </div>
@@ -88,10 +91,10 @@ export default function AdminReportsPage() {
         <div className="bg-white rounded-xl p-5 border border-border">
           <div className="flex items-center justify-between mb-3">
             <div className="p-2 bg-orange-100 rounded-lg">
-              <Package className="h-5 w-5 text-orange-600" />
+              <Package className="h-5 w-5 text-orange-600" aria-hidden="true" />
             </div>
             <div className={`flex items-center gap-1 text-sm ${stats.productsGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {stats.productsGrowth >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+              {stats.productsGrowth >= 0 ? <TrendingUp className="h-4 w-4" aria-hidden="true" /> : <TrendingDown className="h-4 w-4" aria-hidden="true" />}
               {stats.productsGrowth}%
             </div>
           </div>
@@ -191,9 +194,9 @@ export default function AdminReportsPage() {
           <h2 className="text-lg font-semibold mb-4">Hoạt động gần đây</h2>
           <div className="space-y-4">
             {orders.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex items-start gap-4">
+                <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                  <ShoppingCart className="h-4 w-4 text-blue-600" />
+                  <ShoppingCart className="h-4 w-4 text-blue-600" aria-hidden="true" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">
@@ -202,7 +205,7 @@ export default function AdminReportsPage() {
                     <span className="font-medium">{order.id}</span>
                   </p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                    <Calendar className="h-3 w-3" />
+                    <Calendar className="h-3 w-3" aria-hidden="true" />
                     {order.date}
                   </p>
                 </div>

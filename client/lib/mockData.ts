@@ -300,3 +300,196 @@ export const monthlyRevenue = [
   { month: "T12", revenue: 168000000, orders: 342 },
 ];
 
+// Campaign types
+export interface Campaign {
+  id: string;
+  name: string;
+  type: "flash_sale" | "voucher" | "banner" | "seasonal" | "combo";
+  status: "draft" | "scheduled" | "active" | "paused" | "ended";
+  startDate: string;
+  endDate: string;
+  budget: number;
+  spent: number;
+  discount?: number;
+  targetProducts?: string[];
+  targetCategories?: string[];
+  minOrderValue?: number;
+  maxDiscount?: number;
+  usageLimit?: number;
+  usageCount: number;
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  revenue: number;
+  createdAt: string;
+  description?: string;
+}
+
+export const campaigns: Campaign[] = [
+  {
+    id: "CMP-001",
+    name: "Flash Sale Tết 2026",
+    type: "flash_sale",
+    status: "active",
+    startDate: "2026-01-15",
+    endDate: "2026-01-20",
+    budget: 50000000,
+    spent: 32500000,
+    discount: 30,
+    targetCategories: ["racket", "shoes"],
+    usageLimit: 500,
+    usageCount: 324,
+    impressions: 45600,
+    clicks: 8920,
+    conversions: 324,
+    revenue: 156800000,
+    createdAt: "2026-01-10",
+    description: "Giảm giá 30% tất cả vợt và giày nhân dịp Tết Nguyên Đán",
+  },
+  {
+    id: "CMP-002",
+    name: "Voucher Khách Mới",
+    type: "voucher",
+    status: "active",
+    startDate: "2026-01-01",
+    endDate: "2026-03-31",
+    budget: 20000000,
+    spent: 8500000,
+    discount: 15,
+    minOrderValue: 500000,
+    maxDiscount: 100000,
+    usageLimit: 1000,
+    usageCount: 425,
+    impressions: 28400,
+    clicks: 5680,
+    conversions: 425,
+    revenue: 85600000,
+    createdAt: "2025-12-25",
+    description: "Giảm 15% cho khách hàng đăng ký mới, tối đa 100K",
+  },
+  {
+    id: "CMP-003",
+    name: "Banner Yonex Collection",
+    type: "banner",
+    status: "active",
+    startDate: "2026-01-10",
+    endDate: "2026-02-10",
+    budget: 15000000,
+    spent: 6800000,
+    targetProducts: ["1", "4", "6", "7"],
+    usageCount: 0,
+    impressions: 68500,
+    clicks: 12340,
+    conversions: 186,
+    revenue: 42500000,
+    createdAt: "2026-01-08",
+    description: "Quảng bá bộ sưu tập Yonex mới nhất",
+  },
+  {
+    id: "CMP-004",
+    name: "Combo Vợt + Cầu",
+    type: "combo",
+    status: "scheduled",
+    startDate: "2026-02-01",
+    endDate: "2026-02-28",
+    budget: 30000000,
+    spent: 0,
+    discount: 20,
+    targetCategories: ["racket", "shuttlecock"],
+    usageLimit: 300,
+    usageCount: 0,
+    impressions: 0,
+    clicks: 0,
+    conversions: 0,
+    revenue: 0,
+    createdAt: "2026-01-14",
+    description: "Mua vợt tặng cầu hoặc giảm 20% khi mua combo",
+  },
+  {
+    id: "CMP-005",
+    name: "Summer Sale 2025",
+    type: "seasonal",
+    status: "ended",
+    startDate: "2025-06-01",
+    endDate: "2025-08-31",
+    budget: 80000000,
+    spent: 78500000,
+    discount: 25,
+    usageLimit: 2000,
+    usageCount: 1856,
+    impressions: 125000,
+    clicks: 32400,
+    conversions: 1856,
+    revenue: 468000000,
+    createdAt: "2025-05-20",
+    description: "Khuyến mãi mùa hè giảm giá đến 25%",
+  },
+  {
+    id: "CMP-006",
+    name: "Black Friday 2025",
+    type: "flash_sale",
+    status: "ended",
+    startDate: "2025-11-25",
+    endDate: "2025-11-30",
+    budget: 100000000,
+    spent: 98000000,
+    discount: 50,
+    usageLimit: 1000,
+    usageCount: 987,
+    impressions: 156000,
+    clicks: 45600,
+    conversions: 987,
+    revenue: 524000000,
+    createdAt: "2025-11-15",
+    description: "Siêu sale Black Friday giảm 50% toàn bộ sản phẩm",
+  },
+  {
+    id: "CMP-007",
+    name: "Voucher VIP Members",
+    type: "voucher",
+    status: "paused",
+    startDate: "2026-01-01",
+    endDate: "2026-12-31",
+    budget: 50000000,
+    spent: 12500000,
+    discount: 10,
+    minOrderValue: 1000000,
+    maxDiscount: 500000,
+    usageLimit: 500,
+    usageCount: 125,
+    impressions: 8500,
+    clicks: 2100,
+    conversions: 125,
+    revenue: 62500000,
+    createdAt: "2025-12-28",
+    description: "Voucher dành riêng cho thành viên VIP",
+  },
+  {
+    id: "CMP-008",
+    name: "Banner Victor New Arrivals",
+    type: "banner",
+    status: "draft",
+    startDate: "2026-02-15",
+    endDate: "2026-03-15",
+    budget: 10000000,
+    spent: 0,
+    targetProducts: ["2", "5"],
+    usageCount: 0,
+    impressions: 0,
+    clicks: 0,
+    conversions: 0,
+    revenue: 0,
+    createdAt: "2026-01-16",
+    description: "Quảng bá sản phẩm Victor mới về",
+  },
+];
+
+export const campaignStats = {
+  totalCampaigns: 8,
+  activeCampaigns: 3,
+  totalBudget: 355000000,
+  totalSpent: 236800000,
+  totalRevenue: 1339400000,
+  avgConversionRate: 3.2,
+};
+

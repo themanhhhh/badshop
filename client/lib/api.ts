@@ -1,0 +1,375 @@
+import {
+  User,
+  Product,
+  Category,
+  Brand,
+  Order,
+  Cart,
+  Address,
+  Review,
+  Campaign,
+  FlashSale,
+} from './types';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+
+// Generic fetch wrapper with error handling
+async function fetchApi<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  
+  const config: RequestInit = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    ...options,
+  };
+
+  const response = await fetch(url, config);
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// ============================================
+// USER API
+// ============================================
+export const userApi = {
+  getAll: (): Promise<User[]> => 
+    fetchApi('/users'),
+  
+  getById: (id: string): Promise<User> => 
+    fetchApi(`/users/${id}`),
+  
+  getByEmail: (email: string): Promise<User> => 
+    fetchApi(`/users/email/${encodeURIComponent(email)}`),
+  
+  create: (data: Partial<User>): Promise<User> => 
+    fetchApi('/users', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<User>): Promise<User> => 
+    fetchApi(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/users/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// PRODUCT API
+// ============================================
+export const productApi = {
+  getAll: (): Promise<Product[]> => 
+    fetchApi('/products'),
+  
+  getById: (id: string): Promise<Product> => 
+    fetchApi(`/products/${id}`),
+  
+  getWithDetails: (id: string): Promise<Product> => 
+    fetchApi(`/products/${id}/details`),
+  
+  getBySlug: (slug: string): Promise<Product> => 
+    fetchApi(`/products/slug/${slug}`),
+  
+  getByCategory: (categoryId: string): Promise<Product[]> => 
+    fetchApi(`/products/category/${categoryId}`),
+  
+  getByBrand: (brandId: string): Promise<Product[]> => 
+    fetchApi(`/products/brand/${brandId}`),
+  
+  create: (data: Partial<Product>): Promise<Product> => 
+    fetchApi('/products', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Product>): Promise<Product> => 
+    fetchApi(`/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/products/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// CATEGORY API
+// ============================================
+export const categoryApi = {
+  getAll: (): Promise<Category[]> => 
+    fetchApi('/categories'),
+  
+  getRootCategories: (): Promise<Category[]> => 
+    fetchApi('/categories/root'),
+  
+  getById: (id: string): Promise<Category> => 
+    fetchApi(`/categories/${id}`),
+  
+  getBySlug: (slug: string): Promise<Category> => 
+    fetchApi(`/categories/slug/${slug}`),
+  
+  create: (data: Partial<Category>): Promise<Category> => 
+    fetchApi('/categories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Category>): Promise<Category> => 
+    fetchApi(`/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/categories/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// BRAND API
+// ============================================
+export const brandApi = {
+  getAll: (): Promise<Brand[]> => 
+    fetchApi('/brands'),
+  
+  getById: (id: string): Promise<Brand> => 
+    fetchApi(`/brands/${id}`),
+  
+  getBySlug: (slug: string): Promise<Brand> => 
+    fetchApi(`/brands/slug/${slug}`),
+  
+  create: (data: Partial<Brand>): Promise<Brand> => 
+    fetchApi('/brands', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Brand>): Promise<Brand> => 
+    fetchApi(`/brands/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/brands/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// ORDER API
+// ============================================
+export const orderApi = {
+  getAll: (): Promise<Order[]> => 
+    fetchApi('/orders'),
+  
+  getById: (id: string): Promise<Order> => 
+    fetchApi(`/orders/${id}`),
+  
+  getByOrderNumber: (orderNumber: string): Promise<Order> => 
+    fetchApi(`/orders/number/${orderNumber}`),
+  
+  getByUser: (userId: string): Promise<Order[]> => 
+    fetchApi(`/orders/user/${userId}`),
+  
+  create: (data: Partial<Order>): Promise<Order> => 
+    fetchApi('/orders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Order>): Promise<Order> => 
+    fetchApi(`/orders/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/orders/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// CART API
+// ============================================
+export const cartApi = {
+  getAll: (): Promise<Cart[]> => 
+    fetchApi('/carts'),
+  
+  getById: (id: string): Promise<Cart> => 
+    fetchApi(`/carts/${id}`),
+  
+  getByUser: (userId: string): Promise<Cart> => 
+    fetchApi(`/carts/user/${userId}`),
+  
+  getOrCreate: (userId: string): Promise<Cart> => 
+    fetchApi(`/carts/user/${userId}`, { method: 'POST' }),
+  
+  addItem: (cartId: string, item: { productId: string; quantity: number }): Promise<Cart> => 
+    fetchApi(`/carts/${cartId}/items`, {
+      method: 'POST',
+      body: JSON.stringify(item),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/carts/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// ADDRESS API
+// ============================================
+export const addressApi = {
+  getAll: (): Promise<Address[]> => 
+    fetchApi('/addresses'),
+  
+  getById: (id: string): Promise<Address> => 
+    fetchApi(`/addresses/${id}`),
+  
+  getByUser: (userId: string): Promise<Address[]> => 
+    fetchApi(`/addresses/user/${userId}`),
+  
+  getDefaultByUser: (userId: string): Promise<Address> => 
+    fetchApi(`/addresses/user/${userId}/default`),
+  
+  create: (data: Partial<Address>): Promise<Address> => 
+    fetchApi('/addresses', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Address>): Promise<Address> => 
+    fetchApi(`/addresses/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/addresses/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// REVIEW API
+// ============================================
+export const reviewApi = {
+  getAll: (): Promise<Review[]> => 
+    fetchApi('/reviews'),
+  
+  getById: (id: string): Promise<Review> => 
+    fetchApi(`/reviews/${id}`),
+  
+  getByProduct: (productId: string): Promise<Review[]> => 
+    fetchApi(`/reviews/product/${productId}`),
+  
+  getAverageRating: (productId: string): Promise<{ rating: number; count: number }> => 
+    fetchApi(`/reviews/product/${productId}/rating`),
+  
+  getByUser: (userId: string): Promise<Review[]> => 
+    fetchApi(`/reviews/user/${userId}`),
+  
+  create: (data: Partial<Review>): Promise<Review> => 
+    fetchApi('/reviews', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Review>): Promise<Review> => 
+    fetchApi(`/reviews/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/reviews/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// CAMPAIGN API
+// ============================================
+export const campaignApi = {
+  getAll: (): Promise<Campaign[]> => 
+    fetchApi('/campaigns'),
+  
+  getActive: (): Promise<Campaign[]> => 
+    fetchApi('/campaigns/active'),
+  
+  getById: (id: string): Promise<Campaign> => 
+    fetchApi(`/campaigns/${id}`),
+  
+  getByCode: (code: string): Promise<Campaign> => 
+    fetchApi(`/campaigns/code/${code}`),
+  
+  validate: (code: string): Promise<{ valid: boolean; campaign?: Campaign; message?: string }> => 
+    fetchApi(`/campaigns/validate/${code}`),
+  
+  create: (data: Partial<Campaign>): Promise<Campaign> => 
+    fetchApi('/campaigns', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Campaign>): Promise<Campaign> => 
+    fetchApi(`/campaigns/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/campaigns/${id}`, { method: 'DELETE' }),
+};
+
+// ============================================
+// FLASH SALE API
+// ============================================
+export const flashSaleApi = {
+  getAll: (): Promise<FlashSale[]> => 
+    fetchApi('/flash-sales'),
+  
+  getActive: (): Promise<FlashSale[]> => 
+    fetchApi('/flash-sales/active'),
+  
+  getById: (id: string): Promise<FlashSale> => 
+    fetchApi(`/flash-sales/${id}`),
+  
+  getWithProducts: (id: string): Promise<FlashSale> => 
+    fetchApi(`/flash-sales/${id}/products`),
+  
+  create: (data: Partial<FlashSale>): Promise<FlashSale> => 
+    fetchApi('/flash-sales', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<FlashSale>): Promise<FlashSale> => 
+    fetchApi(`/flash-sales/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/flash-sales/${id}`, { method: 'DELETE' }),
+};
+
+// Export all APIs as a single object for convenience
+export const api = {
+  users: userApi,
+  products: productApi,
+  categories: categoryApi,
+  brands: brandApi,
+  orders: orderApi,
+  carts: cartApi,
+  addresses: addressApi,
+  reviews: reviewApi,
+  campaigns: campaignApi,
+  flashSales: flashSaleApi,
+};
+
+export default api;

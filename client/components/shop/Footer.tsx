@@ -14,16 +14,23 @@ export function Footer() {
             <p className="text-sm text-gray-600 mb-6">
               Nhận thông tin mới nhất về sản phẩm và khuyến mãi
             </p>
-            <div className="flex gap-0">
+            <form className="flex gap-0">
+              <label htmlFor="newsletter-email" className="sr-only">Email</label>
               <input
+                id="newsletter-email"
                 type="email"
-                placeholder="Email của bạn"
-                className="flex-1 h-12 px-4 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors"
+                name="email"
+                autoComplete="email"
+                placeholder="Email của bạn…"
+                className="flex-1 h-12 px-4 border border-gray-200 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset transition-colors"
               />
-              <button className="px-8 h-12 bg-black text-white text-xs uppercase tracking-widest font-medium hover:bg-gray-900 transition-colors">
+              <button 
+                type="submit"
+                className="px-8 h-12 bg-black text-white text-xs uppercase tracking-widest font-medium hover:bg-gray-900 transition-colors focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              >
                 Đăng ký
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>
@@ -42,14 +49,14 @@ export function Footer() {
               Cửa hàng chuyên cung cấp các sản phẩm cầu lông chính hãng từ các thương hiệu hàng đầu thế giới.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="p-2 hover:opacity-60 transition-opacity">
-                <Facebook className="h-4 w-4" />
+              <a href="#" className="p-2 hover:opacity-60 transition-opacity" aria-label="Facebook">
+                <Facebook className="h-4 w-4" aria-hidden="true" />
               </a>
-              <a href="#" className="p-2 hover:opacity-60 transition-opacity">
-                <Instagram className="h-4 w-4" />
+              <a href="#" className="p-2 hover:opacity-60 transition-opacity" aria-label="Instagram">
+                <Instagram className="h-4 w-4" aria-hidden="true" />
               </a>
-              <a href="#" className="p-2 hover:opacity-60 transition-opacity">
-                <Youtube className="h-4 w-4" />
+              <a href="#" className="p-2 hover:opacity-60 transition-opacity" aria-label="Youtube">
+                <Youtube className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -97,17 +104,17 @@ export function Footer() {
             </h4>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 mt-1 shrink-0 text-gray-400" />
+                <MapPin className="h-4 w-4 mt-1 shrink-0 text-gray-400" aria-hidden="true" />
                 <span className="text-sm text-gray-600">
                   123 Nguyễn Huệ, Quận 1, TP.Hồ Chí Minh
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 shrink-0 text-gray-400" />
+                <Phone className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
                 <span className="text-sm text-gray-600">1900 1234</span>
               </div>
               <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 shrink-0 text-gray-400" />
+                <Mail className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
                 <span className="text-sm text-gray-600">support@badmintonpro.vn</span>
               </div>
             </div>

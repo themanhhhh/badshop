@@ -1,12 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Play } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 export function HeroBanner() {
-  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
-
   return (
     <section className="relative bg-black overflow-hidden">
       {/* Hero Container */}
@@ -48,7 +45,7 @@ export function HeroBanner() {
             className="group inline-flex items-center gap-4 px-10 py-4 border border-white/40 text-white text-xs uppercase tracking-[0.25em] font-medium hover:bg-white hover:text-black transition-all duration-300"
           >
             Shop Now
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
 

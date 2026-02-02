@@ -24,19 +24,26 @@ export function AdminHeader() {
       <div className="flex items-center gap-3 ml-auto">
         {/* Search */}
         <div className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <label htmlFor="admin-search" className="sr-only">Tìm kiếm</label>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
           <input
-            type="text"
-            placeholder="Tìm kiếm..."
-            className="w-64 h-10 pl-10 pr-4 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+            id="admin-search"
+            type="search"
+            name="search"
+            autoComplete="off"
+            placeholder="Tìm kiếm…"
+            className="w-64 h-10 pl-10 pr-4 rounded-lg border border-input bg-background text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent transition-all"
           />
         </div>
 
         {/* Notifications */}
-        <button className="relative p-2 hover:bg-accent rounded-lg transition-colors">
-          <Bell className="h-5 w-5 text-foreground" />
+        <button 
+          className="relative p-2 hover:bg-accent rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label={`Thông báo${notifications > 0 ? `, ${notifications} thông báo mới` : ''}`}
+        >
+          <Bell className="h-5 w-5 text-foreground" aria-hidden="true" />
           {notifications > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 h-5 w-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center font-medium">
+            <span className="absolute -top-0.5 -right-0.5 h-5 w-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center font-medium" aria-hidden="true">
               {notifications}
             </span>
           )}
