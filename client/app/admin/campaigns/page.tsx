@@ -234,13 +234,19 @@ export default function AdminCampaignsPage() {
             <tbody className="divide-y divide-border">
               {displayCampaigns.map((campaign: any) => {
                 const TypeIcon = typeIcons[campaign.type] || Ticket;
-                const budgetPercent = campaign.budget > 0 ? Math.round((campaign.spent / campaign.budget) * 100) : 0;
-                const conversionRate = campaign.clicks > 0 
-                  ? ((campaign.conversions / campaign.clicks) * 100).toFixed(1) 
+                
+                // Fields might be undefined or different based on type usage
+                const budget = campaign.budget || 0;
+                const spent = campaign.spent || 0;
+                const budgetPercent = budget > 0 ? Math.round((spent / budget) * 100) : 0;
+                
+                const clicks = campaign.clicks || 0;
+                const conversions = campaign.conversions || 0;
+                const conversionRate = clicks > 0 
+                  ? ((conversions / clicks) * 100).toFixed(1) 
                   : 0;
-                const status = campaign.isActive !== undefined 
-                  ? (campaign.isActive ? 'active' : 'ended')
-                  : campaign.status;
+                
+                const status = campaign.status; // Now using status field directly
                 
                 return (
                   <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
@@ -254,7 +260,7 @@ export default function AdminCampaignsPage() {
                         </div>
                         <div>
                           <p className="font-medium">{campaign.name}</p>
-                          <p className="text-xs text-muted-foreground">{campaign.id || campaign.code}</p>
+                          <p className="text-xs text-muted-foreground">{campaign.code}</p>
                         </div>
                       </div>
                     </td>
@@ -265,13 +271,17 @@ export default function AdminCampaignsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <p className="text-sm">{campaign.startDate}</p>
-                        <p className="text-xs text-muted-foreground">→ {campaign.endDate}</p>
+                        {campaign.start_date && (
+                            <p className="text-sm">{new Date(campaign.start_date).toLocaleDateString('vi-VN')}</p>
+                        )}
+                        {campaign.end_date && (
+                             <p className="text-xs text-muted-foreground">→ {new Date(campaign.end_date).toLocaleDateString('vi-VN')}</p>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-1">
-                        <p className="text-sm font-medium">{formatPrice(campaign.spent || 0)}</p>
+                        <p className="text-sm font-medium">{formatPrice(spent)}</p>
                         <div className="flex items-center gap-2">
                           <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                             <div 
@@ -291,7 +301,7 @@ export default function AdminCampaignsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <MousePointerClick className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
-                          <span>{(campaign.clicks || 0).toLocaleString()} clicks ({conversionRate}%)</span>
+                          <span>{(clicks).toLocaleString()} clicks ({conversionRate}%)</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <TrendingUp className="h-3 w-3 text-green-600" aria-hidden="true" />
@@ -306,36 +316,33 @@ export default function AdminCampaignsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1">
-                        <button 
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring" 
-                          aria-label={`Xem ${campaign.name}`}
-                        >
-                          <Eye className="h-4 w-4 text-gray-600" aria-hidden="true" />
-                        </button>
-                        <button 
+                        <Link
+                          href={`/admin/campaigns/${campaign.id}/edit`} 
                           className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring" 
                           aria-label={`Sửa ${campaign.name}`}
                         >
                           <Edit className="h-4 w-4 text-blue-600" aria-hidden="true" />
-                        </button>
-                        {status === 'active' ? (
-                          <button 
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring" 
-                            aria-label={`Tạm dừng ${campaign.name}`}
-                          >
-                            <Pause className="h-4 w-4 text-yellow-600" aria-hidden="true" />
-                          </button>
-                        ) : status === 'paused' || status === 'scheduled' ? (
-                          <button 
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring" 
-                            aria-label={`Chạy ${campaign.name}`}
-                          >
-                            <Play className="h-4 w-4 text-green-600" aria-hidden="true" />
-                          </button>
-                        ) : null}
+                        </Link>
                         <button 
                           className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring" 
                           aria-label={`Xóa ${campaign.name}`}
+                          onClick={async () => {
+                            if (confirm('Bạn có chắc muốn xóa chiến dịch này?')) {
+                              try {
+                                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'}/campaigns/${campaign.id}`, {
+                                  method: 'DELETE',
+                                });
+                                if (response.ok) {
+                                  alert('Đã xóa chiến dịch');
+                                  window.location.reload(); 
+                                } else {
+                                  alert('Không thể xóa chiến dịch');
+                                }
+                              } catch (error) {
+                                alert('Có lỗi xảy ra');
+                              }
+                            }
+                          }}
                         >
                           <Trash2 className="h-4 w-4 text-red-600" aria-hidden="true" />
                         </button>

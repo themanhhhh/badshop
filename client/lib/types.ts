@@ -148,18 +148,21 @@ export interface Review {
 export interface Campaign {
   id: string;
   name: string;
+  title?: string;
+  description?: string;
   code: string;
-  type: 'percentage' | 'fixed' | 'free_shipping';
-  discountValue: number;
-  minOrderValue?: number;
-  maxDiscount?: number;
-  usageLimit?: number;
-  usageCount: number;
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  type: 'collection' | 'flash_sale' | 'promotion' | 'seasonal';
+  status: 'draft' | 'active' | 'scheduled' | 'paused' | 'ended';
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  start_date: string;
+  end_date: string;
+  image_url?: string;
+  display_order: number;
+  show_on_homepage: boolean;
+  isActive?: boolean; // Keep for backward compatibility if used, but server seems not to return it explicitly unless calculated
+  created_at: string;
+  updated_at: string;
 }
 
 export interface FlashSaleProduct {

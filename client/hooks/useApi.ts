@@ -12,6 +12,7 @@ import {
   reviewApi,
   campaignApi,
   flashSaleApi,
+  statsApi,
 } from '@/lib/api';
 import type {
   User,
@@ -265,4 +266,20 @@ export function useFlashSale(id: string) {
 
 export function useFlashSaleWithProducts(id: string) {
   return useApi<FlashSale>(() => flashSaleApi.getWithProducts(id), [id]);
+}
+
+// ============================================
+// STATS HOOKS
+// ============================================
+export function useDashboardStats() {
+  return useApi<{
+    totalRevenue: number;
+    totalOrders: number;
+    totalCustomers: number;
+    totalProducts: number;
+    revenueGrowth: number;
+    ordersGrowth: number;
+    customersGrowth: number;
+    productsGrowth: number;
+  }>(() => statsApi.getDashboardStats());
 }

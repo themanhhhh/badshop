@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { 
   ChevronLeft, 
   Zap, 
@@ -14,6 +14,7 @@ import {
   X,
   Check,
   Loader2,
+  Trash2,
   Upload,
   Image as ImageIcon
 } from 'lucide-react';
@@ -29,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useProducts as useProductsHook } from '@/hooks/useApi';
+import { useProducts, useCampaign } from '@/hooks/useApi';
 import { uploadApi } from '@/lib/api';
 import { getToken } from '@/lib/auth';
 
@@ -50,10 +51,14 @@ const campaignTypes = [
   { id: 'seasonal', name: 'Theo mùa', icon: Calendar, description: 'Chiến dịch theo mùa/dịp lễ' },
 ];
 
-export default function NewCampaignPage() {
+export default function EditCampaignPage() {
   const router = useRouter();
-  const { data: allProducts, loading: productsLoading } = useProductsHook();
+  const params = useParams();
+  const id = params.id as string;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { data: campaign, loading: campaignLoading } = useCampaign(id);
+  const { data: allProducts, loading: productsLoading } = useProducts();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -77,6 +82,32 @@ export default function NewCampaignPage() {
     show_on_homepage: true,
     status: 'draft',
   });
+
+  // Load campaign data
+  useEffect(() => {
+    if (campaign) {
+      setFormData({
+        name: campaign.name,
+        title: campaign.title || '',
+        code: campaign.code,
+        description: campaign.description || '',
+        type: campaign.type || 'collection',
+        startDate: campaign.start_date ? new Date(campaign.start_date).toISOString().slice(0, 16) : '',
+        endDate: campaign.end_date ? new Date(campaign.end_date).toISOString().slice(0, 16) : '',
+        discount_type: campaign.discount_type || 'percentage',
+        discount_value: campaign.discount_value || 0,
+        image_url: campaign.image_url || '',
+        display_order: campaign.display_order || 0,
+        show_on_homepage: campaign.show_on_homepage,
+        status: campaign.status || 'draft',
+      });
+      setSelectedType(campaign.type || 'collection');
+      
+      if ((campaign as any).products) {
+         setSelectedProducts((campaign as any).products.map((p: any) => p.id));
+      }
+    }
+  }, [campaign]);
 
   // Filter products by search
   const filteredProducts = useMemo(() => {
@@ -107,21 +138,11 @@ export default function NewCampaignPage() {
     setError('');
 
     try {
-      // Use the generic uploadImage method we added
-      // Note: direct usage of api imported from lib/api
-      // We need to make sure we import 'api' correctly or use the right object. 
-      // In my previous step I exported `api` from `lib/api.ts` which includes `campaigns`, `users` etc.
-      // But `uploadImage` was added to `uploadApi` inside `lib/api.ts` but `api` export might not expose it directly if it wasn't added to the exported `api` object.
-      // Let's re-read api.ts. It exports `uploadApi` separately too? 
-      // Re-reading step 176: Yes, `uploadApi` is exported.
-      // I should import `uploadApi` from `lib/api`.
-      const { uploadApi } = require('@/lib/api'); // Dynamic import to avoid issues or just expect it to be there if I add import above.
-      
       const result = await uploadApi.uploadImage(file);
       setFormData(prev => ({ ...prev, image_url: result.url }));
     } catch (err: any) {
       setError('Không thể tải ảnh banner. Vui lòng thử lại.');
-      console.error('Upload error:', err);
+      alert(err.message || 'Lỗi tải ảnh');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -138,9 +159,9 @@ export default function NewCampaignPage() {
     try {
       const token = getToken();
       
-      // Create campaign
-      const response = await fetch(`${API_BASE_URL}/campaigns`, {
-        method: 'POST',
+      // Update basic info
+      const response = await fetch(`${API_BASE_URL}/campaigns/${id}`, {
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -164,46 +185,91 @@ export default function NewCampaignPage() {
 
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.error?.message || 'Không thể tạo chiến dịch');
+        throw new Error(errData.error?.message || 'Không thể cập nhật chiến dịch');
       }
 
-      const result = await response.json();
-      const campaignId = result.data.id;
+      // Sync products logic
+       if ((campaign as any)?.products || selectedProducts.length > 0) {
+        // Since we don't have a sync endpoint, we will just try to add all selected.
+        // It might fail if already exists depending on API, or we can clear and add if we had clear endpoint.
+        // A safer way without sync endpoint is to just use 'POST /products' which usually handles "add if not exists" or similar, 
+        // OR we should be explicit. 
+        // Given earlier analysis: API has addProducts and removeProducts.
+        // Let's TRY to compute diff if we have initial products.
+        const currentIds = (campaign as any)?.products?.map((p: any) => p.id) || [];
+        const toAdd = selectedProducts.filter(id => !currentIds.includes(id));
+        const toRemove = currentIds.filter((id: string) => !selectedProducts.includes(id));
 
-      // Add products to campaign if any selected
-      if (selectedProducts.length > 0) {
-        await fetch(`${API_BASE_URL}/campaigns/${campaignId}/products`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ productIds: selectedProducts }),
-        });
+        if (toAdd.length > 0) {
+            await fetch(`${API_BASE_URL}/campaigns/${id}/products`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productIds: toAdd }),
+            });
+        }
+        if (toRemove.length > 0) {
+            await fetch(`${API_BASE_URL}/campaigns/${id}/products`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productIds: toRemove }),
+            });
+        }
       }
 
+      alert('Cập nhật chiến dịch thành công');
       router.push('/admin/campaigns');
     } catch (err: any) {
       setError(err.message);
+      alert(err.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleDelete = async () => {
+      if (!confirm('Bạn có chắc chắn muốn xóa chiến dịch này không?')) return;
+      try {
+          const token = getToken();
+          const response = await fetch(`${API_BASE_URL}/campaigns/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` },
+          });
+          if (!response.ok) throw new Error('Không thể xóa chiến dịch');
+          alert('Đã xóa chiến dịch');
+          router.push('/admin/campaigns');
+      } catch (err: any) {
+          alert(err.message);
+      }
+  }
+
+  if (campaignLoading) {
+      return (
+          <div className="flex items-center justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          </div>
+      )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link 
-          href="/admin/campaigns" 
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold">Tạo chiến dịch mới</h1>
-          <p className="text-muted-foreground">Thiết lập chiến dịch và chọn sản phẩm</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+            <Link 
+            href="/admin/campaigns" 
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+            <ChevronLeft className="h-5 w-5" />
+            </Link>
+            <div>
+            <h1 className="text-2xl font-bold">Chỉnh sửa chiến dịch</h1>
+            <p className="text-muted-foreground">{formData.name}</p>
+            </div>
         </div>
+        <Button variant="destructive" size="sm" onClick={handleDelete}>
+            <Trash2 className="h-4 w-4 mr-2" />
+            Xóa chiến dịch
+        </Button>
       </div>
 
       {error && (
@@ -387,10 +453,13 @@ export default function NewCampaignPage() {
                   <div className="flex flex-wrap gap-2 p-3 bg-blue-50 rounded-lg">
                     {selectedProducts.map(id => {
                       const product = (allProducts || []).find((p: Product) => p.id === id);
-                      if (!product) return null;
+                      // If product is not in allProducts (maybe not loaded yet or pagination issue), try to find in initial campaign products if available
+                      const productDisplay = product || ((campaign as any)?.products || []).find((p: any) => p.id === id);
+                      
+                      if (!productDisplay) return null;
                       return (
                         <div key={id} className="flex items-center gap-1 px-2 py-1 bg-white border border-blue-200 rounded-full text-sm">
-                          <span className="max-w-40 truncate">{product.name}</span>
+                          <span className="max-w-40 truncate">{productDisplay.name}</span>
                           <button type="button" onClick={() => toggleProduct(id)} className="text-gray-400 hover:text-red-600">
                             <X className="h-3 w-3" />
                           </button>
@@ -579,12 +648,12 @@ export default function NewCampaignPage() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Đang tạo...
+                      Đang lưu...
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4 mr-2" />
-                      Tạo chiến dịch
+                      Lưu thay đổi
                     </>
                   )}
                 </Button>

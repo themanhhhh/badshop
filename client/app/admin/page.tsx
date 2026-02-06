@@ -3,30 +3,27 @@
 import Link from 'next/link';
 import { DollarSign, ShoppingCart, Users, Package, MoreHorizontal, Eye, BarChart3, Loader2 } from 'lucide-react';
 import { StatsCard } from '@/components/admin/StatsCard';
-import { useOrders, useProducts, useUsers } from '@/hooks/useApi';
+import { useOrders, useProducts, useUsers, useDashboardStats } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
 
 export default function AdminDashboardPage() {
+  const { data: stats, loading: statsLoading } = useDashboardStats();
   const { data: orders, loading: ordersLoading } = useOrders();
   const { data: products, loading: productsLoading } = useProducts();
-  const { data: users, loading: usersLoading } = useUsers();
-
+  
   // Use API data only - no mock fallback
   const recentOrders = orders?.slice(0, 5) || [];
-  const loading = ordersLoading || productsLoading || usersLoading;
+  const loading = statsLoading || ordersLoading || productsLoading; // Keep others for lists for now
 
-  // Calculate stats from real API data
-  const totalRevenue = orders?.reduce((sum: number, order: any) => sum + (order.total || 0), 0) || 0;
-  
   const dynamicStats = {
-    totalRevenue,
-    totalOrders: orders?.length || 0,
-    totalCustomers: users?.length || 0,
-    totalProducts: products?.length || 0,
-    revenueGrowth: 12.5, // TODO: Calculate from historical data
-    ordersGrowth: 8.2,
-    customersGrowth: 15.3,
-    productsGrowth: 4.1,
+    totalRevenue: stats?.totalRevenue || 0,
+    totalOrders: stats?.totalOrders || 0,
+    totalCustomers: stats?.totalCustomers || 0,
+    totalProducts: stats?.totalProducts || 0,
+    revenueGrowth: stats?.revenueGrowth || 0,
+    ordersGrowth: stats?.ordersGrowth || 0,
+    customersGrowth: stats?.customersGrowth || 0,
+    productsGrowth: stats?.productsGrowth || 0,
   };
 
   const statusColors: Record<string, string> = {

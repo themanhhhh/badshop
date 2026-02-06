@@ -379,16 +379,6 @@ export default function AddProductPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Tips */}
-          <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white">
-            <h3 className="font-semibold mb-2">💡 Mẹo</h3>
-            <ul className="text-sm space-y-2 opacity-90">
-              <li>• Ảnh sản phẩm rõ nét giúp tăng tỷ lệ chuyển đổi</li>
-              <li>• Mô tả chi tiết giúp SEO tốt hơn</li>
-              <li>• Thêm nhiều ảnh để khách hàng xem chi tiết</li>
-            </ul>
-          </div>
         </div>
       </form>
     </div>

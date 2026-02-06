@@ -45,14 +45,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { icon: LayoutDashboard, label: 'Bảng điều khiển', href: '/admin' },
   { icon: Users, label: 'Khách hàng', href: '/admin/customers' },
-  { 
-    icon: ShoppingCart, 
-    label: 'Bán hàng', 
-    children: [
-      { label: 'Đơn hàng', href: '/admin/orders' },
-      { label: 'Giỏ hàng', href: '/admin/carts' },
-    ]
-  },
+  { icon: ShoppingCart, label: 'Đơn hàng', href: '/admin/orders' },
   { 
     icon: Package, 
     label: 'Sản phẩm', 

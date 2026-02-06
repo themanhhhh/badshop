@@ -10,6 +10,7 @@ import {
   Campaign,
   FlashSale,
 } from './types';
+import { getToken } from './auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
 
@@ -33,9 +34,12 @@ async function fetchApi<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   
+  const token = getToken();
+  
   const config: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...options.headers,
     },
     ...options,
@@ -93,6 +97,26 @@ export const uploadApi = {
   // Delete a product image
   deleteProductImage: async (imageId: string): Promise<void> => {
     return fetchApi(`/upload/product-image/${imageId}`, { method: 'DELETE' });
+  },
+
+  // Generic upload image (for banners, etc.)
+  uploadImage: async (file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch(`${API_BASE_URL}/upload/image`, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Failed to upload image' }));
+      throw new Error(error.message || 'Failed to upload image');
+    }
+
+    const json = await response.json();
+    return json.data;
   },
 };
 
@@ -440,6 +464,22 @@ export const flashSaleApi = {
     fetchApi(`/flash-sales/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// STATS API
+// ============================================
+export const statsApi = {
+  getDashboardStats: (): Promise<{
+    totalRevenue: number;
+    totalOrders: number;
+    totalCustomers: number;
+    totalProducts: number;
+    revenueGrowth: number;
+    ordersGrowth: number;
+    customersGrowth: number;
+    productsGrowth: number;
+  }> => fetchApi('/stats/dashboard'),
+};
+
 // Export all APIs as a single object for convenience
 export const api = {
   users: userApi,
@@ -452,6 +492,7 @@ export const api = {
   reviews: reviewApi,
   campaigns: campaignApi,
   flashSales: flashSaleApi,
+  stats: statsApi,
 };
 
 export default api;
