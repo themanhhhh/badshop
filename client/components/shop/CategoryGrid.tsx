@@ -10,7 +10,7 @@ const categories = [
     subtitle: 'Rackets',
     description: 'Công nghệ hàng đầu',
     href: '/products?category=racket',
-    gradient: 'from-slate-800 to-slate-900',
+    image: '/img/racketcate.jpg',
   },
   {
     id: 'shoes',
@@ -18,7 +18,7 @@ const categories = [
     subtitle: 'Footwear',
     description: 'Power Cushion',
     href: '/products?category=shoes',
-    gradient: 'from-slate-700 to-slate-800',
+    image: '/img/footwearercate.jpg',
   },
   {
     id: 'accessories',
@@ -26,7 +26,7 @@ const categories = [
     subtitle: 'Accessories',
     description: 'Cước, quấn cán, balo',
     href: '/products?category=accessories',
-    gradient: 'from-slate-600 to-slate-700',
+    image: '/img/accessoriescate.png',
   },
 ];
 
@@ -52,13 +52,15 @@ export function CategoryGrid() {
               href={category.href}
               className="group relative aspect-[4/5] overflow-hidden"
             >
-              {/* Background */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} transition-transform duration-700 group-hover:scale-105`}>
-                {/* Decorative elements */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="absolute top-10 right-10 w-32 h-32 border border-white/20 rounded-full" />
-                  <div className="absolute bottom-20 left-10 w-24 h-24 border border-white/20 rounded-full" />
-                </div>
+              {/* Background Image */}
+              <div className="absolute inset-0">
+                <img 
+                  src={category.image} 
+                  alt={category.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                {/* Dark overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 group-hover:from-black/70 transition-all duration-300" />
               </div>
 
               {/* Content */}

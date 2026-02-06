@@ -16,7 +16,7 @@ export function AdminHeader() {
 
       {/* Title */}
       <div className="hidden sm:block flex-1">
-        <h1 className="text-lg font-semibold text-foreground">Xin chào, Admin! 👋</h1>
+        <h1 className="text-lg font-semibold text-foreground">Xin chào, Admin! </h1>
         <p className="text-sm text-muted-foreground">Đây là tổng quan cửa hàng của bạn</p>
       </div>
 

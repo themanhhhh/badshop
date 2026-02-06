@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
   Save, 
@@ -26,18 +26,21 @@ import { useBrands, useCategories } from '@/hooks/useApi';
 import { api } from '@/lib/api';
 import { uploadFileToPinata } from '@/lib/pinata';
 
-export default function AddProductPage() {
+export default function EditProductPage() {
+  const params = useParams();
   const router = useRouter();
+  const productId = params.id as string;
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { data: brands } = useBrands();
   const { data: categories } = useCategories();
   
+  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
   const [images, setImages] = useState<string[]>([]);
-
+  
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -49,6 +52,33 @@ export default function AddProductPage() {
     brand_id: '',
     category_id: '',
   });
+
+  // Fetch product data
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const product = await api.products.getById(productId);
+        setFormData({
+          name: product.name || '',
+          slug: product.slug || '',
+          description: product.description || '',
+          price: product.price?.toString() || '',
+          original_price: product.original_price?.toString() || '',
+          stock: product.stock?.toString() || '',
+          sku: product.sku || '',
+          brand_id: product.brand?.id || product.brand_id || '',
+          category_id: product.category?.id || product.category_id || '',
+        });
+        setImages(product.images?.map((img: any) => img.url) || []);
+      } catch (err) {
+        setError('Không thể tải thông tin sản phẩm');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   const generateSlug = (name: string) => {
     return name
@@ -64,7 +94,7 @@ export default function AddProductPage() {
     setFormData({
       ...formData,
       name,
-      slug: generateSlug(name),
+      slug: formData.slug || generateSlug(name),
     });
   };
 
@@ -99,7 +129,7 @@ export default function AddProductPage() {
     setIsSubmitting(true);
     
     try {
-      await api.products.create({
+      await api.products.update(productId, {
         name: formData.name,
         slug: formData.slug || generateSlug(formData.name),
         description: formData.description || undefined,
@@ -114,7 +144,7 @@ export default function AddProductPage() {
       
       router.push('/admin/products');
     } catch (err: any) {
-      setError(err.message || 'Không thể tạo sản phẩm');
+      setError(err.message || 'Không thể cập nhật sản phẩm');
     } finally {
       setIsSubmitting(false);
     }
@@ -123,6 +153,14 @@ export default function AddProductPage() {
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -146,8 +184,8 @@ export default function AddProductPage() {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">Thêm sản phẩm mới</h1>
-            <p className="text-muted-foreground">Điền thông tin sản phẩm</p>
+            <h1 className="text-2xl font-bold">Chỉnh sửa sản phẩm</h1>
+            <p className="text-muted-foreground">Cập nhật thông tin sản phẩm</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -163,7 +201,7 @@ export default function AddProductPage() {
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Lưu sản phẩm
+                Lưu thay đổi
               </>
             )}
           </Button>
@@ -379,16 +417,6 @@ export default function AddProductPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Tips */}
-          <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white">
-            <h3 className="font-semibold mb-2">💡 Mẹo</h3>
-            <ul className="text-sm space-y-2 opacity-90">
-              <li>• Ảnh sản phẩm rõ nét giúp tăng tỷ lệ chuyển đổi</li>
-              <li>• Mô tả chi tiết giúp SEO tốt hơn</li>
-              <li>• Thêm nhiều ảnh để khách hàng xem chi tiết</li>
-            </ul>
-          </div>
         </div>
       </form>
     </div>

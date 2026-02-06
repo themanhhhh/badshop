@@ -17,8 +17,8 @@ interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: (data: LoginData) => Promise<{ success: boolean; message?: string }>;
-  register: (data: RegisterData) => Promise<{ success: boolean; message?: string }>;
+  login: (data: LoginData) => Promise<{ success: boolean; message?: string; user?: AuthUser }>;
+  register: (data: RegisterData) => Promise<{ success: boolean; message?: string; user?: AuthUser }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -65,6 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const result = await authLogin(data);
       if (result.success && result.data) {
         setUser(result.data.user);
+        return { success: result.success, message: result.message, user: result.data.user };
       }
       return { success: result.success, message: result.message };
     } finally {

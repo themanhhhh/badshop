@@ -28,16 +28,29 @@ function mapBadge(badge?: string): 'hot' | 'new' | 'sale' | undefined {
 export function mapProductForDisplay(product: ApiProduct): DisplayProduct {
   // Handle both camelCase and snake_case from API
   const stock = product.stock ?? product.stock_quantity ?? 0;
+  // Support both originalPrice (camelCase) and original_price (snake_case)
+  const origPrice = product.originalPrice ?? product.original_price;
+  
+  // Get image from product_images (snake_case from API) or images (camelCase)
+  const images = product.product_images || product.images || [];
+  let imageUrl = '/products/placeholder.jpg';
+  
+  if (images.length > 0) {
+    // Find primary image first, otherwise use first image
+    const primaryImage = images.find(img => img.is_primary || img.isPrimary);
+    const firstImage = primaryImage || images[0];
+    imageUrl = firstImage.image_url || firstImage.url || imageUrl;
+  }
   
   return {
     id: product.id,
     name: product.name,
     brand: product.brand?.name || '',
     price: Number(product.price),
-    originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
-    image: product.images?.[0]?.url || '/products/placeholder.jpg',
+    originalPrice: origPrice ? Number(origPrice) : undefined,
+    image: imageUrl,
     category: product.category?.slug || 'racket',
-    rating: product.rating ?? 4.5,
+    rating: Number(product.rating) || 4.5,
     reviews: 0,
     badge: mapBadge(product.badge),
     inStock: stock > 0,

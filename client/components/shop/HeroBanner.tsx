@@ -8,20 +8,16 @@ export function HeroBanner() {
     <section className="relative bg-black overflow-hidden">
       {/* Hero Container */}
       <div className="relative h-[85vh] min-h-[600px] max-h-[900px] flex items-center justify-center">
-        {/* Background Video/Image Placeholder */}
+        {/* Background Image */}
         <div className="absolute inset-0">
-          {/* Animated gradient background simulating video */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-            {/* Animated particles effect */}
-            <div className="absolute inset-0 opacity-30">
-              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500" />
-            </div>
-          </div>
+          <img 
+            src="/img/herobanner.jpeg" 
+            alt="Badminton Pro Series Banner" 
+            className="w-full h-full object-cover"
+          />
           
           {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/50" />
         </div>
 
         {/* Content */}

@@ -2,12 +2,15 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { ShoppingBag, Search, Menu, User } from 'lucide-react';
+import { ShoppingBag, Search, Menu, User, LogIn } from 'lucide-react';
 import { Sidebar } from './Sidebar';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [cartCount] = useState(2);
+  const { itemCount } = useCart();
+  const { isAuthenticated, loading } = useAuth();
 
   const navLinks = [
     { href: '/products', label: 'ALL PRODUCT' },
@@ -63,25 +66,45 @@ export function Header() {
                 >
                   <Search className="h-5 w-5" aria-hidden="true" />
                 </button>
-                <Link 
-                  href="/account" 
-                  className="p-2 hover:opacity-60 transition-opacity hidden sm:block focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
-                  aria-label="Tài khoản"
-                >
-                  <User className="h-5 w-5" aria-hidden="true" />
-                </Link>
-                <Link 
-                  href="/cart" 
-                  className="relative p-2 hover:opacity-60 transition-opacity focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
-                  aria-label={`Giỏ hàng${cartCount > 0 ? `, ${cartCount} sản phẩm` : ''}`}
-                >
-                  <ShoppingBag className="h-5 w-5" aria-hidden="true" />
-                  {cartCount > 0 && (
-                    <span className="absolute top-0 right-0 h-4 w-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center" aria-hidden="true">
-                      {cartCount}
-                    </span>
-                  )}
-                </Link>
+                
+                {!loading && (
+                  <>
+                    {isAuthenticated ? (
+                      <>
+                        {/* User Icon - only when logged in */}
+                        <Link 
+                          href="/account" 
+                          className="p-2 hover:opacity-60 transition-opacity hidden sm:block focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                          aria-label="Tài khoản"
+                        >
+                          <User className="h-5 w-5" aria-hidden="true" />
+                        </Link>
+                        {/* Cart - only when logged in */}
+                        <Link 
+                          href="/cart" 
+                          className="relative p-2 hover:opacity-60 transition-opacity focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                          aria-label={`Giỏ hàng${itemCount > 0 ? `, ${itemCount} sản phẩm` : ''}`}
+                        >
+                          <ShoppingBag className="h-5 w-5" aria-hidden="true" />
+                          {itemCount > 0 && (
+                            <span className="absolute top-0 right-0 h-4 w-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center" aria-hidden="true">
+                              {itemCount}
+                            </span>
+                          )}
+                        </Link>
+                      </>
+                    ) : (
+                      /* Login Button - only when not logged in */
+                      <Link 
+                        href="/account" 
+                        className="flex items-center gap-2 px-4 py-2 bg-black text-white text-xs font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors"
+                      >
+                        <LogIn className="h-4 w-4" />
+                        Đăng nhập
+                      </Link>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>

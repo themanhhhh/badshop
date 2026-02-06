@@ -37,6 +37,10 @@ export interface ProductImage {
   url: string;
   alt?: string;
   isPrimary: boolean;
+  // snake_case from API
+  image_url?: string;
+  is_primary?: boolean;
+  product_id?: string;
 }
 
 export interface Product {
@@ -46,10 +50,12 @@ export interface Product {
   description?: string;
   price: number;
   originalPrice?: number;
+  original_price?: number; // snake_case from API
   sku?: string;
   stock: number;
   stock_quantity?: number;
   images: ProductImage[];
+  product_images?: ProductImage[]; // snake_case from API
   categoryId?: string;
   category_id?: string;
   category?: Category;

@@ -7,12 +7,14 @@ import { CategoryGrid } from '@/components/shop/CategoryGrid';
 import { AthleteSpotlight } from '@/components/shop/AthleteSpotlight';
 import { TechShowcase } from '@/components/shop/TechShowcase';
 import { ProductCarousel } from '@/components/shop/ProductCarousel';
-import { useProducts } from '@/hooks/useApi';
+import { CampaignSection } from '@/components/shop/CampaignSection';
+import { useProducts, useHomepageCampaigns } from '@/hooks/useApi';
 import { mapProductsForDisplay } from '@/lib/productMapper';
 import { Loader2 } from 'lucide-react';
 
 export default function HomePage() {
   const { data: apiProducts, loading, error } = useProducts();
+  const { data: campaigns } = useHomepageCampaigns();
   
   // Map API products to display format
   const products = apiProducts ? mapProductsForDisplay(apiProducts) : [];
@@ -20,6 +22,9 @@ export default function HomePage() {
   const newProducts = products.filter(p => p.badge === 'new' || !p.badge).slice(0, 8);
   const bestProducts = products.filter(p => p.badge === 'hot' || p.rating >= 4.7).slice(0, 8);
   const saleProducts = products.filter(p => p.badge === 'sale' || p.originalPrice).slice(0, 8);
+
+  // Active campaigns for homepage
+  const activeCampaigns = campaigns || [];
 
   if (loading) {
     return (
@@ -55,6 +60,11 @@ export default function HomePage() {
             viewAllHref="/products"
           />
         )}
+
+        {/* Campaign Collections from API */}
+        {activeCampaigns.map((campaign: any) => (
+          <CampaignSection key={campaign.id} campaign={campaign} />
+        ))}
 
         {/* Pro Player / Athlete Spotlight */}
         <AthleteSpotlight />

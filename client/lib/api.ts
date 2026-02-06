@@ -13,6 +13,19 @@ import {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
 
+// API Response format from server
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 // Generic fetch wrapper with error handling
 async function fetchApi<T>(
   endpoint: string,
@@ -35,8 +48,53 @@ async function fetchApi<T>(
     throw new Error(error.message || `HTTP error! status: ${response.status}`);
   }
   
-  return response.json();
+  const json = await response.json() as ApiResponse<T>;
+  
+  // Extract data from API response format
+  if (json && typeof json === 'object' && 'success' in json && 'data' in json) {
+    return json.data;
+  }
+  
+  // Fallback: return as-is if not in standard format
+  return json as T;
 }
+
+// ============================================
+// UPLOAD API
+// ============================================
+export const uploadApi = {
+  // Upload image for a product - saves to database
+  uploadProductImage: async (productId: string, file: File, isPrimary: boolean = false): Promise<{ url: string; id: string }> => {
+    const formData = new FormData();
+    formData.append('image', file);
+    if (isPrimary) {
+      formData.append('is_primary', 'true');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/upload/product/${productId}/image`, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+
+    const json = await response.json();
+    return json.data;
+  },
+
+  // Get all images for a product
+  getProductImages: async (productId: string): Promise<{ id: string; url: string; is_primary: boolean }[]> => {
+    return fetchApi(`/upload/product/${productId}/images`);
+  },
+
+  // Delete a product image
+  deleteProductImage: async (imageId: string): Promise<void> => {
+    return fetchApi(`/upload/product-image/${imageId}`, { method: 'DELETE' });
+  },
+};
 
 // ============================================
 // USER API
@@ -70,10 +128,37 @@ export const userApi = {
 // ============================================
 // PRODUCT API
 // ============================================
+export interface ProductFilters {
+  category?: string;
+  brand?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
 export const productApi = {
   getAll: (): Promise<Product[]> => 
     fetchApi('/products'),
   
+  getWithFilters: (filters: ProductFilters): Promise<Product[]> => {
+    // Build query string from filters
+    const params = new URLSearchParams();
+    if (filters.category) params.append('category', filters.category);
+    if (filters.brand) params.append('brand', filters.brand);
+    if (filters.search) params.append('search', filters.search);
+    if (filters.minPrice) params.append('minPrice', filters.minPrice.toString());
+    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+    
+    const queryString = params.toString();
+    return fetchApi(`/products${queryString ? `?${queryString}` : ''}`);
+  },
+
+  getByCategory: (categoryId: string): Promise<Product[]> =>
+    fetchApi(`/products/category/${categoryId}`),
+
+  getByBrand: (brandId: string): Promise<Product[]> =>
+    fetchApi(`/products/brand/${brandId}`),
+
   getById: (id: string): Promise<Product> => 
     fetchApi(`/products/${id}`),
   
@@ -82,12 +167,6 @@ export const productApi = {
   
   getBySlug: (slug: string): Promise<Product> => 
     fetchApi(`/products/slug/${slug}`),
-  
-  getByCategory: (categoryId: string): Promise<Product[]> => 
-    fetchApi(`/products/category/${categoryId}`),
-  
-  getByBrand: (brandId: string): Promise<Product[]> => 
-    fetchApi(`/products/brand/${brandId}`),
   
   create: (data: Partial<Product>): Promise<Product> => 
     fetchApi('/products', {
@@ -300,6 +379,9 @@ export const campaignApi = {
   
   getActive: (): Promise<Campaign[]> => 
     fetchApi('/campaigns/active'),
+  
+  getForHomepage: (): Promise<Campaign[]> => 
+    fetchApi('/campaigns/homepage'),
   
   getById: (id: string): Promise<Campaign> => 
     fetchApi(`/campaigns/${id}`),

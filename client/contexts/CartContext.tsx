@@ -77,7 +77,7 @@ export function CartProvider({ children }: CartProviderProps) {
     const loadCart = async () => {
       setLoading(true);
       
-      if (isAuthenticated && user) {
+      if (isAuthenticated && user && user.id) {
         // Load cart from API for authenticated users
         try {
           const token = getToken();

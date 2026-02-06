@@ -69,6 +69,30 @@ export function useProducts() {
   return useApi<Product[]>(() => productApi.getAll());
 }
 
+export interface ProductFilters {
+  category?: string;
+  brand?: string;
+  search?: string;
+}
+
+export function useProductsWithFilters(filters: ProductFilters) {
+  const filterKey = JSON.stringify(filters);
+  return useApi<Product[]>(
+    () => {
+      // Use specific endpoints if only one filter is set
+      if (filters.category && !filters.brand && !filters.search) {
+        return productApi.getByCategory(filters.category);
+      }
+      if (filters.brand && !filters.category && !filters.search) {
+        return productApi.getByBrand(filters.brand);
+      }
+      // Otherwise get all and filter will be client-side for now
+      return productApi.getAll();
+    },
+    [filterKey]
+  );
+}
+
 export function useProduct(id: string) {
   return useApi<Product>(() => productApi.getById(id), [id]);
 }
@@ -214,6 +238,10 @@ export function useCampaigns() {
 
 export function useActiveCampaigns() {
   return useApi<Campaign[]>(() => campaignApi.getActive());
+}
+
+export function useHomepageCampaigns() {
+  return useApi<Campaign[]>(() => campaignApi.getForHomepage());
 }
 
 export function useCampaign(id: string) {

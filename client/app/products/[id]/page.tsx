@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import Link from 'next/link';
 import { Minus, Plus, Heart, Truck, Shield, RotateCcw } from 'lucide-react';
 import { Header } from '@/components/shop/Header';
@@ -11,9 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { products, formatPrice } from '@/lib/mockData';
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
+export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [quantity, setQuantity] = useState(1);
-  const product = products.find(p => p.id === params.id) || products[0];
+  const product = products.find(p => p.id === id) || products[0];
   const relatedProducts = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
 
   const discount = product.originalPrice
