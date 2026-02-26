@@ -345,6 +345,7 @@ interface Order {
   createdAt?: string;
   created_at?: string;
   items?: OrderItem[];
+  order_items?: OrderItem[];
 }
 
 // Address type from API
@@ -574,7 +575,7 @@ function AccountDashboard() {
                           </div>
                           
                           <div className="space-y-2">
-                            {order.items?.map((item: OrderItem, idx: number) => (
+                            {(order.order_items || order.items)?.map((item: OrderItem, idx: number) => (
                               <div key={idx} className="flex justify-between text-sm">
                                 <span>{item.product?.name || 'Sản phẩm'} x{item.quantity}</span>
                                 <span>{formatPrice(item.price)}</span>
@@ -586,8 +587,10 @@ function AccountDashboard() {
                           
                           <div className="flex justify-between items-center">
                             <span className="font-medium">Tổng cộng: {formatPrice(order.total)}</span>
-                            <Button variant="outline" size="sm">
-                              Xem chi tiết <ChevronRight className="h-4 w-4 ml-1" />
+                            <Button asChild variant="outline" size="sm">
+                              <Link href={`/account/orders/${order.id}`}>
+                                Xem chi tiết <ChevronRight className="h-4 w-4 ml-1" />
+                              </Link>
                             </Button>
                           </div>
                         </div>

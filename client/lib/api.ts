@@ -299,6 +299,17 @@ export const orderApi = {
   
   delete: (id: string): Promise<void> => 
     fetchApi(`/orders/${id}`, { method: 'DELETE' }),
+
+  verifyOTP: (orderId: string, otp: string): Promise<{ success: boolean; message: string }> =>
+    fetchApi(`/orders/${orderId}/verify-otp`, {
+      method: 'POST',
+      body: JSON.stringify({ otp }),
+    }),
+
+  resendOTP: (orderId: string): Promise<{ success: boolean; message: string }> =>
+    fetchApi(`/orders/${orderId}/resend-otp`, {
+      method: 'POST',
+    }),
 };
 
 // ============================================

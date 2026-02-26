@@ -35,7 +35,7 @@ interface UseApiState<T> {
 }
 
 // Generic hook for API calls
-function useApi<T>(
+export function useApi<T>(
   fetchFn: () => Promise<T>,
   deps: unknown[] = []
 ): UseApiState<T> & { refetch: () => void } {
@@ -177,6 +177,7 @@ export function useOrder(id: string) {
 export function useOrderByNumber(orderNumber: string) {
   return useApi<Order>(() => orderApi.getByOrderNumber(orderNumber), [orderNumber]);
 }
+
 
 export function useUserOrders(userId: string) {
   return useApi<Order[]>(() => orderApi.getByUser(userId), [userId]);
