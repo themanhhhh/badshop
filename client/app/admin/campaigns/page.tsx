@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { 
   Plus, 
@@ -23,9 +24,12 @@ import {
 } from 'lucide-react';
 import { useCampaigns } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
+import { AdminSelect } from '@/components/admin/AdminSelect';
+import { AdminLoading } from '@/components/admin/AdminLoading';
 
 export default function AdminCampaignsPage() {
   const { data: campaigns, loading } = useCampaigns();
+  const [typeFilter, setTypeFilter] = useState('all');
 
   // Use API data directly
   const displayCampaigns = campaigns || [];
@@ -87,6 +91,10 @@ export default function AdminCampaignsPage() {
     free_shipping: 'bg-teal-100 text-teal-700',
   };
 
+  if (loading) {
+    return <AdminLoading fullPage text="Đang tải chiến dịch..." />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -94,14 +102,7 @@ export default function AdminCampaignsPage() {
         <div>
           <h1 className="text-2xl font-bold">Quản lý chiến dịch</h1>
           <p className="text-muted-foreground">
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Đang tải...
-              </span>
-            ) : (
-              'Quản lý các chiến dịch marketing và khuyến mãi'
-            )}
+            Quản lý các chiến dịch marketing và khuyến mãi
           </p>
         </div>
         <Link
@@ -188,17 +189,20 @@ export default function AdminCampaignsPage() {
             className="w-full h-10 pl-10 pr-4 rounded-lg border border-input bg-background text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </div>
-        <div>
-          <label htmlFor="campaign-type" className="sr-only">Loại chiến dịch</label>
-          <select id="campaign-type" className="h-10 px-4 border border-input rounded-lg bg-background text-sm focus-visible:ring-2 focus-visible:ring-ring">
-            <option value="">Loại chiến dịch</option>
-            <option value="flash_sale">Flash Sale</option>
-            <option value="voucher">Voucher</option>
-            <option value="banner">Banner Ads</option>
-            <option value="seasonal">Theo mùa</option>
-            <option value="combo">Combo</option>
-          </select>
-        </div>
+        <AdminSelect
+          value={typeFilter}
+          onValueChange={setTypeFilter}
+          placeholder="Loại chiến dịch"
+          className="w-[180px]"
+          options={[
+            { value: 'all', label: 'Tất cả loại' },
+            { value: 'flash_sale', label: 'Flash Sale' },
+            { value: 'voucher', label: 'Voucher' },
+            { value: 'banner', label: 'Banner Ads' },
+            { value: 'seasonal', label: 'Theo mùa' },
+            { value: 'combo', label: 'Combo' },
+          ]}
+        />
         <div>
           <label htmlFor="campaign-date" className="sr-only">Lọc theo ngày</label>
           <input

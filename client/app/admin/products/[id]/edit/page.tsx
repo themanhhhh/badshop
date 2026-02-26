@@ -69,7 +69,7 @@ export default function EditProductPage() {
           brand_id: product.brand?.id || product.brand_id || '',
           category_id: product.category?.id || product.category_id || '',
         });
-        setImages(product.images?.map((img: any) => img.url) || []);
+        setImages(product.product_images?.map((img: any) => img.image_url || img.url) || product.images?.map((img: any) => img.url || img.image_url) || []);
       } catch (err) {
         setError('Không thể tải thông tin sản phẩm');
       } finally {

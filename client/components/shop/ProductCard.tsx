@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ShoppingCart, Check } from 'lucide-react';
 import { type DisplayProduct, formatPrice } from '@/lib/productMapper';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProductCardProps {
   product: DisplayProduct;
@@ -13,6 +15,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const [isAdding, setIsAdding] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -23,6 +27,11 @@ export function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
     
     setIsAdding(true);
     
@@ -77,14 +86,21 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Image */}
       <Link href={`/products/${product.id}`} className="block">
         <div className="aspect-[3/4] bg-gray-50 overflow-hidden mb-4">
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50 group-hover:scale-105 transition-transform duration-500">
-            {/* Placeholder icon */}
-            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-              <span className="text-gray-400 text-3xl font-light">
-                {product.brand.charAt(0)}
-              </span>
+          {product.image ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50">
+              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
+                <span className="text-gray-400 text-3xl font-light">
+                  {product.brand.charAt(0)}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Link>
 

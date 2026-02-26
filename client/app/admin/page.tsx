@@ -5,6 +5,8 @@ import { DollarSign, ShoppingCart, Users, Package, MoreHorizontal, Eye, BarChart
 import { StatsCard } from '@/components/admin/StatsCard';
 import { useOrders, useProducts, useUsers, useDashboardStats } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
+import { AdminLoading } from '@/components/admin/AdminLoading';
+import { AdminSelect } from '@/components/admin/AdminSelect';
 
 export default function AdminDashboardPage() {
   const { data: stats, loading: statsLoading } = useDashboardStats();
@@ -46,15 +48,12 @@ export default function AdminDashboardPage() {
     shipping: 'Đang vận chuyển',
   };
 
+  if (loading) {
+    return <AdminLoading fullPage text="Đang tải dữ liệu..." />;
+  }
+
   return (
     <div className="space-y-6">
-      {/* Loading Indicator */}
-      {loading && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Đang tải dữ liệu từ server...
-        </div>
-      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -98,16 +97,15 @@ export default function AdminDashboardPage() {
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-border">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Doanh thu theo tháng</h2>
-            <div>
-              <label htmlFor="revenue-year" className="sr-only">Năm báo cáo</label>
-              <select 
-                id="revenue-year"
-                className="px-3 py-2 border border-input rounded-lg text-sm bg-background focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option>Năm 2026</option>
-                <option>Năm 2025</option>
-              </select>
-            </div>
+            <AdminSelect
+              value="2026"
+              onValueChange={() => {}}
+              className="w-[130px]"
+              options={[
+                { value: '2026', label: 'Năm 2026' },
+                { value: '2025', label: 'Năm 2025' },
+              ]}
+            />
           </div>
           <div className="h-64 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
             <div className="text-center text-muted-foreground">

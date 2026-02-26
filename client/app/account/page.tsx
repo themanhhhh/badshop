@@ -660,9 +660,19 @@ function AccountDashboard() {
 
 // Main Account Page
 export default function AccountPage() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
+  const router = useRouter();
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace('/login');
+    }
+    if (!loading && isAuthenticated && user?.role === 'admin') {
+      router.replace('/admin');
+    }
+  }, [loading, isAuthenticated, user, router]);
+
+  if (loading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -670,6 +680,6 @@ export default function AccountPage() {
     );
   }
 
-  // Show login form if not authenticated, otherwise show dashboard
-  return isAuthenticated ? <AccountDashboard /> : <LoginForm />;
+  return <AccountDashboard />;
 }
+

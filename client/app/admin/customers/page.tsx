@@ -1,11 +1,16 @@
 'use client';
 
+import { useState } from 'react';
+
 import { Search, Filter, Mail, Phone, MoreHorizontal, UserPlus, Loader2 } from 'lucide-react';
 import { useUsers } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
+import { AdminSelect } from '@/components/admin/AdminSelect';
+import { AdminLoading } from '@/components/admin/AdminLoading';
 
 export default function AdminCustomersPage() {
   const { data: users, loading, refetch } = useUsers();
+  const [statusFilter, setStatusFilter] = useState('all');
 
   // Transform API users to customer format
   const displayCustomers = (users || []).map(user => ({
@@ -20,6 +25,10 @@ export default function AdminCustomersPage() {
     lastOrderDate: '',
   }));
 
+  if (loading) {
+    return <AdminLoading fullPage text="Đang tải khách hàng..." />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -27,14 +36,7 @@ export default function AdminCustomersPage() {
         <div>
           <h1 className="text-2xl font-bold">Quản lý khách hàng</h1>
           <p className="text-muted-foreground">
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Đang tải...
-              </span>
-            ) : (
-              `Tổng cộng ${displayCustomers.length} khách hàng`
-            )}
+            Tổng cộng {displayCustomers.length} khách hàng
           </p>
         </div>
         <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
@@ -76,14 +78,17 @@ export default function AdminCustomersPage() {
             className="w-full h-10 pl-10 pr-4 rounded-lg border border-input bg-background text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </div>
-        <div>
-          <label htmlFor="customer-status" className="sr-only">Lọc theo trạng thái</label>
-          <select id="customer-status" className="h-10 px-4 border border-input rounded-lg bg-background text-sm focus-visible:ring-2 focus-visible:ring-ring">
-            <option value="">Tất cả trạng thái</option>
-            <option value="active">Hoạt động</option>
-            <option value="inactive">Không hoạt động</option>
-          </select>
-        </div>
+        <AdminSelect
+          value={statusFilter}
+          onValueChange={setStatusFilter}
+          placeholder="Tất cả trạng thái"
+          className="w-[180px]"
+          options={[
+            { value: 'all', label: 'Tất cả trạng thái' },
+            { value: 'active', label: 'Hoạt động' },
+            { value: 'inactive', label: 'Không hoạt động' },
+          ]}
+        />
         <button className="h-10 px-4 border border-input rounded-lg bg-background hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">
           <Filter className="h-4 w-4" aria-hidden="true" />
           Bộ lọc

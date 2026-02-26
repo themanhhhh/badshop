@@ -26,19 +26,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { api } from '@/lib/api';
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  stock?: number;
-  rating?: number;
-  reviews?: number;
-  images?: { url: string }[];
-  brand?: { id: string; name: string };
-  category?: { id: string; name: string; slug: string };
-}
+import type { Product } from '@/lib/types';
+import { AdminLoading } from '@/components/admin/AdminLoading';
 
 export default function AdminProductsPage() {
   const { data: products, loading, refetch } = useProducts();
@@ -86,6 +75,10 @@ export default function AdminProductsPage() {
     }
   };
 
+  if (loading) {
+    return <AdminLoading fullPage text="Đang tải sản phẩm..." />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -93,14 +86,7 @@ export default function AdminProductsPage() {
         <div>
           <h1 className="text-2xl font-bold">Quản lý sản phẩm</h1>
           <p className="text-muted-foreground">
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Đang tải...
-              </span>
-            ) : (
-              `Tổng cộng ${filteredProducts.length} sản phẩm`
-            )}
+            Tổng cộng {filteredProducts.length} sản phẩm
           </p>
         </div>
         <Link href="/admin/products/new">
@@ -182,17 +168,20 @@ export default function AdminProductsPage() {
                     <tr key={product.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          {product.images?.[0]?.url ? (
-                            <img 
-                              src={product.images[0].url} 
-                              alt={product.name}
-                              className="w-12 h-12 object-cover rounded-lg"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                              <ImageIcon className="h-5 w-5 text-gray-400" />
-                            </div>
-                          )}
+                          {(() => {
+                            const primaryImg = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
+                            return primaryImg?.image_url ? (
+                              <img 
+                                src={primaryImg.image_url} 
+                                alt={product.name}
+                                className="w-12 h-12 object-cover rounded-lg"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <ImageIcon className="h-5 w-5 text-gray-400" />
+                              </div>
+                            );
+                          })()}
                           <div>
                             <p className="font-medium line-clamp-1">{product.name}</p>
                             <p className="text-sm text-muted-foreground">{product.brand?.name || '-'}</p>
@@ -216,18 +205,18 @@ export default function AdminProductsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                          (product.stock ?? 0) > 0 
+                          ((product.stock ?? product.stock_quantity ?? 0) > 0)
                             ? 'bg-green-100 text-green-700' 
                             : 'bg-red-100 text-red-700'
                         }`}>
-                          {product.stock !== undefined ? `${product.stock} sp` : 'N/A'}
+                          {(product.stock ?? product.stock_quantity) !== undefined ? `${product.stock ?? product.stock_quantity} sp` : 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1">
                           <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                           <span className="font-medium">{product.rating || '-'}</span>
-                          <span className="text-muted-foreground text-sm">({product.reviews || 0})</span>
+                          <span className="text-muted-foreground text-sm">({(product as any).reviews?.length || 0})</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">

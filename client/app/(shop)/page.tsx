@@ -1,8 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import { ArrowRight, Truck, Shield, Headphones, CreditCard, Flame, CircleDot, Footprints, Feather, Backpack } from 'lucide-react';
 import { HeroBanner } from '@/components/shop/HeroBanner';
 import { ProductCard } from '@/components/shop/ProductCard';
-import { products, categories } from '@/lib/mockData';
+import { useProducts, useCategories } from '@/hooks/useApi';
+import { mapProductsForDisplay } from '@/lib/productMapper';
+import { CampaignSection } from '@/components/shop/CampaignSection';
 
 // Category icon renderer
 function CategoryIcon({ iconName, className }: { iconName: string; className?: string }) {
@@ -20,9 +24,38 @@ function CategoryIcon({ iconName, className }: { iconName: string; className?: s
   }
 }
 
+// Map category slug to icon name
+function getCategoryIcon(slug: string): string {
+  const iconMap: Record<string, string> = {
+    'racket': 'circle-dot',
+    'rackets': 'circle-dot',
+    'vot-cau-long': 'circle-dot',
+    'shoes': 'footprints',
+    'giay-cau-long': 'footprints',
+    'footwear': 'footprints',
+    'shuttlecock': 'feather',
+    'cau-long': 'feather',
+    'accessories': 'backpack',
+    'phu-kien': 'backpack',
+    'bags': 'backpack',
+    'tui-dung-vot': 'backpack',
+    'tui-balo': 'backpack',
+    'clothing': 'backpack',
+    'quan-ao-cau-long': 'backpack',
+  };
+  return iconMap[slug] || 'circle-dot';
+}
+
 export default function HomePage() {
-  const featuredProducts = products.slice(0, 4);
-  const hotProducts = products.filter(p => p.badge === 'hot' || p.badge === 'sale');
+  const { data: apiProducts } = useProducts();
+  const { data: apiCategories } = useCategories();
+
+  const displayProducts = apiProducts ? mapProductsForDisplay(apiProducts) : [];
+  const featuredProducts = displayProducts.slice(0, 4);
+  const saleProducts = displayProducts.filter(p => p.badge === 'hot' || p.badge === 'sale').slice(0, 4);
+
+  // Use real categories or fallback
+  const categories = apiCategories || [];
 
   return (
     <div className="min-h-screen">
@@ -74,60 +107,63 @@ export default function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-3">Danh mục sản phẩm</h2>
-            <p className="text-muted-foreground">Khám phá các sản phẩm chất lượng cao</p>
+      {categories.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold mb-3">Danh mục sản phẩm</h2>
+              <p className="text-muted-foreground">Khám phá các sản phẩm chất lượng cao</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {categories.map((category: any) => (
+                <Link
+                  key={category.id}
+                  href={`/products?category=${category.slug || category.id}`}
+                  className="group p-6 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 rounded-2xl text-center transition-all hover:shadow-lg hover:-translate-y-1"
+                >
+                  <div className="mb-4 group-hover:scale-110 transition-transform flex justify-center">
+                    <CategoryIcon iconName={getCategoryIcon(category.slug || '')} className="h-12 w-12 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-1">{category.name}</h3>
+                </Link>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/products?category=${category.id}`}
-                className="group p-6 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 rounded-2xl text-center transition-all hover:shadow-lg hover:-translate-y-1"
-              >
-                <div className="mb-4 group-hover:scale-110 transition-transform flex justify-center">
-                  <CategoryIcon iconName={category.icon} className="h-12 w-12 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-lg mb-1">{category.name}</h3>
-                <p className="text-sm text-muted-foreground">{category.count} sản phẩm</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Featured Products */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-10">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">Sản phẩm nổi bật</h2>
-              <p className="text-muted-foreground">Được yêu thích nhất</p>
+      {featuredProducts.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-10">
+              <div>
+                <h2 className="text-3xl font-bold mb-2">Sản phẩm nổi bật</h2>
+                <p className="text-muted-foreground">Được yêu thích nhất</p>
+              </div>
+              <Link
+                href="/products"
+                className="hidden sm:flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                Xem tất cả
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
             <Link
               href="/products"
-              className="hidden sm:flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              className="mt-8 sm:hidden flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
-              Xem tất cả
+              Xem tất cả sản phẩm
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-          <Link
-            href="/products"
-            className="mt-8 sm:hidden flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
-          >
-            Xem tất cả sản phẩm
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Hot Deals Banner */}
       <section className="py-16 bg-gradient-to-r from-orange-500 to-red-500 text-white">
@@ -155,28 +191,30 @@ export default function HomePage() {
       </section>
 
       {/* Sale Products */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-10">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">Đang giảm giá</h2>
-              <p className="text-muted-foreground">Tiết kiệm đến 30%</p>
+      {saleProducts.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-10">
+              <div>
+                <h2 className="text-3xl font-bold mb-2">Đang giảm giá</h2>
+                <p className="text-muted-foreground">Tiết kiệm đến 30%</p>
+              </div>
+              <Link
+                href="/products?sale=true"
+                className="hidden sm:flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                Xem tất cả
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
-            <Link
-              href="/products?sale=true"
-              className="hidden sm:flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              Xem tất cả
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {saleProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {hotProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Brands */}
       <section className="py-16 bg-gray-50">

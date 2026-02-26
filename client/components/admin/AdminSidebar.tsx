@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Package,
@@ -67,6 +67,7 @@ const settingsItems: MenuItem[] = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
   const [expandedItems, setExpandedItems] = useState<string[]>(['Sản phẩm']);
 
@@ -91,8 +92,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" className="border-r border-gray-200 bg-white sticky top-0 h-screen" {...props}>
       {/* Header */}
-      <SidebarHeader className="px-4 py-5 border-b border-gray-100">
-        <Link href="/admin" className="flex items-center gap-3">
+      <SidebarHeader className="px-4 py-5 border-b border-gray-100 group-data-[collapsible=icon]:px-2">
+        <Link href="/admin" className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 font-bold text-sm text-white">
             BP
           </div>
@@ -103,7 +104,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       {/* Main Menu */}
-      <SidebarContent className="px-2">
+      <SidebarContent className="px-2 group-data-[collapsible=icon]:px-0">
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-medium text-gray-500 uppercase tracking-wider px-3 mb-1">
             General
@@ -122,7 +123,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuButton
                           onClick={() => toggleExpand(item.label)}
                           isActive={isActive}
-                          className="justify-between group"
+                          className="justify-between group-data-[collapsible=icon]:!justify-center group"
+                          tooltip={item.label}
                         >
                           <div className="flex items-center gap-3">
                             <item.icon className="h-5 w-5" aria-hidden="true" />
@@ -186,7 +188,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       {/* Footer with User Info */}
       <SidebarFooter className="border-t border-gray-100 p-3">
-        <div className="flex items-center gap-3 px-1">
+        <div className="flex items-center gap-3 px-1 group-data-[collapsible=icon]:justify-center">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-rose-500 font-semibold text-white text-sm">
             {user?.name?.charAt(0).toUpperCase() || 'A'}
           </div>
@@ -199,8 +201,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
           </div>
           <button 
-            onClick={() => logout()}
-            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded group-data-[collapsible=icon]:hidden"
+            onClick={() => {
+              logout();
+              router.push('/login');
+            }}
+            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
             title="Đăng xuất"
           >
             <LogOut className="h-4 w-4" />

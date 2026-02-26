@@ -40,7 +40,9 @@ export interface ProductImage {
   // snake_case from API
   image_url?: string;
   is_primary?: boolean;
+  is_delete?: boolean;
   product_id?: string;
+  display_order?: number;
 }
 
 export interface Product {

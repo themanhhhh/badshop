@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Search, Filter, Eye, MoreHorizontal, Download, Loader2, AlertCircle } from 'lucide-react';
 import { useOrders } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
+import { AdminLoading } from '@/components/admin/AdminLoading';
 
 export default function AdminOrdersPage() {
   const { data: orders, loading, error, refetch } = useOrders();
@@ -31,6 +32,10 @@ export default function AdminOrdersPage() {
     shipping: 'Đang vận chuyển',
   };
 
+  if (loading) {
+    return <AdminLoading fullPage text="Đang tải đơn hàng..." />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -38,14 +43,7 @@ export default function AdminOrdersPage() {
         <div>
           <h1 className="text-2xl font-bold">Quản lý đơn hàng</h1>
           <p className="text-muted-foreground">
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Đang tải...
-              </span>
-            ) : (
-              `Tổng cộng ${displayOrders.length} đơn hàng`
-            )}
+            Tổng cộng {displayOrders.length} đơn hàng
           </p>
         </div>
         <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-white hover:bg-gray-50 font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring">

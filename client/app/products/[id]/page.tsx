@@ -2,24 +2,96 @@
 
 import { useState, use } from 'react';
 import Link from 'next/link';
-import { Minus, Plus, Heart, Truck, Shield, RotateCcw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Minus, Plus, Heart, Truck, Shield, RotateCcw, Loader2 } from 'lucide-react';
 import { Header } from '@/components/shop/Header';
 import { Footer } from '@/components/shop/Footer';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { products, formatPrice } from '@/lib/mockData';
+import { useProduct, useProducts } from '@/hooks/useApi';
+import { mapProductForDisplay, mapProductsForDisplay, formatPrice } from '@/lib/productMapper';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { data: product, loading, error } = useProduct(id);
+  const { data: allProducts } = useProducts();
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
-  const product = products.find(p => p.id === id) || products[0];
-  const relatedProducts = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
 
-  const discount = product.originalPrice
-    ? Math.round((1 - product.price / product.originalPrice) * 100)
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-2">Không tìm thấy sản phẩm</h1>
+            <p className="text-muted-foreground mb-4">Sản phẩm bạn tìm không tồn tại hoặc đã bị xóa.</p>
+            <Button asChild>
+              <Link href="/products">Xem tất cả sản phẩm</Link>
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  const displayProduct = mapProductForDisplay(product);
+  const images = product.product_images || product.images || [];
+  const discount = displayProduct.originalPrice
+    ? Math.round((1 - displayProduct.price / displayProduct.originalPrice) * 100)
     : 0;
+
+  // Related products: same category, exclude current
+  const relatedProducts = allProducts
+    ? mapProductsForDisplay(
+        allProducts
+          .filter(p => p.id !== product.id && p.category?.id === product.category?.id)
+          .slice(0, 4)
+      )
+    : [];
+
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    setIsAdding(true);
+    await addToCart({
+      productId: product.id,
+      name: product.name,
+      brand: displayProduct.brand,
+      price: displayProduct.price,
+      image: displayProduct.image || '/products/placeholder.jpg',
+      quantity,
+    });
+    setIsAdding(false);
+  };
+
+  // Get current main image URL
+  const mainImageUrl = images.length > 0
+    ? (images[selectedImageIndex]?.image_url || images[selectedImageIndex]?.url)
+    : null;
 
   return (
     <>
@@ -43,46 +115,76 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
             {/* Product Images */}
             <div className="space-y-4">
-              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center relative">
-                {product.badge && (
+              <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
+                {displayProduct.badge && (
                   <Badge 
-                    variant={product.badge === 'sale' ? 'destructive' : 'default'}
-                    className="absolute top-4 left-4"
+                    variant={displayProduct.badge === 'sale' ? 'destructive' : 'default'}
+                    className="absolute top-4 left-4 z-10"
                   >
-                    {product.badge === 'hot' ? 'Best Seller' :
-                     product.badge === 'new' ? 'New' :
+                    {displayProduct.badge === 'hot' ? 'Best Seller' :
+                     displayProduct.badge === 'new' ? 'New' :
                      `-${discount}%`}
                   </Badge>
                 )}
-                <div className="w-32 h-32 bg-muted-foreground/10 rounded-full flex items-center justify-center">
-                  <span className="text-muted-foreground text-5xl font-light">
-                    {product.brand.charAt(0)}
-                  </span>
+                {mainImageUrl ? (
+                  <img
+                    src={mainImageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-32 h-32 bg-muted-foreground/10 rounded-full flex items-center justify-center">
+                      <span className="text-muted-foreground text-5xl font-light">
+                        {displayProduct.brand.charAt(0)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Thumbnail gallery */}
+              {images.length > 1 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {images.map((img, i) => {
+                    const thumbUrl = img.image_url || img.url;
+                    return (
+                      <button
+                        key={img.id || i}
+                        onClick={() => setSelectedImageIndex(i)}
+                        className={`aspect-square bg-gray-50 rounded overflow-hidden cursor-pointer transition-all ${
+                          selectedImageIndex === i
+                            ? 'ring-2 ring-black'
+                            : 'hover:opacity-80'
+                        }`}
+                      >
+                        <img
+                          src={thumbUrl}
+                          alt={`${product.name} - ${i + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
-              </div>
-              <div className="grid grid-cols-4 gap-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-square bg-muted rounded cursor-pointer hover:opacity-80 transition-opacity" />
-                ))}
-              </div>
+              )}
             </div>
 
             {/* Product Info */}
             <div className="space-y-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">
-                  {product.brand}
+                  {displayProduct.brand}
                 </p>
                 <h1 className="text-2xl lg:text-3xl font-bold uppercase tracking-wide mb-4">
                   {product.name}
                 </h1>
                 <div className="flex items-baseline gap-3">
                   <span className="text-2xl font-bold">
-                    {formatPrice(product.price)}
+                    {formatPrice(displayProduct.price)}
                   </span>
-                  {product.originalPrice && (
+                  {displayProduct.originalPrice && (
                     <span className="text-lg text-muted-foreground line-through">
-                      {formatPrice(product.originalPrice)}
+                      {formatPrice(displayProduct.originalPrice)}
                     </span>
                   )}
                 </div>
@@ -90,9 +192,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
               {/* Description */}
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Sản phẩm chính hãng {product.brand} với chất lượng cao cấp. 
-                Thiết kế hiện đại, phù hợp cho mọi cấp độ chơi từ nghiệp dư đến chuyên nghiệp.
+                {product.description || `Sản phẩm chính hãng ${displayProduct.brand} với chất lượng cao cấp. Thiết kế hiện đại, phù hợp cho mọi cấp độ chơi từ nghiệp dư đến chuyên nghiệp.`}
               </p>
+
+              {/* Stock status */}
+              <div className="flex items-center gap-2">
+                {displayProduct.inStock ? (
+                  <span className="text-sm text-green-600 font-medium">● Còn hàng</span>
+                ) : (
+                  <span className="text-sm text-red-600 font-medium">● Hết hàng</span>
+                )}
+              </div>
 
               {/* Quantity */}
               <div className="flex items-center gap-4">
@@ -120,8 +230,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
               {/* Actions */}
               <div className="flex gap-3">
-                <Button className="flex-1 h-12">
-                  Thêm vào giỏ
+                <Button 
+                  className="flex-1 h-12" 
+                  onClick={handleAddToCart}
+                  disabled={isAdding || !displayProduct.inStock}
+                >
+                  {isAdding ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Đang thêm...
+                    </>
+                  ) : (
+                    'Thêm vào giỏ'
+                  )}
                 </Button>
                 <Button variant="outline" size="icon" className="h-12 w-12">
                   <Heart className="h-5 w-5" />
@@ -155,8 +276,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <h2 className="text-lg font-bold uppercase tracking-wide mb-6">Mô tả sản phẩm</h2>
             <div className="prose prose-sm max-w-none text-muted-foreground">
               <p>
-                {product.name} là sản phẩm cao cấp đến từ thương hiệu {product.brand}. 
-                Được thiết kế với công nghệ tiên tiến, sản phẩm mang đến trải nghiệm tuyệt vời cho người chơi cầu lông.
+                {product.description || `${product.name} là sản phẩm cao cấp đến từ thương hiệu ${displayProduct.brand}. Được thiết kế với công nghệ tiên tiến, sản phẩm mang đến trải nghiệm tuyệt vời cho người chơi cầu lông.`}
               </p>
               <p className="mt-4">
                 Đặc điểm nổi bật:

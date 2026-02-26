@@ -76,10 +76,14 @@ export interface ProductFilters {
   search?: string;
 }
 
-export function useProductsWithFilters(filters: ProductFilters) {
+export function useProductsWithFilters(filters: ProductFilters & { _pending?: boolean }) {
   const filterKey = JSON.stringify(filters);
   return useApi<Product[]>(
     () => {
+      // Don't fetch if we're still waiting for category/brand to resolve
+      if (filters._pending) {
+        return Promise.resolve([]);
+      }
       // Use specific endpoints if only one filter is set
       if (filters.category && !filters.brand && !filters.search) {
         return productApi.getByCategory(filters.category);
