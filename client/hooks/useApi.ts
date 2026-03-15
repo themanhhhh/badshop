@@ -66,8 +66,8 @@ export function useApi<T>(
 // ============================================
 // PRODUCT HOOKS
 // ============================================
-export function useProducts() {
-  return useApi<Product[]>(() => productApi.getAll());
+export function useProducts(limit?: number) {
+  return useApi<Product[]>(() => productApi.getAll(limit));
 }
 
 export interface ProductFilters {

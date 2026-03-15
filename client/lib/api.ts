@@ -161,8 +161,9 @@ export interface ProductFilters {
 }
 
 export const productApi = {
-  getAll: (): Promise<Product[]> => 
-    fetchApi('/products'),
+  getAll: (limit?: number): Promise<Product[]> => 
+    // Use a high limit to fetch all products (server default is 100)
+    fetchApi(`/products?limit=${limit || 1000}`),
   
   getWithFilters: (filters: ProductFilters): Promise<Product[]> => {
     // Build query string from filters

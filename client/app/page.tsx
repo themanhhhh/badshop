@@ -13,14 +13,14 @@ import { mapProductsForDisplay } from '@/lib/productMapper';
 import { Loader2 } from 'lucide-react';
 
 export default function HomePage() {
-  const { data: apiProducts, loading, error } = useProducts();
+  const { data: apiProducts, loading, error } = useProducts(100);
   const { data: campaigns } = useHomepageCampaigns();
   
   // Map API products to display format
   const products = apiProducts ? mapProductsForDisplay(apiProducts) : [];
   
-  const newProducts = products.filter(p => p.badge === 'new' || !p.badge).slice(0, 8);
-  const bestProducts = products.filter(p => p.badge === 'hot' || p.rating >= 4.7).slice(0, 8);
+  const newProducts = products.filter(p => p.badge === 'new').slice(0, 8);
+  const bestProducts = products.filter(p => p.badge === 'hot').slice(0, 8);
   const saleProducts = products.filter(p => p.badge === 'sale' || p.originalPrice).slice(0, 8);
 
   // Active campaigns for homepage

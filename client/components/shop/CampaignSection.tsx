@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Zap, Calendar, Tag, Package } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 import { mapProductsForDisplay } from '@/lib/productMapper';
@@ -103,11 +104,12 @@ export function CampaignSection({ campaign }: CampaignSectionProps) {
 
         {/* Banner Image (optional) */}
         {campaign.image_url && (
-          <div className="mb-8 overflow-hidden rounded-xl">
-            <img 
+          <div className="mb-8 overflow-hidden rounded-xl relative h-48 md:h-64">
+            <Image 
               src={campaign.image_url} 
               alt={campaign.title || campaign.name}
-              className="w-full h-48 md:h-64 object-cover"
+              fill
+              className="object-cover"
             />
           </div>
         )}

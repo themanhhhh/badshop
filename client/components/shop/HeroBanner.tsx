@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 
 export function HeroBanner() {
@@ -10,10 +11,13 @@ export function HeroBanner() {
       <div className="relative h-[85vh] min-h-[600px] max-h-[900px] flex items-center justify-center">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img 
-            src="/img/herobanner.jpeg" 
+          <Image 
+            src="/img/herobanner.jpeg"
             alt="Badminton Pro Series Banner" 
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
           />
           
           {/* Overlay gradient */}

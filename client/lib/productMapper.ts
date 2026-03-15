@@ -42,9 +42,21 @@ export function mapProductForDisplay(product: ApiProduct): DisplayProduct {
     const primaryImage = images.find(img => img.is_primary || img.isPrimary);
     const firstImage = primaryImage || images[0];
     const url = firstImage.image_url || firstImage.url || '';
-    // Only use full URLs (http/https), skip relative paths
-    if (url.startsWith('http')) {
+    // Accept both full URLs (http/https) and relative paths (/products/...)
+    if (url.startsWith('http') || url.startsWith('/')) {
       imageUrl = url;
+    }
+  }
+  
+  // If no image found, use placeholder based on category
+  if (!imageUrl) {
+    const categorySlug = product.category?.slug || '';
+    if (categorySlug.includes('vot') || categorySlug.includes('racket')) {
+      imageUrl = '/img/racketcate.jpg';
+    } else if (categorySlug.includes('giay') || categorySlug.includes('shoes') || categorySlug.includes('footwear')) {
+      imageUrl = '/img/footwearercate.jpg';
+    } else if (categorySlug.includes('phu-kien') || categorySlug.includes('accessories')) {
+      imageUrl = '/img/accessoriescate.png';
     }
   }
   
