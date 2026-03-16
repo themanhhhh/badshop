@@ -54,7 +54,7 @@ export function Header() {
 
               {/* Center - Logo */}
               <Link href="/" className="absolute left-1/2 -translate-x-1/2">
-                <h1 className="text-2xl font-bold tracking-[0.3em] uppercase">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase truncate max-w-[160px] sm:max-w-none">
                   BadmintonPro
                 </h1>
               </Link>
@@ -84,7 +84,7 @@ export function Header() {
                         {/* Cart - only when logged in */}
                         <Link 
                           href="/cart" 
-                          className="relative p-2 hover:opacity-60 transition-opacity focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                          className="relative p-2 sm:p-2.5 hover:opacity-60 transition-opacity focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center -m-2"
                           aria-label={`Giỏ hàng${itemCount > 0 ? `, ${itemCount} sản phẩm` : ''}`}
                         >
                           <ShoppingBag className="h-5 w-5" aria-hidden="true" />
@@ -99,10 +99,10 @@ export function Header() {
                       /* Login Button - only when not logged in */
                       <Link 
                         href="/account" 
-                        className="flex items-center gap-2 px-4 py-2 bg-black text-white text-xs font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors"
+                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-black text-white text-[10px] sm:text-xs font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors"
                       >
-                        <LogIn className="h-4 w-4" />
-                        Đăng nhập
+                        <LogIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        <span className="hidden xs:inline">Đăng nhập</span>
                       </Link>
                     )}
                   </>

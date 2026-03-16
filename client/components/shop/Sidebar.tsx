@@ -120,48 +120,55 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop with blur */}
       <div 
-        className={`fixed inset-0 bg-black/40 z-50 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={handleClose}
+        aria-hidden="true"
       />
 
       {/* Sidebar Panel */}
       <div 
-        className={`fixed top-0 left-0 h-full w-[85vw] max-w-[400px] bg-white z-50 flex flex-col transform transition-transform duration-300 ease-out ${
+        className={`fixed top-0 left-0 h-full w-[300px] max-w-[85vw] bg-white z-50 flex flex-col shadow-2xl transform transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu điều hướng"
       >
         {/* Header */}
-        <div className="flex items-center justify-between h-14 px-5 border-b border-gray-100 shrink-0">
+        <div className="flex items-center justify-between h-16 px-5 border-b border-gray-100 shrink-0">
           {activeSubmenu ? (
             <>
               <button 
                 onClick={handleBack}
-                className="flex items-center gap-2 text-sm hover:opacity-60 transition-opacity"
+                className="flex items-center gap-2 text-sm font-medium hover:opacity-60 transition-opacity min-h-[44px] min-w-[44px] -ml-2 px-2"
+                aria-label="Quay lại"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <span className="text-sm font-medium uppercase tracking-widest">
+              <span className="text-sm font-semibold uppercase tracking-widest truncate px-2">
                 {activeSubmenu.label}
               </span>
               <button 
                 onClick={handleClose}
-                className="p-1 hover:opacity-60 transition-opacity"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors min-h-[44px] min-w-[44px]"
+                aria-label="Đóng menu"
               >
                 <X className="h-5 w-5" />
               </button>
             </>
           ) : (
             <>
-              <span className="text-sm font-medium uppercase tracking-widest">
+              <span className="text-sm font-semibold uppercase tracking-widest">
                 Danh mục
               </span>
               <button 
                 onClick={handleClose}
-                className="p-1 hover:opacity-60 transition-opacity"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors min-h-[44px] min-w-[44px]"
+                aria-label="Đóng menu"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -187,12 +194,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   key={item.label}
                   href={item.href}
                   onClick={(e) => handleMenuClick(item, e)}
-                  className={`flex items-center justify-between px-5 py-4 text-sm uppercase tracking-widest transition-colors hover:bg-gray-50 ${
-                    item.highlight ? 'text-red-600 font-semibold' : 'font-medium'
+                  className={`flex items-center justify-between px-5 py-4 text-sm uppercase tracking-widest transition-colors hover:bg-gray-50 min-h-[52px] ${
+                    item.highlight ? 'text-red-600 font-semibold' : 'font-medium text-gray-800'
                   }`}
                 >
                   {item.label}
-                  {item.submenu && <ChevronRight className="h-4 w-4 text-gray-400" />}
+                  {item.submenu && <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />}
                 </Link>
               ))}
             </nav>
@@ -215,7 +222,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     key={subItem.label}
                     href={subItem.href}
                     onClick={handleClose}
-                    className="block px-5 py-4 text-sm uppercase tracking-widest font-medium transition-colors hover:bg-gray-50"
+                    className="block px-5 py-4 text-sm uppercase tracking-widest font-medium transition-colors hover:bg-gray-50 min-h-[52px] text-gray-700"
                   >
                     {subItem.label}
                   </Link>
@@ -232,21 +239,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               key={link.label}
               href={link.href}
               onClick={handleClose}
-              className="block px-5 py-3 text-xs text-gray-500 hover:text-black transition-colors"
+              className="block px-5 py-3.5 text-xs text-gray-500 hover:text-black transition-colors min-h-[44px]"
             >
               {link.label}
             </Link>
           ))}
 
           {/* Social Links */}
-          <div className="flex gap-5 px-5 py-4 border-t border-gray-100">
-            <a href="#" className="text-gray-400 hover:text-black transition-colors">
-              <Instagram className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-gray-400 hover:text-black transition-colors">
+          <div className="flex gap-4 px-5 py-4 border-t border-gray-100">
+            <a href="#" className="text-gray-400 hover:text-black transition-colors p-2" aria-label="Facebook">
               <Facebook className="h-5 w-5" />
             </a>
-            <a href="#" className="text-gray-400 hover:text-black transition-colors">
+            <a href="#" className="text-gray-400 hover:text-black transition-colors p-2" aria-label="Instagram">
+              <Instagram className="h-5 w-5" />
+            </a>
+            <a href="#" className="text-gray-400 hover:text-black transition-colors p-2" aria-label="Youtube">
               <Youtube className="h-5 w-5" />
             </a>
           </div>

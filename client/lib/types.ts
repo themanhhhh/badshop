@@ -187,6 +187,23 @@ export interface FlashSale {
   updatedAt: string;
 }
 
+export interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  featured_image?: string;
+  status: 'draft' | 'published';
+  view_count: number;
+  meta_title?: string;
+  meta_description?: string;
+  author_id?: string;
+  author?: User;
+  created_at: string;
+  updated_at: string;
+}
+
 // API Response types
 export interface ApiResponse<T> {
   data: T;

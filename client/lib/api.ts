@@ -9,6 +9,7 @@ import {
   Review,
   Campaign,
   FlashSale,
+  Post,
 } from './types';
 import { getToken } from './auth';
 
@@ -492,6 +493,38 @@ export const statsApi = {
   }> => fetchApi('/stats/dashboard'),
 };
 
+// ============================================
+// POST API
+// ============================================
+export const postApi = {
+  getAll: (page: number = 1, limit: number = 10): Promise<{ data: Post[]; pagination: any }> => 
+    fetchApi(`/posts?page=${page}&limit=${limit}`),
+  
+  getPublished: (page: number = 1, limit: number = 10): Promise<{ data: Post[]; pagination: any }> => 
+    fetchApi(`/posts/published?page=${page}&limit=${limit}`),
+  
+  getById: (id: string): Promise<Post> => 
+    fetchApi(`/posts/${id}`),
+  
+  getBySlug: (slug: string): Promise<Post> => 
+    fetchApi(`/posts/slug/${slug}`),
+  
+  create: (data: Partial<Post>): Promise<Post> => 
+    fetchApi('/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Post>): Promise<Post> => 
+    fetchApi(`/posts/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/posts/${id}`, { method: 'DELETE' }),
+};
+
 // Export all APIs as a single object for convenience
 export const api = {
   users: userApi,
@@ -505,6 +538,7 @@ export const api = {
   campaigns: campaignApi,
   flashSales: flashSaleApi,
   stats: statsApi,
+  posts: postApi,
 };
 
 export default api;

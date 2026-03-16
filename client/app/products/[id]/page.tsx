@@ -99,27 +99,27 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       <main className="min-h-screen bg-white">
         {/* Breadcrumb */}
         <div className="border-b border-gray-100">
-          <div className="container mx-auto px-4 py-4">
-            <nav className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="container mx-auto px-4 py-3 sm:py-4">
+            <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground overflow-x-auto whitespace-nowrap">
               <Link href="/" className="hover:text-foreground transition-colors">Trang chủ</Link>
               <span>/</span>
               <Link href="/products" className="hover:text-foreground transition-colors">Sản phẩm</Link>
               <span>/</span>
-              <span className="text-foreground">{product.name}</span>
+              <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-none">{product.name}</span>
             </nav>
           </div>
         </div>
 
         {/* Product Detail */}
-        <div className="container mx-auto px-4 py-10">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
+        <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-16">
             {/* Product Images */}
-            <div className="space-y-4">
-              <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="aspect-square bg-gray-50 rounded-lg sm:rounded-xl overflow-hidden relative">
                 {displayProduct.badge && (
                   <Badge 
                     variant={displayProduct.badge === 'sale' ? 'destructive' : 'default'}
-                    className="absolute top-4 left-4 z-10"
+                    className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 text-[10px] sm:text-xs px-2 py-0.5 sm:px-3 sm:py-1"
                   >
                     {displayProduct.badge === 'hot' ? 'Best Seller' :
                      displayProduct.badge === 'new' ? 'New' :
@@ -144,17 +144,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </div>
               {/* Thumbnail gallery */}
               {images.length > 1 && (
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
                   {images.map((img, i) => {
                     const thumbUrl = img.image_url || img.url;
                     return (
                       <button
                         key={img.id || i}
                         onClick={() => setSelectedImageIndex(i)}
-                        className={`aspect-square bg-gray-50 rounded overflow-hidden cursor-pointer transition-all ${
+                        className={`aspect-square bg-gray-50 rounded-md overflow-hidden cursor-pointer transition-all ${
                           selectedImageIndex === i
-                            ? 'ring-2 ring-black'
-                            : 'hover:opacity-80'
+                            ? 'ring-2 ring-black ring-offset-2'
+                            : 'hover:opacity-80 active:opacity-60'
                         }`}
                       >
                         <img
@@ -170,20 +170,20 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* Product Info */}
-            <div className="space-y-6">
+            <div className="space-y-5 sm:space-y-6">
               <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">
+                <p className="text-xs sm:text-sm uppercase tracking-widest text-muted-foreground mb-2">
                   {displayProduct.brand}
                 </p>
-                <h1 className="text-2xl lg:text-3xl font-bold uppercase tracking-wide mb-4">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold uppercase tracking-wide mb-3 sm:mb-4 line-clamp-2">
                   {product.name}
                 </h1>
-                <div className="flex items-baseline gap-3">
-                  <span className="text-2xl font-bold">
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
+                  <span className="text-xl sm:text-2xl font-bold">
                     {formatPrice(displayProduct.price)}
                   </span>
                   {displayProduct.originalPrice && (
-                    <span className="text-lg text-muted-foreground line-through">
+                    <span className="text-base sm:text-lg text-muted-foreground line-through">
                       {formatPrice(displayProduct.originalPrice)}
                     </span>
                   )}
@@ -196,7 +196,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </p>
 
               {/* Stock status */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 py-2">
                 {displayProduct.inStock ? (
                   <span className="text-sm text-green-600 font-medium">● Còn hàng</span>
                 ) : (
@@ -205,33 +205,32 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </div>
 
               {/* Quantity */}
-              <div className="flex items-center gap-4">
-                <span className="text-xs uppercase tracking-widest font-medium">Số lượng</span>
-                <div className="flex items-center border rounded">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-10 w-10"
+              <div className="flex items-center gap-3 sm:gap-4">
+                <span className="text-xs uppercase tracking-widest font-medium whitespace-nowrap">Số lượng</span>
+                <div className="flex items-center border rounded-lg overflow-hidden">
+                  <button 
+                    className="h-12 w-12 sm:h-10 sm:w-10 flex items-center justify-center hover:bg-gray-50 active:bg-gray-100 transition-colors disabled:opacity-50"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                    aria-label="Giảm số lượng"
                   >
                     <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="w-12 text-center text-sm font-medium">{quantity}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-10 w-10"
+                  </button>
+                  <span className="w-12 sm:w-12 text-center text-base font-semibold select-none">{quantity}</span>
+                  <button 
+                    className="h-12 w-12 sm:h-10 sm:w-10 flex items-center justify-center hover:bg-gray-50 active:bg-gray-100 transition-colors"
                     onClick={() => setQuantity(quantity + 1)}
+                    aria-label="Tăng số lượng"
                   >
                     <Plus className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button 
-                  className="flex-1 h-12" 
+                  className="flex-1 h-12 sm:h-12 text-sm sm:text-base" 
                   onClick={handleAddToCart}
                   disabled={isAdding || !displayProduct.inStock}
                 >
@@ -244,7 +243,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     'Thêm vào giỏ'
                   )}
                 </Button>
-                <Button variant="outline" size="icon" className="h-12 w-12">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-12 w-12 sm:h-12 sm:w-12"
+                >
                   <Heart className="h-5 w-5" />
                 </Button>
               </div>
@@ -252,18 +255,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <Separator />
 
               {/* Features */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <Truck className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-xs text-muted-foreground">Miễn phí giao hàng</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-4">
+                <div className="flex sm:flex-col items-center gap-2 sm:gap-3 text-center p-3 sm:p-0">
+                  <Truck className="h-6 w-6 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-muted-foreground">Miễn phí giao hàng</p>
                 </div>
-                <div className="text-center">
-                  <Shield className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-xs text-muted-foreground">Bảo hành 12 tháng</p>
+                <div className="flex sm:flex-col items-center gap-2 sm:gap-3 text-center p-3 sm:p-0">
+                  <Shield className="h-6 w-6 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-muted-foreground">Bảo hành 12 tháng</p>
                 </div>
-                <div className="text-center">
-                  <RotateCcw className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-xs text-muted-foreground">Đổi trả 30 ngày</p>
+                <div className="flex sm:flex-col items-center gap-2 sm:gap-3 text-center p-3 sm:p-0">
+                  <RotateCcw className="h-6 w-6 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
+                  <p className="text-xs sm:text-sm text-muted-foreground">Đổi trả 30 ngày</p>
                 </div>
               </div>
             </div>
@@ -294,11 +297,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="border-t">
-            <div className="container mx-auto px-4 py-12">
-              <h2 className="text-lg font-bold uppercase tracking-wide mb-8 text-center">
+            <div className="container mx-auto px-4 py-10 sm:py-12">
+              <h2 className="text-lg font-bold uppercase tracking-wide mb-6 sm:mb-8 text-center">
                 Sản phẩm liên quan
               </h2>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
                 {relatedProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
