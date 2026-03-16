@@ -37,11 +37,14 @@ export function mapProductForDisplay(product: ApiProduct): DisplayProduct {
   const images = rawImages.filter(img => !img.is_delete);
   let imageUrl = '';
   
+  console.log('[DEBUG] Product:', product.name, 'Raw images:', rawImages.length, 'Filtered:', images.length);
+  
   if (images.length > 0) {
     // Find primary image first, otherwise use first image
     const primaryImage = images.find(img => img.is_primary || img.isPrimary);
     const firstImage = primaryImage || images[0];
     const url = firstImage.image_url || firstImage.url || '';
+    console.log('[DEBUG] First image URL:', url);
     // Accept both full URLs (http/https) and relative paths (/products/...)
     if (url.startsWith('http') || url.startsWith('/')) {
       imageUrl = url;

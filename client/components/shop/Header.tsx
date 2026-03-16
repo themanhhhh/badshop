@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { ShoppingBag, Search, Menu, User, LogIn } from 'lucide-react';
 import { Sidebar } from './Sidebar';
+import { ThemeToggle } from './ThemeToggle';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -59,8 +60,9 @@ export function Header() {
               </Link>
 
               {/* Right - Actions */}
-              <div className="flex items-center gap-2">
-                <button 
+              <div className="flex items-center gap-1">
+                <ThemeToggle />
+                <button
                   className="p-2 hover:opacity-60 transition-opacity sm:hidden focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                   aria-label="Tìm kiếm"
                 >

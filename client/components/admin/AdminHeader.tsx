@@ -4,6 +4,7 @@ import { Bell, Search } from 'lucide-react';
 import { useState } from 'react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
+import { ThemeToggle } from '@/components/shop/ThemeToggle';
 
 export function AdminHeader() {
   const [notifications] = useState(5);
@@ -48,6 +49,9 @@ export function AdminHeader() {
             </span>
           )}
         </button>
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
 
         {/* User Avatar */}
         <div className="flex items-center gap-3 pl-3 border-l border-border">

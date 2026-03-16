@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { type DisplayProduct, formatPrice } from '@/lib/productMapper';
 
@@ -147,13 +148,23 @@ function ProductCarouselCard({ product }: { product: DisplayProduct }) {
           </div>
         )}
         
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50 group-hover:scale-105 transition-transform duration-500">
-          <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-            <span className="text-gray-400 text-2xl font-light">
-              {product.brand.charAt(0)}
-            </span>
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            unoptimized
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50 group-hover:scale-105 transition-transform duration-500">
+            <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-gray-400 text-2xl font-light">
+                {product.brand.charAt(0)}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Content */}

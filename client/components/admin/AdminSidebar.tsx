@@ -90,14 +90,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-gray-200 bg-white sticky top-0 h-screen" {...props}>
+    <Sidebar collapsible="icon" className="border-r border-border bg-background dark:bg-gray-900 sticky top-0 h-screen" {...props}>
       {/* Header */}
-      <SidebarHeader className="px-4 py-5 border-b border-gray-100 group-data-[collapsible=icon]:px-2">
+      <SidebarHeader className="px-4 py-5 border-b border-border dark:border-gray-800 group-data-[collapsible=icon]:px-2">
         <Link href="/admin" className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 font-bold text-sm text-white">
             BP
           </div>
-          <span className="text-lg font-semibold text-gray-900 group-data-[collapsible=icon]:hidden">
+          <span className="text-lg font-semibold text-foreground group-data-[collapsible=icon]:hidden">
             Admin Portal
           </span>
         </Link>
@@ -106,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* Main Menu */}
       <SidebarContent className="px-2 group-data-[collapsible=icon]:px-0">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium text-gray-500 uppercase tracking-wider px-3 mb-1">
+          <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-1">
             General
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -131,24 +131,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                           </div>
                           <ChevronRight 
-                            className={`h-4 w-4 text-gray-400 transition-transform group-data-[collapsible=icon]:hidden ${isExpanded ? 'rotate-90' : ''}`} 
+                            className="h-4 w-4 text-muted-foreground transition-transform group-data-[collapsible=icon]:hidden" 
+                            style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
                           />
                         </SidebarMenuButton>
                         {isExpanded && (
                           <div className="ml-8 mt-1 space-y-1 group-data-[collapsible=icon]:hidden">
-                            {item.children?.map((child) => (
-                              <Link
-                                key={child.href}
-                                href={child.href}
-                                className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-                                  pathname === child.href || pathname.startsWith(child.href)
-                                    ? 'bg-gray-100 text-gray-900 font-medium'
-                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                }`}
-                              >
-                                {child.label}
-                              </Link>
-                            ))}
+                             {item.children?.map((child) => (
+                               <Link
+                                 key={child.href}
+                                 href={child.href}
+                                 className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                                   pathname === child.href || pathname.startsWith(child.href)
+                                     ? 'bg-secondary text-secondary-foreground font-medium'
+                                     : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'
+                                 }`}
+                               >
+                                 {child.label}
+                               </Link>
+                             ))}
                           </div>
                         )}
                       </>
@@ -187,16 +188,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       {/* Footer with User Info */}
-      <SidebarFooter className="border-t border-gray-100 p-3">
+      <SidebarFooter className="border-t border-border dark:border-gray-800 p-3">
         <div className="flex items-center gap-3 px-1 group-data-[collapsible=icon]:justify-center">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-rose-500 font-semibold text-white text-sm">
             {user?.name?.charAt(0).toUpperCase() || 'A'}
           </div>
           <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-            <div className="font-medium text-gray-900 truncate text-sm">
+            <div className="font-medium text-foreground truncate text-sm">
               {user?.name || 'Admin User'}
             </div>
-            <div className="text-xs text-gray-500 truncate">
+            <div className="text-xs text-muted-foreground truncate">
               {user?.email || 'admin@example.com'}
             </div>
           </div>
@@ -205,7 +206,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               logout();
               router.push('/login');
             }}
-            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded transition-colors"
             title="Đăng xuất"
           >
             <LogOut className="h-4 w-4" />
