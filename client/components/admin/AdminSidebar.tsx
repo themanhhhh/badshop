@@ -91,9 +91,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border bg-background dark:bg-gray-900 sticky top-0 h-screen" {...props}>
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar sticky top-0 h-screen" {...props}>
       {/* Header */}
-      <SidebarHeader className="px-4 py-5 border-b border-border dark:border-gray-800 group-data-[collapsible=icon]:px-2">
+      <SidebarHeader className="px-4 py-5 border-b border-sidebar-border group-data-[collapsible=icon]:px-2">
         <Link href="/admin" className="flex items-center justify-center">
           <span className="text-xl font-bold text-foreground group-data-[collapsible=icon]:hidden">
             Admin Portal
@@ -186,7 +186,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       {/* Footer with User Info */}
-      <SidebarFooter className="border-t border-border dark:border-gray-800 p-3">
+      <SidebarFooter className="border-t border-sidebar-border p-3">
         <div className="flex items-center gap-3 px-1 group-data-[collapsible=icon]:justify-center">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-rose-500 font-semibold text-white text-sm">
             {user?.name?.charAt(0).toUpperCase() || 'A'}
@@ -204,7 +204,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               logout();
               router.push('/login');
             }}
-            className="p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-950 rounded transition-colors"
             title="Đăng xuất"
           >
             <LogOut className="h-4 w-4" />
