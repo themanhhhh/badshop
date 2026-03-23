@@ -14,7 +14,7 @@ export default function AdminLayout({
     <ThemeProvider>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="bg-gray-50 dark:bg-gray-900">
+        <SidebarInset>
           <AdminHeader />
           <main className="flex-1 p-6">{children}</main>
         </SidebarInset>

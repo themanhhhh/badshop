@@ -93,9 +93,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border bg-background dark:bg-gray-900 sticky top-0 h-screen" {...props}>
+    <Sidebar variant="floating" collapsible="icon" className="bg-background dark:bg-gray-900 sticky top-0 h-screen" {...props}>
       {/* Header */}
-      <SidebarHeader className="px-4 py-5 border-b border-border dark:border-gray-800 group-data-[collapsible=icon]:px-2">
+      <SidebarHeader className="px-4 py-5 group-data-[collapsible=icon]:px-2">
         <Link href="/admin" className="flex items-center justify-center">
           <span className="text-xl font-bold text-foreground group-data-[collapsible=icon]:hidden">
             Admin Portal
