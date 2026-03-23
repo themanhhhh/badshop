@@ -174,6 +174,11 @@ export function useOrders() {
   return useApi<Order[]>(() => orderApi.getAll());
 }
 
+export function useOrdersWithFilters(filters: any) {
+  const filterKey = JSON.stringify(filters);
+  return useApi<{ data: Order[]; pagination: any }>(() => orderApi.getWithFilters(filters), [filterKey]);
+}
+
 export function useOrder(id: string) {
   return useApi<Order>(() => orderApi.getById(id), [id]);
 }

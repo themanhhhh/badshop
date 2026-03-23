@@ -62,32 +62,32 @@ export default function AdminDashboardPage() {
           value={formatPrice(dynamicStats.totalRevenue)}
           change={dynamicStats.revenueGrowth}
           icon={DollarSign}
-          iconColor="text-green-600"
-          iconBg="bg-green-100"
+          iconColor="text-foreground"
+          iconBg="bg-muted"
         />
         <StatsCard
           title="Đơn hàng"
           value={dynamicStats.totalOrders.toLocaleString()}
           change={dynamicStats.ordersGrowth}
           icon={ShoppingCart}
-          iconColor="text-blue-600"
-          iconBg="bg-blue-100"
+          iconColor="text-foreground"
+          iconBg="bg-muted"
         />
         <StatsCard
           title="Khách hàng"
           value={dynamicStats.totalCustomers.toLocaleString()}
           change={dynamicStats.customersGrowth}
           icon={Users}
-          iconColor="text-purple-600"
-          iconBg="bg-purple-100"
+          iconColor="text-foreground"
+          iconBg="bg-muted"
         />
         <StatsCard
           title="Sản phẩm"
           value={dynamicStats.totalProducts.toLocaleString()}
           change={dynamicStats.productsGrowth}
           icon={Package}
-          iconColor="text-orange-600"
-          iconBg="bg-orange-100"
+          iconColor="text-foreground"
+          iconBg="bg-muted"
         />
       </div>
 

@@ -81,17 +81,17 @@ export default function AdminCustomersPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-card rounded-xl p-4 border border-border">
           <p className="text-sm text-muted-foreground mb-1">Tổng khách hàng</p>
-          <p className="text-2xl font-bold">{allCustomers.length}</p>
+          <p className="text-2xl font-bold text-foreground">{allCustomers.length}</p>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
           <p className="text-sm text-muted-foreground mb-1">Khách hoạt động</p>
-          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <p className="text-2xl font-bold text-foreground">
             {allCustomers.filter(c => c.status === 'active').length}
           </p>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
           <p className="text-sm text-muted-foreground mb-1">Tổng doanh thu</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <p className="text-2xl font-bold text-foreground">
             {formatPrice(allCustomers.reduce((sum, c) => sum + (c.totalSpent || 0), 0))}
           </p>
         </div>

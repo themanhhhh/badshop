@@ -110,23 +110,23 @@ export default function AdminPostsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
-              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-muted rounded-lg">
+              <FileText className="h-5 w-5 text-foreground" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Tổng bài viết</p>
-              <p className="text-2xl font-bold">{pagination.total}</p>
+              <p className="text-2xl font-bold text-foreground">{pagination.total}</p>
             </div>
           </div>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
-              <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <div className="p-2 bg-muted rounded-lg">
+              <Check className="h-5 w-5 text-foreground" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Đã đăng</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-2xl font-bold text-foreground">
                 {posts.filter((p: any) => p.status === 'published').length}
               </p>
             </div>
@@ -135,11 +135,11 @@ export default function AdminPostsPage() {
         <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-muted rounded-lg">
-              <FileText className="h-5 w-5 text-muted-foreground" />
+              <FileText className="h-5 w-5 text-foreground" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Nháp</p>
-              <p className="text-2xl font-bold text-muted-foreground">
+              <p className="text-2xl font-bold text-foreground">
                 {posts.filter((p: any) => p.status === 'draft').length}
               </p>
             </div>
