@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Package,
+  PackageCheck,
   ShoppingCart,
   Users,
   Settings,
@@ -46,6 +47,7 @@ const menuItems: MenuItem[] = [
   { icon: LayoutDashboard, label: 'Bảng điều khiển', href: '/admin' },
   { icon: Users, label: 'Khách hàng', href: '/admin/customers' },
   { icon: ShoppingCart, label: 'Đơn hàng', href: '/admin/orders' },
+  { icon: PackageCheck, label: 'Fulfillment', href: '/admin/fulfillment' },
   { 
     icon: Package, 
     label: 'Sản phẩm', 
@@ -56,6 +58,7 @@ const menuItems: MenuItem[] = [
       { label: 'Thương hiệu', href: '/admin/brands' },
     ]
   },
+  { icon: FileText, label: 'Bài viết', href: '/admin/posts' },
   { icon: Megaphone, label: 'Chiến dịch', href: '/admin/campaigns' },
   { icon: BarChart3, label: 'Báo cáo', href: '/admin/reports' },
 ];
@@ -93,11 +96,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" className="border-r border-border bg-background dark:bg-gray-900 sticky top-0 h-screen" {...props}>
       {/* Header */}
       <SidebarHeader className="px-4 py-5 border-b border-border dark:border-gray-800 group-data-[collapsible=icon]:px-2">
-        <Link href="/admin" className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 font-bold text-sm text-white">
-            BP
-          </div>
-          <span className="text-lg font-semibold text-foreground group-data-[collapsible=icon]:hidden">
+        <Link href="/admin" className="flex items-center justify-center">
+          <span className="text-xl font-bold text-foreground group-data-[collapsible=icon]:hidden">
             Admin Portal
           </span>
         </Link>

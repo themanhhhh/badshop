@@ -13,6 +13,8 @@ import {
   campaignApi,
   flashSaleApi,
   statsApi,
+  postApi,
+  fulfillmentApi,
 } from '@/lib/api';
 import type {
   User,
@@ -25,6 +27,8 @@ import type {
   Review,
   Campaign,
   FlashSale,
+  Post,
+  Shipment,
 } from '@/lib/types';
 
 // Generic hook state type
@@ -183,6 +187,18 @@ export function useUserOrders(userId: string) {
   return useApi<Order[]>(() => orderApi.getByUser(userId), [userId]);
 }
 
+export function useShipmentByOrder(orderId: string) {
+  return useApi<Shipment | null>(() => fulfillmentApi.getShipmentByOrder(orderId), [orderId]);
+}
+
+export function useShipmentsByOrder(orderId: string) {
+  return useApi<Shipment[]>(() => fulfillmentApi.getShipmentsByOrder(orderId), [orderId]);
+}
+
+export function useShipmentByTracking(trackingNumber: string) {
+  return useApi<Shipment>(() => fulfillmentApi.getShipmentByTracking(trackingNumber), [trackingNumber]);
+}
+
 // ============================================
 // CART HOOKS
 // ============================================
@@ -287,4 +303,23 @@ export function useDashboardStats() {
     customersGrowth: number;
     productsGrowth: number;
   }>(() => statsApi.getDashboardStats());
+}
+
+// ============================================
+// POST HOOKS
+// ============================================
+export function usePosts(page: number = 1, limit: number = 10) {
+  return useApi<{ data: Post[]; pagination: any }>(() => postApi.getAll(page, limit), [page, limit]);
+}
+
+export function usePublishedPosts(page: number = 1, limit: number = 10) {
+  return useApi<{ data: Post[]; pagination: any }>(() => postApi.getPublished(page, limit), [page, limit]);
+}
+
+export function usePost(id: string) {
+  return useApi<Post>(() => postApi.getById(id), [id]);
+}
+
+export function usePostBySlug(slug: string) {
+  return useApi<Post>(() => postApi.getBySlug(slug), [slug]);
 }

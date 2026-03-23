@@ -46,10 +46,19 @@ export default function AdminOrdersPage() {
             Tổng cộng {displayOrders.length} đơn hàng
           </p>
         </div>
-        <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-white hover:bg-gray-50 font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring">
-          <Download className="h-4 w-4" aria-hidden="true" />
-          Xuất Excel
-        </button>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/fulfillment"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Eye className="h-4 w-4" aria-hidden="true" />
+            Fulfillment Hub
+          </Link>
+          <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-white hover:bg-gray-50 font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring">
+            <Download className="h-4 w-4" aria-hidden="true" />
+            Xuất Excel
+          </button>
+        </div>
       </div>
 
       {/* Status Tabs */}

@@ -9,6 +9,8 @@ import {
   Review,
   Campaign,
   FlashSale,
+  Post,
+  Shipment,
 } from './types';
 import { getToken } from './auth';
 
@@ -314,6 +316,65 @@ export const orderApi = {
 };
 
 // ============================================
+// FULFILLMENT API
+// ============================================
+export const fulfillmentApi = {
+  getShipmentByOrder: (orderId: string): Promise<Shipment | null> =>
+    fetchApi(`/fulfillment/order/${orderId}/shipment`),
+
+  getShipmentsByOrder: (orderId: string): Promise<Shipment[]> =>
+    fetchApi(`/fulfillment/order/${orderId}/shipments`),
+
+  getShipmentByTracking: (trackingNumber: string): Promise<Shipment> =>
+    fetchApi(`/fulfillment/tracking/${trackingNumber}`),
+
+  createShipment: (orderId: string, data: Partial<Shipment>): Promise<Shipment> =>
+    fetchApi(`/fulfillment/order/${orderId}/shipment`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  startPicking: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/picking`, { method: 'POST' }),
+
+  startPacking: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/packing`, { method: 'POST' }),
+
+  markReady: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/ready`, { method: 'POST' }),
+
+  inputTracking: (orderId: string, tracking_number: string, carrier: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/tracking`, {
+      method: 'POST',
+      body: JSON.stringify({ tracking_number, carrier }),
+    }),
+
+  handover: (orderId: string, data?: { tracking_number?: string; carrier?: string }): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/handover`, {
+      method: 'POST',
+      body: JSON.stringify(data || {}),
+    }),
+
+  confirmDelivery: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/confirm-delivery`, { method: 'POST' }),
+
+  cancelShipment: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/cancel`, { method: 'POST' }),
+
+  updateShipmentStatus: (orderId: string, data: Partial<Shipment> & { status: Shipment['status'] }): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  syncCarrierStatus: (trackingNumber: string, data: Record<string, unknown>): Promise<void> =>
+    fetchApi(`/fulfillment/sync-carrier/${trackingNumber}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
+// ============================================
 // CART API
 // ============================================
 export const cartApi = {
@@ -492,6 +553,38 @@ export const statsApi = {
   }> => fetchApi('/stats/dashboard'),
 };
 
+// ============================================
+// POST API
+// ============================================
+export const postApi = {
+  getAll: (page: number = 1, limit: number = 10): Promise<{ data: Post[]; pagination: any }> => 
+    fetchApi(`/posts?page=${page}&limit=${limit}`),
+  
+  getPublished: (page: number = 1, limit: number = 10): Promise<{ data: Post[]; pagination: any }> => 
+    fetchApi(`/posts/published?page=${page}&limit=${limit}`),
+  
+  getById: (id: string): Promise<Post> => 
+    fetchApi(`/posts/${id}`),
+  
+  getBySlug: (slug: string): Promise<Post> => 
+    fetchApi(`/posts/slug/${slug}`),
+  
+  create: (data: Partial<Post>): Promise<Post> => 
+    fetchApi('/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Post>): Promise<Post> => 
+    fetchApi(`/posts/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/posts/${id}`, { method: 'DELETE' }),
+};
+
 // Export all APIs as a single object for convenience
 export const api = {
   users: userApi,
@@ -505,6 +598,8 @@ export const api = {
   campaigns: campaignApi,
   flashSales: flashSaleApi,
   stats: statsApi,
+  posts: postApi,
+  fulfillment: fulfillmentApi,
 };
 
 export default api;

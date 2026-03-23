@@ -116,6 +116,53 @@ export interface Order {
   updatedAt: string;
 }
 
+export interface ShipmentTrackingEvent {
+  status?: string;
+  note?: string;
+  location?: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+export interface Shipment {
+  id: string;
+  order_id: string;
+  tracking_number?: string;
+  carrier?: string;
+  carrier_service?: 'standard' | 'express' | 'same_day';
+  shipping_method?: 'seller_fulfillment' | 'platform_fulfillment';
+  status:
+    | 'pending'
+    | 'picking'
+    | 'packing'
+    | 'ready_for_pickup'
+    | 'picked_up'
+    | 'in_transit'
+    | 'out_for_delivery'
+    | 'delivered'
+    | 'failed_delivery'
+    | 'returned';
+  pickup_address?: string;
+  pickup_name?: string;
+  pickup_phone?: string;
+  pickup_note?: string;
+  delivery_address?: string;
+  delivery_name?: string;
+  delivery_phone?: string;
+  estimated_delivery?: string;
+  actual_delivery?: string;
+  shipped_at?: string;
+  picked_up_at?: string;
+  shipping_fee?: number;
+  weight?: number;
+  package_dimension?: string;
+  tracking_history?: string | ShipmentTrackingEvent[];
+  is_return?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  order?: Order;
+}
+
 export interface CartItem {
   id: string;
   productId: string;
@@ -185,6 +232,23 @@ export interface FlashSale {
   products: FlashSaleProduct[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  featured_image?: string;
+  status: 'draft' | 'published';
+  view_count: number;
+  meta_title?: string;
+  meta_description?: string;
+  author_id?: string;
+  author?: User;
+  created_at: string;
+  updated_at: string;
 }
 
 // API Response types
