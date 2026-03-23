@@ -162,19 +162,16 @@ export default function AdminOrdersPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-sm truncate max-w-[200px]" title={order.products?.join(', ') || ''}>
-                      {order.products?.join(', ') || order.items?.map((i: any) => i.product?.name).join(', ') || 'Sản phẩm'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {order.products?.length || order.items?.length || 0} sản phẩm
-                    </p>
+                    <span className="font-medium">
+                      {(order.order_items || order.items || []).reduce((acc: number, item: any) => acc + (item.quantity || 1), 0)} sản phẩm
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className="font-semibold">{formatPrice(order.total)}</span>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm">
-                      {order.date || (order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : '')}
+                      {new Date(order.created_at || order.createdAt || new Date()).toLocaleDateString('vi-VN')}
                     </span>
                   </td>
                   <td className="px-6 py-4">

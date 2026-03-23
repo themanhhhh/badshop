@@ -275,7 +275,40 @@ export const brandApi = {
 // ============================================
 // ORDER API
 // ============================================
+export interface OrderFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  date?: string;
+}
+
 export const orderApi = {
+  getWithFilters: async (filters: OrderFilters): Promise<{ data: Order[]; pagination: any }> => {
+    const params = new URLSearchParams();
+    if (filters.page) params.append('page', filters.page.toString());
+    if (filters.limit) params.append('limit', filters.limit.toString());
+    if (filters.search) params.append('search', filters.search);
+    if (filters.status && filters.status !== 'all') params.append('status', filters.status);
+    if (filters.date) params.append('date', filters.date);
+    
+    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'}/orders?${params.toString()}`;
+    const token = getToken();
+    const config: RequestInit = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      },
+    };
+    
+    const response = await fetch(url, config);
+    if (!response.ok) throw new Error('API Error');
+    const json = await response.json();
+    return {
+      data: json.data || [],
+      pagination: json.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 }
+    };
+  },
   getAll: (): Promise<Order[]> => 
     fetchApi('/orders'),
   
