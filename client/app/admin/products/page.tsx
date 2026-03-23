@@ -158,7 +158,7 @@ export default function AdminProductsPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="p-12 text-center text-muted-foreground">
@@ -167,7 +167,7 @@ export default function AdminProductsPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+                <thead className="bg-muted/50 border-b">
                   <tr>
                     <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase">Sản phẩm</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase">Danh mục</th>
@@ -179,7 +179,7 @@ export default function AdminProductsPage() {
                 </thead>
                 <tbody className="divide-y">
                   {paginatedProducts.map((product: Product) => (
-                    <tr key={product.id} className="hover:bg-gray-50">
+                    <tr key={product.id} className="hover:bg-muted/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           {(() => {
@@ -191,8 +191,8 @@ export default function AdminProductsPage() {
                                 className="w-12 h-12 object-cover rounded-lg"
                               />
                             ) : (
-                              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                                <ImageIcon className="h-5 w-5 text-gray-400" />
+                              <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                                <ImageIcon className="h-5 w-5 text-muted-foreground" />
                               </div>
                             );
                           })()}
@@ -203,7 +203,7 @@ export default function AdminProductsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                        <span className="px-2.5 py-1 bg-secondary text-secondary-foreground rounded-full text-xs font-medium">
                           {product.category?.name || '-'}
                         </span>
                       </td>
@@ -220,8 +220,8 @@ export default function AdminProductsPage() {
                       <td className="px-6 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                           ((product.stock ?? product.stock_quantity ?? 0) > 0)
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-red-100 text-red-700'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400' 
+                            : 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                         }`}>
                           {(product.stock ?? product.stock_quantity) !== undefined ? `${product.stock ?? product.stock_quantity} sp` : 'N/A'}
                         </span>
@@ -242,14 +242,14 @@ export default function AdminProductsPage() {
                           </Link>
                           <Link href={`/admin/products/${product.id}/edit`}>
                             <Button variant="ghost" size="sm">
-                              <Edit className="h-4 w-4 text-blue-600" />
+                              <Edit className="h-4 w-4 text-primary" />
                             </Button>
                           </Link>
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => setDeleteProduct(product)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

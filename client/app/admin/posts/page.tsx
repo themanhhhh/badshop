@@ -33,8 +33,8 @@ export default function AdminPostsPage() {
   });
 
   const statusColors: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-700',
-    published: 'bg-green-100 text-green-700',
+    draft: 'bg-secondary text-secondary-foreground',
+    published: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
   };
 
   const statusLabels: Record<string, string> = {
@@ -99,7 +99,7 @@ export default function AdminPostsPage() {
         </div>
         <Link
           href="/admin/posts/new"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           Tạo bài viết
@@ -108,10 +108,10 @@ export default function AdminPostsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FileText className="h-5 w-5 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Tổng bài viết</p>
@@ -119,27 +119,27 @@ export default function AdminPostsPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Check className="h-5 w-5 text-green-600" />
+            <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
+              <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Đã đăng</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {posts.filter((p: any) => p.status === 'published').length}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <FileText className="h-5 w-5 text-gray-600" />
+            <div className="p-2 bg-muted rounded-lg">
+              <FileText className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Nháp</p>
-              <p className="text-2xl font-bold text-gray-600">
+              <p className="text-2xl font-bold text-muted-foreground">
                 {posts.filter((p: any) => p.status === 'draft').length}
               </p>
             </div>
@@ -148,7 +148,7 @@ export default function AdminPostsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl p-4 border border-border flex flex-col sm:flex-row gap-4">
+      <div className="bg-card rounded-2xl p-4 border border-border flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
@@ -171,10 +171,10 @@ export default function AdminPostsPage() {
       </div>
 
       {/* Posts Table */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/50">
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Bài viết</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Slug</th>
@@ -200,7 +200,7 @@ export default function AdminPostsPage() {
                 </tr>
               )}
               {!loading && filteredPosts.map((post: any) => (
-                <tr key={post.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={post.id} className="hover:bg-muted/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {post.featured_image ? (
@@ -210,8 +210,8 @@ export default function AdminPostsPage() {
                           className="w-12 h-12 object-cover rounded-lg"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <FileText className="h-6 w-6 text-gray-400" />
+                        <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                          <FileText className="h-6 w-6 text-muted-foreground" />
                         </div>
                       )}
                       <div>
@@ -223,13 +223,13 @@ export default function AdminPostsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <code className="text-xs bg-gray-100 px-2 py-1 rounded">{post.slug}</code>
+                    <code className="text-xs bg-muted px-2 py-1 rounded">{post.slug}</code>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm">{post.view_count || 0}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${statusColors[post.status] || 'bg-gray-100 text-gray-700'}`}>
+                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${statusColors[post.status] || 'bg-secondary text-secondary-foreground'}`}>
                       {statusLabels[post.status] || post.status}
                     </span>
                   </td>
@@ -242,28 +242,28 @@ export default function AdminPostsPage() {
                     <div className="flex items-center gap-1">
                       <Link
                         href={`/admin/posts/${post.id}/edit`}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-muted rounded-lg transition-colors"
                         title="Sửa"
                       >
-                        <Edit className="h-4 w-4 text-blue-600" />
+                        <Edit className="h-4 w-4 text-primary" />
                       </Link>
                       <button
                         onClick={() => handleToggleStatus(post)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-muted rounded-lg transition-colors"
                         title={post.status === 'published' ? 'Chuyển sang nháp' : 'Đăng bài'}
                       >
                         {post.status === 'published' ? (
-                          <EyeOff className="h-4 w-4 text-gray-600" />
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <Eye className="h-4 w-4 text-green-600" />
+                          <Eye className="h-4 w-4 text-green-600 dark:text-green-400" />
                         )}
                       </button>
                       <button
                         onClick={() => handleDelete(post.id)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-destructive/10 rounded-lg transition-colors group"
                         title="Xóa"
                       >
-                        <Trash2 className="h-4 w-4 text-red-600" />
+                        <Trash2 className="h-4 w-4 text-destructive group-hover:text-destructive" />
                       </button>
                     </div>
                   </td>
@@ -283,14 +283,14 @@ export default function AdminPostsPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={pagination.page === 1}
-                className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
               >
                 Trước
               </button>
               <button
                 onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                 disabled={pagination.page === pagination.totalPages}
-                className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
               >
                 Sau
               </button>

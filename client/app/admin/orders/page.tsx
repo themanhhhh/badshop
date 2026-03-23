@@ -1,16 +1,26 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, Filter, Eye, MoreHorizontal, Download, Loader2, AlertCircle } from 'lucide-react';
+import { Search, Filter, Eye, MoreHorizontal, Download, Loader2, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useOrders } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
 import { AdminLoading } from '@/components/admin/AdminLoading';
+import { Button } from '@/components/ui/button';
 
 export default function AdminOrdersPage() {
   const { data: orders, loading, error, refetch } = useOrders();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Use API data directly
-  const displayOrders = orders || [];
+  const filteredOrders = orders || [];
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  
+  const displayOrders = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredOrders.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredOrders, currentPage]);
 
   const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
@@ -43,17 +53,11 @@ export default function AdminOrdersPage() {
         <div>
           <h1 className="text-2xl font-bold">Quản lý đơn hàng</h1>
           <p className="text-muted-foreground">
-            Tổng cộng {displayOrders.length} đơn hàng
+            Tổng cộng {filteredOrders.length} đơn hàng
           </p>
         </div>
         <div className="flex gap-2">
-          <Link
-            href="/admin/fulfillment"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <Eye className="h-4 w-4" aria-hidden="true" />
-            Fulfillment Hub
-          </Link>
+         
           <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-card hover:bg-accent hover:text-accent-foreground font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring">
             <Download className="h-4 w-4" aria-hidden="true" />
             Xuất Excel
@@ -187,20 +191,54 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* Pagination */}
-        <div className="p-4 border-t border-border flex items-center justify-between">
+        <div className="flex items-center justify-between p-4 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            Hiển thị 1-{displayOrders.length} / {displayOrders.length} đơn hàng
+            Hiển thị {filteredOrders.length > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0}-{Math.min(currentPage * itemsPerPage, filteredOrders.length)} của {filteredOrders.length} đơn hàng
           </p>
+          
+          {/* Pagination Controls */}
           <div className="flex items-center gap-2">
-            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50" disabled>
-              Trước
-            </button>
-            <button className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
-              1
-            </button>
-            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50" disabled>
-              Sau
-            </button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            {/* Page numbers */}
+            <div className="flex items-center gap-1">
+              {totalPages > 0 ? Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  className="w-8 h-8 p-0"
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </Button>
+              )) : (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="w-8 h-8 p-0"
+                  disabled
+                >
+                  1
+                </Button>
+              )}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(Math.max(1, totalPages), prev + 1))}
+              disabled={currentPage >= totalPages || totalPages === 0}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>

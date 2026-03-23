@@ -43,11 +43,11 @@ export default function AdminCampaignsPage() {
   };
 
   const statusColors: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-700',
-    scheduled: 'bg-blue-100 text-blue-700',
-    active: 'bg-green-100 text-green-700',
-    paused: 'bg-yellow-100 text-yellow-700',
-    ended: 'bg-red-100 text-red-700',
+    draft: 'bg-gray-100 text-gray-700 dark:bg-muted dark:text-muted-foreground',
+    scheduled: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    active: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+    paused: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
+    ended: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
   };
 
   const statusLabels: Record<string, string> = {
@@ -81,14 +81,14 @@ export default function AdminCampaignsPage() {
   };
 
   const typeColors: Record<string, string> = {
-    flash_sale: 'bg-orange-100 text-orange-700',
-    voucher: 'bg-purple-100 text-purple-700',
-    banner: 'bg-cyan-100 text-cyan-700',
-    seasonal: 'bg-emerald-100 text-emerald-700',
-    combo: 'bg-pink-100 text-pink-700',
-    percentage: 'bg-purple-100 text-purple-700',
-    fixed: 'bg-blue-100 text-blue-700',
-    free_shipping: 'bg-teal-100 text-teal-700',
+    flash_sale: 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400',
+    voucher: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+    banner: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-400',
+    seasonal: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
+    combo: 'bg-pink-100 text-pink-700 dark:bg-pink-500/20 dark:text-pink-400',
+    percentage: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+    fixed: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    free_shipping: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
   };
 
   if (loading) {
@@ -107,7 +107,7 @@ export default function AdminCampaignsPage() {
         </div>
         <Link
           href="/admin/campaigns/new"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           Tạo chiến dịch
@@ -116,10 +116,10 @@ export default function AdminCampaignsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Target className="h-5 w-5 text-blue-600" aria-hidden="true" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+              <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Tổng chiến dịch</p>
@@ -127,21 +127,21 @@ export default function AdminCampaignsPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Play className="h-5 w-5 text-green-600" aria-hidden="true" />
+            <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
+              <Play className="h-5 w-5 text-green-600 dark:text-green-400" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Đang hoạt động</p>
-              <p className="text-2xl font-bold text-green-600">{dynamicStats.activeCampaigns}</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{dynamicStats.activeCampaigns}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <DollarSign className="h-5 w-5 text-purple-600" aria-hidden="true" />
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
+              <DollarSign className="h-5 w-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Tổng ngân sách</p>
@@ -149,14 +149,14 @@ export default function AdminCampaignsPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-orange-600" aria-hidden="true" />
+            <div className="p-2 bg-orange-100 dark:bg-orange-900/40 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Doanh thu từ chiến dịch</p>
-              <p className="text-xl font-bold text-orange-600">{formatPrice(dynamicStats.totalRevenue)}</p>
+              <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{formatPrice(dynamicStats.totalRevenue)}</p>
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function AdminCampaignsPage() {
           <button
             key={tab}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              i === 0 ? 'bg-blue-600 text-white' : 'bg-white border border-input hover:bg-gray-50'
+              i === 0 ? 'bg-blue-600 text-white dark:bg-blue-600 dark:text-white' : 'bg-card border border-input hover:bg-accent hover:text-accent-foreground'
             }`}
           >
             {tab}
@@ -177,7 +177,7 @@ export default function AdminCampaignsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl p-4 border border-border flex flex-col sm:flex-row gap-4">
+      <div className="bg-card rounded-2xl p-4 border border-border flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <label htmlFor="campaign-search" className="sr-only">Tìm kiếm chiến dịch</label>
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
@@ -211,20 +211,20 @@ export default function AdminCampaignsPage() {
             className="h-10 px-4 border border-input rounded-lg bg-background text-sm focus-visible:ring-2 focus-visible:ring-ring"
           />
         </div>
-        <button className="h-10 px-4 border border-input rounded-lg bg-background hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">
+        <button className="h-10 px-4 border border-input rounded-lg bg-background hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">
           <Filter className="h-4 w-4" aria-hidden="true" />
           Bộ lọc
         </button>
       </div>
 
       {/* Campaigns Table */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/50">
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">
-                  <input type="checkbox" className="rounded" aria-label="Chọn tất cả chiến dịch" />
+                  <input type="checkbox" className="rounded border-input text-primary focus:ring-primary" aria-label="Chọn tất cả chiến dịch" />
                 </th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Chiến dịch</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Loại</th>
@@ -253,13 +253,13 @@ export default function AdminCampaignsPage() {
                 const status = campaign.status; // Now using status field directly
                 
                 return (
-                  <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={campaign.id} className="hover:bg-muted/50 transition-colors">
                     <td className="px-6 py-4">
-                      <input type="checkbox" className="rounded" aria-label={`Chọn ${campaign.name}`} />
+                      <input type="checkbox" className="rounded border-input text-primary focus:ring-primary" aria-label={`Chọn ${campaign.name}`} />
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${typeColors[campaign.type] || 'bg-gray-100 text-gray-700'}`}>
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${typeColors[campaign.type] || 'bg-muted text-muted-foreground'}`}>
                           <TypeIcon className="h-5 w-5" aria-hidden="true" />
                         </div>
                         <div>
@@ -269,7 +269,7 @@ export default function AdminCampaignsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${typeColors[campaign.type] || 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${typeColors[campaign.type] || 'bg-muted text-muted-foreground'}`}>
                         {typeLabels[campaign.type] || campaign.type}
                       </span>
                     </td>
@@ -287,9 +287,9 @@ export default function AdminCampaignsPage() {
                       <div className="space-y-1">
                         <p className="text-sm font-medium">{formatPrice(spent)}</p>
                         <div className="flex items-center gap-2">
-                          <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                             <div 
-                              className={`h-full rounded-full ${budgetPercent > 80 ? 'bg-red-500' : budgetPercent > 50 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                              className={`h-full rounded-full ${budgetPercent > 80 ? 'bg-destructive' : budgetPercent > 50 ? 'bg-yellow-500' : 'bg-green-500'}`}
                               style={{ width: `${Math.min(budgetPercent, 100)}%` }}
                             />
                           </div>
@@ -308,13 +308,13 @@ export default function AdminCampaignsPage() {
                           <span>{(clicks).toLocaleString()} clicks ({conversionRate}%)</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <TrendingUp className="h-3 w-3 text-green-600" aria-hidden="true" />
-                          <span className="text-green-600 font-medium">{formatPrice(campaign.revenue || 0)}</span>
+                          <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" aria-hidden="true" />
+                          <span className="text-green-600 dark:text-green-400 font-medium">{formatPrice(campaign.revenue || 0)}</span>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${statusColors[status] || 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${statusColors[status] || 'bg-muted text-muted-foreground'}`}>
                         {statusLabels[status] || status}
                       </span>
                     </td>
@@ -322,13 +322,13 @@ export default function AdminCampaignsPage() {
                       <div className="flex items-center gap-1">
                         <Link
                           href={`/admin/campaigns/${campaign.id}/edit`} 
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring" 
+                          className="p-2 hover:bg-accent hover:text-accent-foreground text-primary rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring" 
                           aria-label={`Sửa ${campaign.name}`}
                         >
-                          <Edit className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                          <Edit className="h-4 w-4" aria-hidden="true" />
                         </Link>
                         <button 
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring" 
+                          className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring group" 
                           aria-label={`Xóa ${campaign.name}`}
                           onClick={async () => {
                             if (confirm('Bạn có chắc muốn xóa chiến dịch này?')) {
@@ -348,7 +348,7 @@ export default function AdminCampaignsPage() {
                             }
                           }}
                         >
-                          <Trash2 className="h-4 w-4 text-red-600" aria-hidden="true" />
+                          <Trash2 className="h-4 w-4" aria-hidden="true" />
                         </button>
                       </div>
                     </td>
@@ -365,13 +365,13 @@ export default function AdminCampaignsPage() {
             Hiển thị 1-{displayCampaigns.length} / {displayCampaigns.length} chiến dịch
           </p>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
+            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50" disabled>
               Trước
             </button>
             <button className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
               1
             </button>
-            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
+            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50" disabled>
               Sau
             </button>
           </div>
