@@ -174,15 +174,8 @@ export default function AdminFulfillmentPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[28px] border border-slate-200 bg-sidebar p-6 shadow-sm">
+      <div className="rounded-[28px] border border-border bg-card p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-2">
-            <Badge variant="outline" className="border-sky-200 bg-sky-50 text-sky-700">SmashX Fulfillment</Badge>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Điều phối pick, pack, handover và tracking</h1>
-            <p className="max-w-3xl text-sm leading-6 text-slate-600">
-              Dùng màn này để xử lý các đơn đã thanh toán, tạo shipment, nhập tracking và đồng bộ trạng thái giao hàng theo flow bạn đã yêu cầu.
-            </p>
-          </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               { label: 'Đơn có thể ship', value: normalizedOrders.filter((o: any) => ['paid', 'awaiting_shipment'].includes(o.status)).length },
@@ -191,8 +184,8 @@ export default function AdminFulfillmentPage() {
               { label: 'Completed', value: normalizedOrders.filter((o: any) => o.status === 'completed').length },
             ].map((item) => (
               <div key={item.label} className="rounded-2xl border border-border bg-background px-4 py-3">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{item.label}</div>
-                <div className="mt-2 text-2xl font-semibold text-slate-900">{item.value}</div>
+                <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{item.label}</div>
+                <div className="mt-2 text-2xl font-semibold text-foreground">{item.value}</div>
               </div>
             ))}
           </div>
@@ -202,21 +195,23 @@ export default function AdminFulfillmentPage() {
       {feedback && (
         <div className={cn(
           'rounded-2xl border px-4 py-3 text-sm',
-          feedback.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'
+          feedback.type === 'success' 
+            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:border-emerald-500/30 dark:text-emerald-400' 
+            : 'border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:border-rose-500/30 dark:text-rose-400'
         )}>
           {feedback.text}
         </div>
       )}
 
       <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-        <Card className="border-slate-200 bg-white">
+        <Card className="border-border bg-card">
           <CardHeader>
             <CardTitle>Queue xử lý</CardTitle>
             <CardDescription>Chọn một đơn để thao tác fulfillment</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm theo mã đơn hoặc khách hàng" className="pl-9" />
             </div>
 
@@ -233,20 +228,20 @@ export default function AdminFulfillmentPage() {
                     className={cn(
                       'w-full rounded-2xl border p-4 text-left transition-all',
                       isActive
-                        ? 'border-sky-300 bg-sky-50 shadow-sm'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                        ? 'border-primary bg-primary/10 shadow-sm'
+                        : 'border-border bg-card hover:border-accent hover:bg-accent/50'
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <div className="font-mono text-sm font-semibold text-slate-900">{getOrderNumber(order)}</div>
-                        <div className="mt-1 text-sm text-slate-600">{order.user?.name || 'Khach hang'}</div>
+                        <div className="font-mono text-sm font-semibold text-foreground">{getOrderNumber(order)}</div>
+                        <div className="mt-1 text-sm text-muted-foreground">{order.user?.name || 'Khach hang'}</div>
                       </div>
-                      <Badge variant="outline" className="border-slate-200 bg-white text-slate-700">
+                      <Badge variant="outline" className="border-border bg-card text-foreground">
                         {orderStageLabel[order.status] || order.status}
                       </Badge>
                     </div>
-                    <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                    <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                       <span>{itemCount} san pham</span>
                       <span>{formatPrice(order.total || 0)}</span>
                     </div>
@@ -255,7 +250,7 @@ export default function AdminFulfillmentPage() {
               })}
 
               {!filteredOrders.length && (
-                <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
+                <div className="rounded-2xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
                   Khong tim thay don hang phu hop.
                 </div>
               )}
@@ -265,7 +260,7 @@ export default function AdminFulfillmentPage() {
 
         {selectedOrder && (
           <div className="space-y-6">
-            <Card className="border-slate-200 bg-white">
+            <Card className="border-border bg-card">
               <CardHeader>
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
@@ -283,23 +278,23 @@ export default function AdminFulfillmentPage() {
               <CardContent className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl bg-slate-50 p-4">
-                      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Tong gia tri</div>
-                      <div className="mt-2 text-lg font-semibold text-slate-900">{formatPrice((selectedOrder as any).total || 0)}</div>
+                    <div className="rounded-2xl bg-muted/50 p-4">
+                      <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Tong gia tri</div>
+                      <div className="mt-2 text-lg font-semibold text-foreground">{formatPrice((selectedOrder as any).total || 0)}</div>
                     </div>
-                    <div className="rounded-2xl bg-slate-50 p-4">
-                      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Shipment</div>
-                      <div className="mt-2 text-lg font-semibold text-slate-900">{shipment ? 'Da tao' : 'Chua co'}</div>
+                    <div className="rounded-2xl bg-muted/50 p-4">
+                      <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Shipment</div>
+                      <div className="mt-2 text-lg font-semibold text-foreground">{shipment ? 'Da tao' : 'Chua co'}</div>
                     </div>
-                    <div className="rounded-2xl bg-slate-50 p-4">
-                      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Tracking</div>
-                      <div className="mt-2 truncate text-lg font-semibold text-slate-900">{shipment?.tracking_number || '--'}</div>
+                    <div className="rounded-2xl bg-muted/50 p-4">
+                      <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Tracking</div>
+                      <div className="mt-2 truncate text-lg font-semibold text-foreground">{shipment?.tracking_number || '--'}</div>
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 p-4">
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-900">
-                      <ShieldCheck className="h-4 w-4 text-sky-600" />
+                  <div className="rounded-2xl border border-border p-4">
+                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
+                      <ShieldCheck className="h-4 w-4 text-primary" />
                       Action nhanh
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -333,7 +328,7 @@ export default function AdminFulfillmentPage() {
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-slate-200 bg-slate-950 p-5 text-slate-50 shadow-sm">
+                <div className="rounded-3xl border border-border bg-slate-950 p-5 text-slate-50 shadow-sm dark:bg-black/40">
                   <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Current shipment</div>
                   {shipmentLoading ? (
                     <div className="mt-4 flex items-center gap-2 text-sm text-slate-300">
@@ -369,7 +364,7 @@ export default function AdminFulfillmentPage() {
             </Card>
 
             <div className="grid gap-6 xl:grid-cols-2">
-              <Card className="border-slate-200 bg-white">
+              <Card className="border-border bg-card">
                 <CardHeader>
                   <CardTitle>Tao shipment</CardTitle>
                   <CardDescription>Tao cau hinh giao nhan cho seller fulfillment</CardDescription>
@@ -405,7 +400,7 @@ export default function AdminFulfillmentPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-slate-200 bg-white">
+              <Card className="border-border bg-card">
                 <CardHeader>
                   <CardTitle>Tracking & status sync</CardTitle>
                   <CardDescription>Nhap ma van don, cap nhat event va dong bo trang thai carrier</CardDescription>
@@ -462,19 +457,19 @@ export default function AdminFulfillmentPage() {
                   <Separator />
 
                   <div className="space-y-3">
-                    <div className="text-sm font-medium text-slate-900">Lich su tracking</div>
+                    <div className="text-sm font-medium text-foreground">Lich su tracking</div>
                     {trackingHistory.length ? trackingHistory.map((event: any, index: number) => (
-                      <div key={`${event.timestamp || index}-${index}`} className="rounded-2xl border border-slate-200 p-3">
+                      <div key={`${event.timestamp || index}-${index}`} className="rounded-2xl border border-border bg-card p-3">
                         <div className="flex items-center justify-between gap-4">
-                          <div className="font-medium text-slate-900">{shipmentStageLabel[event.status] || event.status || 'Tracking event'}</div>
-                          <div className="text-xs text-slate-500">{event.timestamp ? new Date(event.timestamp).toLocaleString('vi-VN') : '--'}</div>
+                          <div className="font-medium text-foreground">{shipmentStageLabel[event.status] || event.status || 'Tracking event'}</div>
+                          <div className="text-xs text-muted-foreground">{event.timestamp ? new Date(event.timestamp).toLocaleString('vi-VN') : '--'}</div>
                         </div>
                         {(event.note || event.location) && (
-                          <div className="mt-1 text-sm text-slate-600">{event.note || 'Khong co ghi chu'}{event.location ? ` - ${event.location}` : ''}</div>
+                          <div className="mt-1 text-sm text-muted-foreground">{event.note || 'Khong co ghi chu'}{event.location ? ` - ${event.location}` : ''}</div>
                         )}
                       </div>
                     )) : (
-                      <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-sm text-slate-500">
+                      <div className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
                         Chua co tracking history.
                       </div>
                     )}

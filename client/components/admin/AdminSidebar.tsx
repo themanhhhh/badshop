@@ -93,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar sticky top-0 h-screen" {...props}>
+    <Sidebar collapsible="icon" className="m-4 border border-sidebar-border bg-sidebar sticky top-4 h-[calc(100vh-1.0rem)] rounded-[0.5rem] overflow-hidden shadow-md" {...props}>
       {/* Header */}
       <SidebarHeader className="px-4 py-5 border-b border-sidebar-border group-data-[collapsible=icon]:px-2">
         <Link href="/admin" className="flex items-center justify-center">

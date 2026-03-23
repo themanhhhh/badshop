@@ -13,13 +13,13 @@ export default function AdminOrdersPage() {
   const displayOrders = orders || [];
 
   const statusColors: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-700',
-    processing: 'bg-blue-100 text-blue-700',
-    shipped: 'bg-purple-100 text-purple-700',
-    delivered: 'bg-green-100 text-green-700',
-    cancelled: 'bg-red-100 text-red-700',
-    confirmed: 'bg-teal-100 text-teal-700',
-    shipping: 'bg-indigo-100 text-indigo-700',
+    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
+    processing: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    shipped: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+    delivered: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+    cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+    confirmed: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
+    shipping: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
   };
 
   const statusLabels: Record<string, string> = {
@@ -54,7 +54,7 @@ export default function AdminOrdersPage() {
             <Eye className="h-4 w-4" aria-hidden="true" />
             Fulfillment Hub
           </Link>
-          <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-white hover:bg-gray-50 font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring">
+          <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-card hover:bg-accent hover:text-accent-foreground font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring">
             <Download className="h-4 w-4" aria-hidden="true" />
             Xuất Excel
           </button>
@@ -67,7 +67,7 @@ export default function AdminOrdersPage() {
           <button
             key={tab}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              i === 0 ? 'bg-blue-600 text-white' : 'bg-white border border-input hover:bg-gray-50'
+              i === 0 ? 'bg-blue-600 text-white' : 'bg-card border border-input hover:bg-accent hover:text-accent-foreground'
             }`}
           >
             {tab}
@@ -76,7 +76,7 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl p-4 border border-border flex flex-col sm:flex-row gap-4">
+      <div className="bg-card rounded-2xl p-4 border border-border flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <label htmlFor="order-search" className="sr-only">Tìm kiếm đơn hàng</label>
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
@@ -96,17 +96,17 @@ export default function AdminOrdersPage() {
             className="h-10 px-4 border border-input rounded-lg bg-background text-sm focus-visible:ring-2 focus-visible:ring-ring"
           />
         </div>
-        <button className="h-10 px-4 border border-input rounded-lg bg-background hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">
+        <button className="h-10 px-4 border border-input rounded-lg bg-background hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">
           <Filter className="h-4 w-4" aria-hidden="true" />
           Bộ lọc
         </button>
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/50">
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">
                   <input type="checkbox" className="rounded" aria-label="Chọn tất cả đơn hàng" />
@@ -122,7 +122,7 @@ export default function AdminOrdersPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {displayOrders.map((order: any) => (
-                <tr key={order.id || order.orderNumber} className="hover:bg-gray-50 transition-colors">
+                <tr key={order.id || order.orderNumber} className="hover:bg-muted/50 transition-colors">
                   <td className="px-6 py-4">
                     <input type="checkbox" className="rounded" aria-label={`Chọn đơn hàng ${order.id || order.orderNumber}`} />
                   </td>
@@ -155,7 +155,7 @@ export default function AdminOrdersPage() {
                     <label htmlFor={`status-${order.id || order.orderNumber}`} className="sr-only">Trạng thái đơn hàng</label>
                     <select 
                       id={`status-${order.id || order.orderNumber}`}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring ${statusColors[order.status] || 'bg-gray-100 text-gray-700'}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring ${statusColors[order.status] || 'bg-gray-100 text-gray-700 dark:bg-muted dark:text-muted-foreground'}`}
                       defaultValue={order.status}
                     >
                       {Object.entries(statusLabels).map(([value, label]) => (
@@ -167,16 +167,16 @@ export default function AdminOrdersPage() {
                     <div className="flex items-center gap-1">
                       <Link 
                         href={`/admin/orders/${order.id || order.orderNumber}`}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+                        className="p-2 hover:bg-accent rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
                         aria-label={`Chi tiết đơn hàng ${order.id || order.orderNumber}`}
                       >
-                        <Eye className="h-4 w-4 text-gray-600" aria-hidden="true" />
+                        <Eye className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       </Link>
                       <button 
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+                        className="p-2 hover:bg-accent rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
                         aria-label={`Tùy chọn khác cho đơn hàng ${order.id || order.orderNumber}`}
                       >
-                        <MoreHorizontal className="h-4 w-4 text-gray-600" aria-hidden="true" />
+                        <MoreHorizontal className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       </button>
                     </div>
                   </td>
@@ -192,13 +192,13 @@ export default function AdminOrdersPage() {
             Hiển thị 1-{displayOrders.length} / {displayOrders.length} đơn hàng
           </p>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
+            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50" disabled>
               Trước
             </button>
             <button className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
               1
             </button>
-            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
+            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50" disabled>
               Sau
             </button>
           </div>

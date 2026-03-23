@@ -47,17 +47,17 @@ export default function AdminCustomersPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <p className="text-sm text-muted-foreground mb-1">Tổng khách hàng</p>
           <p className="text-2xl font-bold">{displayCustomers.length}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <p className="text-sm text-muted-foreground mb-1">Khách hoạt động</p>
           <p className="text-2xl font-bold text-green-600">
             {displayCustomers.filter(c => c.status === 'active').length}
           </p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-border">
+        <div className="bg-card rounded-xl p-4 border border-border">
           <p className="text-sm text-muted-foreground mb-1">Tổng doanh thu</p>
           <p className="text-2xl font-bold text-blue-600">
             {formatPrice(displayCustomers.reduce((sum, c) => sum + (c.totalSpent || 0), 0))}
@@ -66,7 +66,7 @@ export default function AdminCustomersPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl p-4 border border-border flex flex-col sm:flex-row gap-4">
+      <div className="bg-card rounded-2xl p-4 border border-border flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <label htmlFor="customer-search" className="sr-only">Tìm kiếm khách hàng</label>
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
@@ -89,17 +89,17 @@ export default function AdminCustomersPage() {
             { value: 'inactive', label: 'Không hoạt động' },
           ]}
         />
-        <button className="h-10 px-4 border border-input rounded-lg bg-background hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">
+        <button className="h-10 px-4 border border-input rounded-lg bg-background hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">
           <Filter className="h-4 w-4" aria-hidden="true" />
           Bộ lọc
         </button>
       </div>
 
       {/* Customers Table */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/50">
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">
                   <input type="checkbox" className="rounded" aria-label="Chọn tất cả khách hàng" />
@@ -114,7 +114,7 @@ export default function AdminCustomersPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {displayCustomers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={customer.id} className="hover:bg-muted/50 transition-colors">
                   <td className="px-6 py-4">
                     <input type="checkbox" className="rounded" aria-label={`Chọn ${customer.name}`} />
                   </td>
@@ -155,18 +155,18 @@ export default function AdminCustomersPage() {
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
                       customer.status === 'active' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-gray-100 text-gray-700'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400' 
+                        : 'bg-gray-100 text-gray-700 dark:bg-muted dark:text-muted-foreground'
                     }`}>
                       {customer.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <button 
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+                      className="p-2 hover:bg-accent rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
                       aria-label={`Tùy chọn cho ${customer.name}`}
                     >
-                      <MoreHorizontal className="h-4 w-4 text-gray-600" aria-hidden="true" />
+                      <MoreHorizontal className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     </button>
                   </td>
                 </tr>
@@ -181,13 +181,13 @@ export default function AdminCustomersPage() {
             Hiển thị 1-{displayCustomers.length} / {displayCustomers.length} khách hàng
           </p>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
+            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50" disabled>
               Trước
             </button>
             <button className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
               1
             </button>
-            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
+            <button className="px-3 py-2 border border-input rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50" disabled>
               Sau
             </button>
           </div>

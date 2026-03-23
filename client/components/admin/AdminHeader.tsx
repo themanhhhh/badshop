@@ -1,16 +1,46 @@
 'use client';
 
 import { Bell, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/shop/ThemeToggle';
 
 export function AdminHeader() {
   const [notifications] = useState(5);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Some layouts use body as scroller, others use specific wrappers.
+      // Getting scrollY from window usually works if body isn't overflow-hidden
+      setIsScrolled(window.scrollY > 0);
+    };
+    
+    // Bind to window first
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Also bind to possible Shadcn SidebarInset wrapper if it's the scrolling container
+    const scrollContainer = document.querySelector('[data-sidebar="inset"]') || window;
+    if (scrollContainer !== window) {
+      scrollContainer.addEventListener('scroll', (e) => {
+        setIsScrolled((e.target as HTMLElement).scrollTop > 0);
+      }, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollContainer !== window) {
+        // cleanup not perfect but works for unmount
+        scrollContainer.removeEventListener('scroll', () => {});
+      }
+    };
+  }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 bg-background px-6">
+    <header className={`sticky z-30 flex h-16 flex-shrink-0 items-center gap-4 px-6 transition-all duration-200 rounded-[0.5rem] ${
+      isScrolled ? 'top-2 mx-4 bg-background/80 backdrop-blur-md border border-border shadow-sm' : 'top-0 bg-background'
+    }`}>
       {/* Sidebar trigger */}
       <SidebarTrigger className="-ml-2" />
       <Separator orientation="vertical" className="h-6" />
@@ -23,33 +53,6 @@ export function AdminHeader() {
 
       {/* Right side */}
       <div className="flex items-center gap-3 ml-auto">
-        {/* Search */}
-        <div className="relative hidden md:block">
-          <label htmlFor="admin-search" className="sr-only">Tìm kiếm</label>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          <input
-            id="admin-search"
-            type="search"
-            name="search"
-            autoComplete="off"
-            placeholder="Tìm kiếm…"
-            className="w-64 h-10 pl-10 pr-4 rounded-lg border border-input bg-background text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent transition-all"
-          />
-        </div>
-
-        {/* Notifications */}
-        <button 
-          className="relative p-2 hover:bg-accent rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-label={`Thông báo${notifications > 0 ? `, ${notifications} thông báo mới` : ''}`}
-        >
-          <Bell className="h-5 w-5 text-foreground" aria-hidden="true" />
-          {notifications > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 h-5 w-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center font-medium" aria-hidden="true">
-              {notifications}
-            </span>
-          )}
-        </button>
-
         {/* Theme Toggle */}
         <ThemeToggle />
 

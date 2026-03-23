@@ -188,11 +188,17 @@ export function useUserOrders(userId: string) {
 }
 
 export function useShipmentByOrder(orderId: string) {
-  return useApi<Shipment | null>(() => fulfillmentApi.getShipmentByOrder(orderId), [orderId]);
+  return useApi<Shipment | null>(() => {
+    if (!orderId) return Promise.resolve(null);
+    return fulfillmentApi.getShipmentByOrder(orderId);
+  }, [orderId]);
 }
 
 export function useShipmentsByOrder(orderId: string) {
-  return useApi<Shipment[]>(() => fulfillmentApi.getShipmentsByOrder(orderId), [orderId]);
+  return useApi<Shipment[]>(() => {
+    if (!orderId) return Promise.resolve([]);
+    return fulfillmentApi.getShipmentsByOrder(orderId);
+  }, [orderId]);
 }
 
 export function useShipmentByTracking(trackingNumber: string) {

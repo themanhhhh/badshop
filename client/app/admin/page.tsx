@@ -29,13 +29,13 @@ export default function AdminDashboardPage() {
   };
 
   const statusColors: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-700',
-    processing: 'bg-blue-100 text-blue-700',
-    shipped: 'bg-purple-100 text-purple-700',
-    delivered: 'bg-green-100 text-green-700',
-    cancelled: 'bg-red-100 text-red-700',
-    confirmed: 'bg-teal-100 text-teal-700',
-    shipping: 'bg-indigo-100 text-indigo-700',
+    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
+    processing: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    shipped: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+    delivered: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+    cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+    confirmed: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
+    shipping: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
   };
 
   const statusLabels: Record<string, string> = {
@@ -122,9 +122,9 @@ export default function AdminDashboardPage() {
             {(products?.slice(0, 3) || ['Yonex Astrox 99 Pro', 'Victor Thruster K 9900', 'Yonex Power Cushion 65Z3']).map((product, i) => (
               <div key={typeof product === 'string' ? product : product.id} className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold ${
-                  i === 0 ? 'bg-yellow-100 text-yellow-600' :
-                  i === 1 ? 'bg-gray-100 text-gray-600' :
-                  'bg-orange-100 text-orange-600'
+                  i === 0 ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400' :
+                  i === 1 ? 'bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground' :
+                  'bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'
                 }`}>
                   {i + 1}
                 </div>
@@ -150,7 +150,7 @@ export default function AdminDashboardPage() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/50">
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Mã đơn</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Khách hàng</th>
@@ -162,7 +162,7 @@ export default function AdminDashboardPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {recentOrders.map((order: any) => (
-                <tr key={order.id || order.orderNumber} className="hover:bg-gray-50 transition-colors">
+                <tr key={order.id || order.orderNumber} className="hover:bg-muted/50 transition-colors">
                   <td className="px-6 py-4">
                     <span className="font-mono text-sm font-medium">{order.id || order.orderNumber}</span>
                   </td>
@@ -188,16 +188,16 @@ export default function AdminDashboardPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <button 
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+                        className="p-2 hover:bg-accent rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
                         aria-label={`Xem chi tiết đơn hàng ${order.id || order.orderNumber}`}
                       >
-                        <Eye className="h-4 w-4 text-gray-600" aria-hidden="true" />
+                        <Eye className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       </button>
                       <button 
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+                        className="p-2 hover:bg-accent rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
                         aria-label={`Tùy chọn khác cho đơn hàng ${order.id || order.orderNumber}`}
                       >
-                        <MoreHorizontal className="h-4 w-4 text-gray-600" aria-hidden="true" />
+                        <MoreHorizontal className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       </button>
                     </div>
                   </td>
