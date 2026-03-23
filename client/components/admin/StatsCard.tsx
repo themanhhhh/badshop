@@ -14,7 +14,7 @@ export function StatsCard({ title, value, change, icon: Icon, iconColor, iconBg 
   const isPositive = change >= 0;
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-border hover:shadow-lg transition-shadow">
+    <div className="bg-sidebar rounded-2xl p-6 border border-border hover:shadow-lg transition-shadow">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-muted-foreground mb-1">{title}</p>

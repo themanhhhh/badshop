@@ -174,10 +174,10 @@ export default function AdminFulfillmentPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[28px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(15,23,42,0.06),_transparent_42%),linear-gradient(135deg,_#f8fafc,_#eef2ff_55%,_#ecfeff)] p-6 shadow-sm">
+      <div className="rounded-[28px] border border-slate-200 bg-sidebar p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
-            <Badge variant="outline" className="border-sky-200 bg-white/80 text-sky-700">SmashX Fulfillment</Badge>
+            <Badge variant="outline" className="border-sky-200 bg-sky-50 text-sky-700">SmashX Fulfillment</Badge>
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Điều phối pick, pack, handover và tracking</h1>
             <p className="max-w-3xl text-sm leading-6 text-slate-600">
               Dùng màn này để xử lý các đơn đã thanh toán, tạo shipment, nhập tracking và đồng bộ trạng thái giao hàng theo flow bạn đã yêu cầu.
@@ -190,7 +190,7 @@ export default function AdminFulfillmentPage() {
               { label: 'In transit', value: normalizedOrders.filter((o: any) => o.status === 'in_transit').length },
               { label: 'Completed', value: normalizedOrders.filter((o: any) => o.status === 'completed').length },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-white/70 bg-white/70 px-4 py-3 backdrop-blur">
+              <div key={item.label} className="rounded-2xl border border-border bg-background px-4 py-3">
                 <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{item.label}</div>
                 <div className="mt-2 text-2xl font-semibold text-slate-900">{item.value}</div>
               </div>
