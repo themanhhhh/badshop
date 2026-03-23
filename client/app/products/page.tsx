@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowRight, SlidersHorizontal, ChevronDown, Loader2, AlertCircle, X, Check } from 'lucide-react';
@@ -61,7 +61,7 @@ function sortProducts(products: DisplayProduct[], sort: SortOption): DisplayProd
   }
 }
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const categorySlug = searchParams.get('category');
@@ -387,5 +387,25 @@ export default function ProductsPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-white">
+          <Header />
+          <div className="flex min-h-[70vh] items-center justify-center">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin" /> Dang tai bo loc san pham...
+            </div>
+          </div>
+          <Footer />
+        </main>
+      }
+    >
+      <ProductsContent />
+    </Suspense>
   );
 }

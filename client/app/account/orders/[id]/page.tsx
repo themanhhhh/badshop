@@ -13,12 +13,18 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { orderApi } from '@/lib/api';
 import { useApi } from '@/hooks/useApi';
+import { useShipmentByOrder } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
 import type { Order } from '@/lib/types';
 
 // Status config
 const statusConfig: Record<string, { label: string; color: 'default' | 'secondary' | 'destructive' | 'outline'; icon: typeof Package }> = {
   pending: { label: 'Chờ xác nhận', color: 'secondary', icon: Clock },
+  pending_payment: { label: 'Chờ thanh toán', color: 'secondary', icon: Clock },
+  paid: { label: 'Đã thanh toán', color: 'default', icon: CheckCircle2 },
+  awaiting_shipment: { label: 'Đang chuẩn bị hàng', color: 'default', icon: Package },
+  awaiting_collection: { label: 'Chờ lấy hàng', color: 'default', icon: Truck },
+  in_transit: { label: 'Đang vận chuyển', color: 'default', icon: Truck },
   confirmed: { label: 'Đã xác nhận', color: 'default', icon: CheckCircle2 },
   processing: { label: 'Đang xử lý', color: 'default', icon: Package },
   shipping: { label: 'Đang giao hàng', color: 'default', icon: Truck },
@@ -51,6 +57,18 @@ function formatDate(dateString: string): string {
   });
 }
 
+function parseTrackingHistory(trackingHistory: any) {
+  if (!trackingHistory) return [];
+  if (Array.isArray(trackingHistory)) return trackingHistory;
+
+  try {
+    const parsed = JSON.parse(trackingHistory);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: orderIdentifier } = use(params);
   const router = useRouter();
@@ -66,6 +84,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     },
     [orderIdentifier]
   );
+  const { data: shipment } = useShipmentByOrder(order?.id || orderIdentifier);
 
   // Redirect if not authenticated
   if (!authLoading && !isAuthenticated) {
@@ -113,6 +132,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const paymentStatus = order.paymentStatus || (order as any).payment_status || 'pending';
   const status = statusConfig[order.status] || statusConfig.pending;
   const StatusIcon = status.icon;
+  const trackingHistory = parseTrackingHistory((shipment as any)?.tracking_history);
 
   return (
     <>
@@ -229,6 +249,66 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         {order.address.district && `, ${order.address.district}`}
                         {order.address.province && `, ${order.address.province}`}
                       </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {shipment && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Truck className="h-5 w-5" />
+                      Theo dõi giao hàng
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">Carrier</p>
+                        <p className="mt-2 font-medium">{(shipment as any).carrier || 'Đang cập nhật'}</p>
+                      </div>
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">Tracking</p>
+                        <p className="mt-2 font-medium break-all">{(shipment as any).tracking_number || 'Chưa có'}</p>
+                      </div>
+                      <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">Shipment</p>
+                        <p className="mt-2 font-medium">{(shipment as any).status || 'pending'}</p>
+                      </div>
+                    </div>
+
+                    {(shipment as any).tracking_number && (
+                      <Button asChild variant="outline" className="w-full sm:w-auto">
+                        <Link href={`/tracking/${(shipment as any).tracking_number}`}>
+                          Xem trang tracking chi tiết
+                        </Link>
+                      </Button>
+                    )}
+
+                    <div className="space-y-3">
+                      {trackingHistory.length > 0 ? trackingHistory.map((event: any, index: number) => (
+                        <div key={`${event.timestamp || index}-${index}`} className="flex gap-3 rounded-xl border p-3">
+                          <div className="mt-1 h-2.5 w-2.5 rounded-full bg-blue-500" />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                              <p className="font-medium">{event.status || 'Cập nhật vận chuyển'}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {event.timestamp ? new Date(event.timestamp).toLocaleString('vi-VN') : '--'}
+                              </p>
+                            </div>
+                            {(event.note || event.location) && (
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                {event.note || 'Đang cập nhật'}{event.location ? ` - ${event.location}` : ''}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )) : (
+                        <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                          Shipment đã được tạo nhưng chưa có timeline tracking.
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

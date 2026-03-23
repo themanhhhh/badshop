@@ -10,6 +10,7 @@ import {
   Campaign,
   FlashSale,
   Post,
+  Shipment,
 } from './types';
 import { getToken } from './auth';
 
@@ -315,6 +316,65 @@ export const orderApi = {
 };
 
 // ============================================
+// FULFILLMENT API
+// ============================================
+export const fulfillmentApi = {
+  getShipmentByOrder: (orderId: string): Promise<Shipment | null> =>
+    fetchApi(`/fulfillment/order/${orderId}/shipment`),
+
+  getShipmentsByOrder: (orderId: string): Promise<Shipment[]> =>
+    fetchApi(`/fulfillment/order/${orderId}/shipments`),
+
+  getShipmentByTracking: (trackingNumber: string): Promise<Shipment> =>
+    fetchApi(`/fulfillment/tracking/${trackingNumber}`),
+
+  createShipment: (orderId: string, data: Partial<Shipment>): Promise<Shipment> =>
+    fetchApi(`/fulfillment/order/${orderId}/shipment`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  startPicking: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/picking`, { method: 'POST' }),
+
+  startPacking: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/packing`, { method: 'POST' }),
+
+  markReady: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/ready`, { method: 'POST' }),
+
+  inputTracking: (orderId: string, tracking_number: string, carrier: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/tracking`, {
+      method: 'POST',
+      body: JSON.stringify({ tracking_number, carrier }),
+    }),
+
+  handover: (orderId: string, data?: { tracking_number?: string; carrier?: string }): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/handover`, {
+      method: 'POST',
+      body: JSON.stringify(data || {}),
+    }),
+
+  confirmDelivery: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/confirm-delivery`, { method: 'POST' }),
+
+  cancelShipment: (orderId: string): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/cancel`, { method: 'POST' }),
+
+  updateShipmentStatus: (orderId: string, data: Partial<Shipment> & { status: Shipment['status'] }): Promise<void> =>
+    fetchApi(`/fulfillment/order/${orderId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  syncCarrierStatus: (trackingNumber: string, data: Record<string, unknown>): Promise<void> =>
+    fetchApi(`/fulfillment/sync-carrier/${trackingNumber}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
+// ============================================
 // CART API
 // ============================================
 export const cartApi = {
@@ -539,6 +599,7 @@ export const api = {
   flashSales: flashSaleApi,
   stats: statsApi,
   posts: postApi,
+  fulfillment: fulfillmentApi,
 };
 
 export default api;
