@@ -58,6 +58,10 @@ function clearLocalCart(): void {
   localStorage.removeItem(LOCAL_CART_KEY);
 }
 
+function isNetworkError(error: unknown): boolean {
+  return error instanceof TypeError;
+}
+
 interface CartProviderProps {
   children: ReactNode;
 }
@@ -81,61 +85,73 @@ export function CartProvider({ children }: CartProviderProps) {
         // Load cart from API for authenticated users
         try {
           const token = getToken();
-          const response = await fetch(`${API_BASE_URL}/carts/user/${user.id}`, {
-            method: 'POST', // getOrCreate
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (response.ok) {
-            const result = await response.json();
-            if (result.data) {
-              setCartId(result.data.id);
-              // Map API cart items to our format
-              const apiItems: CartItem[] = (result.data.items || []).map((item: {
-                id: string;
-                product_id?: string;
-                productId?: string;
-                quantity: number;
-                price: number;
-                product?: {
-                  name?: string;
-                  brand?: { name?: string };
-                  images?: { url?: string }[];
-                };
-              }) => ({
-                id: item.id,
-                productId: item.product_id || item.productId,
-                name: item.product?.name || 'Sản phẩm',
-                brand: item.product?.brand?.name || '',
-                price: item.price,
-                image: item.product?.images?.[0]?.url || '/products/placeholder.jpg',
-                quantity: item.quantity,
-              }));
-              
-              // Merge with local cart if any (guest items)
-              const localItems = getLocalCart();
-              if (localItems.length > 0) {
-                // Add local items to server cart
-                for (const localItem of localItems) {
-                  const existing = apiItems.find((i: CartItem) => i.productId === localItem.productId);
-                  if (!existing) {
-                    apiItems.push(localItem);
-                    // TODO: Sync to server
+          if (!token) {
+            setItems(getLocalCart());
+            setCartId(null);
+          } else {
+            const response = await fetch(`${API_BASE_URL}/carts/user/${user.id}`, {
+              method: 'POST', // getOrCreate
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              if (result.data) {
+                setCartId(result.data.id);
+                // Map API cart items to our format
+                const apiItems: CartItem[] = (result.data.items || []).map((item: {
+                  id: string;
+                  product_id?: string;
+                  productId?: string;
+                  quantity: number;
+                  price: number;
+                  product?: {
+                    name?: string;
+                    brand?: { name?: string };
+                    images?: { url?: string }[];
+                  };
+                }) => ({
+                  id: item.id,
+                  productId: item.product_id || item.productId,
+                  name: item.product?.name || 'Sản phẩm',
+                  brand: item.product?.brand?.name || '',
+                  price: item.price,
+                  image: item.product?.images?.[0]?.url || '/products/placeholder.jpg',
+                  quantity: item.quantity,
+                }));
+
+                // Merge with local cart if any (guest items)
+                const localItems = getLocalCart();
+                if (localItems.length > 0) {
+                  // Add local items to server cart
+                  for (const localItem of localItems) {
+                    const existing = apiItems.find((i: CartItem) => i.productId === localItem.productId);
+                    if (!existing) {
+                      apiItems.push(localItem);
+                      // TODO: Sync to server
+                    }
                   }
+                  clearLocalCart();
                 }
-                clearLocalCart();
+
+                setItems(apiItems);
               }
-              
-              setItems(apiItems);
+            } else {
+              setItems(getLocalCart());
+              setCartId(null);
             }
           }
         } catch (error) {
-          console.error('Failed to load cart:', error);
           // Fallback to local cart
           setItems(getLocalCart());
+          setCartId(null);
+
+          if (!isNetworkError(error)) {
+            console.warn('Cart load fallback activated.');
+          }
         }
       } else {
         // Load from localStorage for guests
@@ -173,6 +189,8 @@ export function CartProvider({ children }: CartProviderProps) {
     if (isAuthenticated && cartId) {
       try {
         const token = getToken();
+        if (!token) return;
+
         await fetch(`${API_BASE_URL}/carts/${cartId}/items`, {
           method: 'POST',
           headers: {
@@ -184,8 +202,8 @@ export function CartProvider({ children }: CartProviderProps) {
             quantity: item.quantity,
           }),
         });
-      } catch (error) {
-        console.error('Failed to sync cart:', error);
+      } catch {
+        console.warn('Cart sync skipped because server is unavailable.');
       }
     }
   }, [isAuthenticated, cartId]);

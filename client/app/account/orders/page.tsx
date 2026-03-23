@@ -1,63 +1,47 @@
 'use client';
 
 import Link from 'next/link';
-import { Package, ChevronRight } from 'lucide-react';
-import { Header } from '@/components/shop/Header';
+import { useRouter } from 'next/navigation';
+import { ChevronRight, Loader2, Package, Truck } from 'lucide-react';
 import { Footer } from '@/components/shop/Footer';
+import { Header } from '@/components/shop/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { formatPrice } from '@/lib/mockData';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserOrders } from '@/hooks/useApi';
+import { formatPrice } from '@/lib/productMapper';
 
-// Mock orders data
-const orders = [
-  {
-    id: 'ORD-2026011401',
-    date: '14/01/2026',
-    status: 'processing',
-    statusText: 'Đang xử lý',
-    total: 7400000,
-    items: [
-      { name: 'Yonex Astrox 99 Pro', quantity: 1 },
-      { name: 'Yonex Power Cushion 65Z3', quantity: 2 },
-    ],
-  },
-  {
-    id: 'ORD-2026011201',
-    date: '12/01/2026',
-    status: 'shipped',
-    statusText: 'Đang giao',
-    total: 3800000,
-    items: [
-      { name: 'Victor Thruster K 9900', quantity: 1 },
-    ],
-  },
-  {
-    id: 'ORD-2026011001',
-    date: '10/01/2026',
-    status: 'delivered',
-    statusText: 'Đã giao',
-    total: 2400000,
-    items: [
-      { name: 'Victor A970ACE', quantity: 1 },
-    ],
-  },
-];
-
-const statusColors: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  processing: 'secondary',
-  shipped: 'default',
-  delivered: 'outline',
-  cancelled: 'destructive',
+const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+  pending_payment: { label: 'Chờ thanh toán', variant: 'secondary' },
+  paid: { label: 'Đã thanh toán', variant: 'default' },
+  awaiting_shipment: { label: 'Chuẩn bị giao', variant: 'default' },
+  awaiting_collection: { label: 'Chờ lấy hàng', variant: 'default' },
+  in_transit: { label: 'Đang vận chuyển', variant: 'default' },
+  delivered: { label: 'Đã giao', variant: 'outline' },
+  completed: { label: 'Hoàn tất', variant: 'outline' },
+  cancelled: { label: 'Đã hủy', variant: 'destructive' },
+  confirmed: { label: 'Đã xác nhận', variant: 'default' },
+  shipping: { label: 'Đang giao', variant: 'default' },
 };
 
 export default function OrdersPage() {
+  const router = useRouter();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { data: orders, loading } = useUserOrders(user?.id || '');
+
+  if (!authLoading && !isAuthenticated) {
+    router.replace('/login');
+    return null;
+  }
+
+  const displayOrders = Array.isArray(orders) ? orders : [];
+
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white">
-        {/* Breadcrumb */}
-        <div className="border-b">
+      <main className="min-h-screen bg-[linear-gradient(180deg,_#ffffff_0%,_#f8fbff_30%,_#f9fafb_100%)]">
+        <div className="border-b bg-white/90 backdrop-blur">
           <div className="container mx-auto px-4 py-4">
             <nav className="flex items-center gap-2 text-xs text-muted-foreground">
               <Link href="/" className="hover:text-foreground transition-colors">Trang chủ</Link>
@@ -69,71 +53,112 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        {/* Page Header */}
-        <div className="container mx-auto px-4 py-10">
-          <h1 className="text-3xl font-bold uppercase tracking-wide text-center">
-            Đơn hàng của tôi
-          </h1>
-        </div>
-
-        <div className="container mx-auto px-4 pb-16 max-w-3xl">
-          {orders.length > 0 ? (
-            <div className="space-y-4">
-              {orders.map((order) => (
-                <Card key={order.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <p className="font-medium">{order.id}</p>
-                        <p className="text-sm text-muted-foreground">{order.date}</p>
-                      </div>
-                      <Badge variant={statusColors[order.status]}>
-                        {order.statusText}
-                      </Badge>
-                    </div>
-
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
-                        <Package className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm">
-                          {order.items.map((item, i) => (
-                            <span key={i}>
-                              {item.name} x{item.quantity}
-                              {i < order.items.length - 1 && ', '}
-                            </span>
-                          ))}
-                        </p>
-                        <p className="text-sm font-medium mt-1">
-                          Tổng: {formatPrice(order.total)}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end">
-                      <Button asChild variant="ghost" size="sm">
-                        <Link href={`/account/orders/${order.id}`}>
-                          Xem chi tiết
-                          <ChevronRight className="h-4 w-4 ml-1" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+        <div className="container mx-auto max-w-5xl px-4 py-10">
+          <div className="mb-8 rounded-[28px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.10),_transparent_34%),linear-gradient(135deg,_#ffffff,_#eff6ff_60%,_#f8fafc)] p-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-sky-700">
+                  Don hang cua toi
+                </div>
+                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900">Theo doi don hang va giao nhan</h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                  Xem tien do fulfillment, ma van don va truy cap trang tracking chi tiet cho tung don.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/70 bg-white/80 px-5 py-4 text-sm text-slate-600 backdrop-blur">
+                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Tong don</div>
+                <div className="mt-2 text-2xl font-semibold text-slate-900">{displayOrders.length}</div>
+              </div>
             </div>
-          ) : (
-            <div className="text-center py-16">
-              <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground mb-6">Bạn chưa có đơn hàng nào</p>
-              <Button asChild>
-                <Link href="/products">
-                  Mua sắm ngay
-                </Link>
-              </Button>
+          </div>
+
+          {(loading || authLoading) && (
+            <div className="flex min-h-[240px] items-center justify-center">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin" /> Dang tai don hang...
+              </div>
             </div>
           )}
+
+          {!loading && !authLoading && (displayOrders.length > 0 ? (
+            <div className="space-y-4">
+              {displayOrders.map((order: any) => {
+                const orderNumber = order.orderNumber || order.order_number || order.id;
+                const items = order.items || order.order_items || [];
+                const status = statusMap[order.status] || { label: order.status, variant: 'outline' as const };
+                const trackingNumber = order.shipments?.[0]?.tracking_number;
+
+                return (
+                  <Card key={order.id} className="border-slate-200 bg-white/95 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+                    <CardContent className="pt-6">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <div className="font-mono text-sm font-semibold text-slate-900">{orderNumber}</div>
+                          <div className="mt-1 text-sm text-muted-foreground">
+                            {order.createdAt ? new Date(order.createdAt).toLocaleString('vi-VN') : order.created_at ? new Date(order.created_at).toLocaleString('vi-VN') : ''}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant={status.variant}>{status.label}</Badge>
+                          <Badge variant="outline">{formatPrice(order.total || 0)}</Badge>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
+                            <Package className="h-5 w-5" />
+                          </div>
+                          <div className="min-w-0 flex-1 space-y-2">
+                            <p className="text-sm text-slate-700">
+                              {items.length > 0
+                                ? items.map((item: any, i: number) => (
+                                    <span key={item.id || i}>
+                                      {item.product?.name || 'Sản phẩm'} x{item.quantity || 1}
+                                      {i < items.length - 1 && ', '}
+                                    </span>
+                                  ))
+                                : 'Đơn hàng đang được đồng bộ sản phẩm'}
+                            </p>
+                            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                              <span>{items.length} sản phẩm</span>
+                              {trackingNumber && (
+                                <span className="inline-flex items-center gap-1">
+                                  <Truck className="h-3.5 w-3.5" /> {trackingNumber}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap justify-end gap-2">
+                          {trackingNumber && (
+                            <Button asChild variant="outline" size="sm">
+                              <Link href={`/tracking/${trackingNumber}`}>Tracking</Link>
+                            </Button>
+                          )}
+                          <Button asChild size="sm">
+                            <Link href={`/account/orders/${order.id}`}>
+                              Xem chi tiết
+                              <ChevronRight className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-[28px] border border-dashed border-slate-200 bg-white px-6 py-16 text-center">
+              <Package className="mx-auto h-12 w-12 text-slate-300" />
+              <p className="mt-4 text-slate-600">Bạn chưa có đơn hàng nào</p>
+              <Button asChild className="mt-6">
+                <Link href="/products">Mua sắm ngay</Link>
+              </Button>
+            </div>
+          ))}
         </div>
       </main>
       <Footer />

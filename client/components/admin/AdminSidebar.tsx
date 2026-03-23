@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Package,
+  PackageCheck,
   ShoppingCart,
   Users,
   Settings,
@@ -46,6 +47,7 @@ const menuItems: MenuItem[] = [
   { icon: LayoutDashboard, label: 'Bảng điều khiển', href: '/admin' },
   { icon: Users, label: 'Khách hàng', href: '/admin/customers' },
   { icon: ShoppingCart, label: 'Đơn hàng', href: '/admin/orders' },
+  { icon: PackageCheck, label: 'Fulfillment', href: '/admin/fulfillment' },
   { 
     icon: Package, 
     label: 'Sản phẩm', 

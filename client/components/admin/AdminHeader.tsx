@@ -10,7 +10,7 @@ export function AdminHeader() {
   const [notifications] = useState(5);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 bg-background px-6">
       {/* Sidebar trigger */}
       <SidebarTrigger className="-ml-2" />
       <Separator orientation="vertical" className="h-6" />

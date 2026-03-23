@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
       {/* Charts and Recent Orders */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Chart Placeholder */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-border">
+        <div className="lg:col-span-2 bg-sidebar rounded-2xl p-6 border border-border">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Doanh thu theo tháng</h2>
             <AdminSelect
@@ -116,7 +116,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Top Products */}
-        <div className="bg-white rounded-2xl p-6 border border-border">
+        <div className="bg-sidebar rounded-2xl p-6 border border-border">
           <h2 className="text-lg font-semibold mb-4">Sản phẩm bán chạy</h2>
           <div className="space-y-4">
             {(products?.slice(0, 3) || ['Yonex Astrox 99 Pro', 'Victor Thruster K 9900', 'Yonex Power Cushion 65Z3']).map((product, i) => (
@@ -141,7 +141,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-sidebar rounded-2xl border border-border overflow-hidden">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <h2 className="text-lg font-semibold">Đơn hàng gần đây</h2>
           <Link href="/admin/orders" className="text-sm text-blue-600 hover:text-blue-700 font-medium">

@@ -14,6 +14,7 @@ import {
   flashSaleApi,
   statsApi,
   postApi,
+  fulfillmentApi,
 } from '@/lib/api';
 import type {
   User,
@@ -27,6 +28,7 @@ import type {
   Campaign,
   FlashSale,
   Post,
+  Shipment,
 } from '@/lib/types';
 
 // Generic hook state type
@@ -183,6 +185,18 @@ export function useOrderByNumber(orderNumber: string) {
 
 export function useUserOrders(userId: string) {
   return useApi<Order[]>(() => orderApi.getByUser(userId), [userId]);
+}
+
+export function useShipmentByOrder(orderId: string) {
+  return useApi<Shipment | null>(() => fulfillmentApi.getShipmentByOrder(orderId), [orderId]);
+}
+
+export function useShipmentsByOrder(orderId: string) {
+  return useApi<Shipment[]>(() => fulfillmentApi.getShipmentsByOrder(orderId), [orderId]);
+}
+
+export function useShipmentByTracking(trackingNumber: string) {
+  return useApi<Shipment>(() => fulfillmentApi.getShipmentByTracking(trackingNumber), [trackingNumber]);
 }
 
 // ============================================
