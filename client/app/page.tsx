@@ -69,9 +69,6 @@ export default function HomePage() {
         {/* Pro Player / Athlete Spotlight */}
         <AthleteSpotlight />
 
-        {/* Technology Showcase */}
-        <TechShowcase />
-
         {/* Best Sellers Carousel */}
         {bestProducts.length > 0 && (
           <ProductCarousel 

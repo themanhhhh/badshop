@@ -77,7 +77,12 @@ export function useProducts(limit?: number) {
 }
 
 export function useProductsByCollection(collectionId: string) {
-  return useApi<Product[]>(() => productApi.getByCollection(collectionId), [collectionId]);
+  return useApi<Product[]>(() => {
+    if (!collectionId) {
+      return Promise.resolve([]);
+    }
+    return productApi.getByCollection(collectionId);
+  }, [collectionId]);
 }
 
 export interface ProductFilters {

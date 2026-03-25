@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useProductsWithFilters, useCategories, useBrands } from '@/hooks/useApi';
+import { useProductsWithFilters, useCategories, useBrands, useCollections, useProductsByCollection } from '@/hooks/useApi';
 import { mapProductsForDisplay, type DisplayProduct } from '@/lib/productMapper';
 
 // Category name mapping for display (supports both API Vietnamese slugs and legacy English slugs)
@@ -66,6 +66,7 @@ function ProductsContent() {
   const router = useRouter();
   const categorySlug = searchParams.get('category');
   const brandSlug = searchParams.get('brand');
+  const collectionSlug = searchParams.get('collection');
   
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
@@ -73,6 +74,7 @@ function ProductsContent() {
   // Fetch categories and brands to get actual IDs
   const { data: categories } = useCategories();
   const { data: brands } = useBrands();
+  const { data: collections } = useCollections();
   
   // Find real category ID from slug
   const categoryId = useMemo(() => {
@@ -105,28 +107,51 @@ function ProductsContent() {
     );
     return brand?.id;
   }, [brandSlug, brands]);
+
+  const collectionId = useMemo(() => {
+    if (!collectionSlug || !collections) return undefined;
+
+    const collection = collections.find((c: any) =>
+      c.slug?.toLowerCase() === collectionSlug.toLowerCase() ||
+      c.name?.toLowerCase() === collectionSlug.toLowerCase()
+    );
+
+    return collection?.id;
+  }, [collectionSlug, collections]);
   
   // Build filters for API call
   const filters = useMemo(() => ({
     category: categoryId,
     brand: brandId,
-    _pending: (categorySlug && !categoryId) || (brandSlug && !brandId) ? true : undefined,
-  }), [categoryId, brandId, categorySlug, brandSlug]);
+    _pending: (categorySlug && !categoryId) || (brandSlug && !brandId) || (collectionSlug && !collectionId) ? true : undefined,
+  }), [categoryId, brandId, categorySlug, brandSlug, collectionSlug, collectionId]);
   
   // Use hook that calls API with filters
   const { data: apiProducts, loading: productsLoading, error, refetch } = useProductsWithFilters(filters);
+  const {
+    data: collectionProducts,
+    loading: collectionProductsLoading,
+    error: collectionProductsError,
+    refetch: refetchCollectionProducts,
+  } = useProductsByCollection(collectionId || '');
   
   // Show loading while categories are still resolving
-  const loading = productsLoading || (categorySlug && !categories) || (brandSlug && !brands);
+  const loading = collectionSlug
+    ? collectionProductsLoading || (collectionSlug && !collections)
+    : productsLoading || (categorySlug && !categories) || (brandSlug && !brands);
 
   // Map API products to display format and sort
   const displayProducts = useMemo(() => {
-    const mapped = apiProducts ? mapProductsForDisplay(apiProducts) : [];
+    const sourceProducts = collectionSlug ? collectionProducts : apiProducts;
+    const mapped = sourceProducts ? mapProductsForDisplay(sourceProducts) : [];
     return sortProducts(mapped, sortBy);
-  }, [apiProducts, sortBy]);
+  }, [apiProducts, collectionProducts, collectionSlug, sortBy]);
+
+  const errorState = collectionSlug ? collectionProductsError : error;
+  const refetchProducts = collectionSlug ? refetchCollectionProducts : refetch;
 
   // Navigate with filter params
-  const applyFilter = (type: 'category' | 'brand', value: string | null) => {
+  const applyFilter = (type: 'category' | 'brand' | 'collection', value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value) {
       params.set(type, value);
@@ -140,7 +165,7 @@ function ProductsContent() {
     router.push('/products');
   };
 
-  const activeFilterCount = (categorySlug ? 1 : 0) + (brandSlug ? 1 : 0);
+  const activeFilterCount = (categorySlug ? 1 : 0) + (brandSlug ? 1 : 0) + (collectionSlug ? 1 : 0);
 
   // Get page title based on filter
   const getPageTitle = () => {
@@ -150,6 +175,10 @@ function ProductsContent() {
     if (brandSlug) {
       const brand = brands?.find((b: any) => b.slug === brandSlug || b.name?.toLowerCase() === brandSlug.toLowerCase());
       return brand?.name || brandSlug.toUpperCase();
+    }
+    if (collectionSlug) {
+      const collection = collections?.find((c: any) => c.slug === collectionSlug || c.name?.toLowerCase() === collectionSlug.toLowerCase());
+      return collection?.name || collectionSlug;
     }
     return 'Tất cả sản phẩm';
   };
@@ -175,6 +204,12 @@ function ProductsContent() {
                 <>
                   <span>/</span>
                   <span className="text-foreground">{brandSlug.toUpperCase()}</span>
+                </>
+              )}
+              {collectionSlug && (
+                <>
+                  <span>/</span>
+                  <span className="text-foreground">{getPageTitle()}</span>
                 </>
               )}
             </nav>
@@ -270,6 +305,15 @@ function ProductsContent() {
                           <X className="h-3 w-3" />
                         </button>
                       )}
+                      {collectionSlug && (
+                        <button
+                          onClick={() => applyFilter('collection', null)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                        >
+                          {getPageTitle()}
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -353,11 +397,11 @@ function ProductsContent() {
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                   <span className="ml-3 text-muted-foreground">Đang tải sản phẩm...</span>
                 </div>
-              ) : error ? (
+              ) : errorState ? (
                 <div className="flex flex-col items-center justify-center py-20">
                   <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
                   <p className="text-red-500 mb-4">Không thể tải sản phẩm. Vui lòng thử lại.</p>
-                  <Button onClick={() => refetch()} variant="outline">
+                  <Button onClick={() => refetchProducts()} variant="outline">
                     Thử lại
                   </Button>
                 </div>

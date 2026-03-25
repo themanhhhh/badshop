@@ -30,14 +30,18 @@ export function AthleteSpotlight() {
   return (
     <section className="bg-white flex flex-col space-y-24 md:space-y-32 py-16 md:py-24">
       {activeCollections.map((collection: Collection, index: number) => {
+        // Hàm trợ giúp để đọc hình ảnh từ API do relation trả về snake_case
+        const getImages = (p: any) => p?.images || p?.product_images || [];
+        const getUrl = (img: any) => img?.url || img?.image_url;
+
         // Lấy 2 sản phẩm đầu tiên có hình ảnh để làm hai ảnh nhỏ bên phải
         const showcaseProducts = (collection.products || [])
-          .filter(p => p.images && p.images.length > 0)
+          .filter(p => getImages(p).length > 0)
           .slice(0, 2);
 
         // Đảm bảo đủ 2 hình nhỏ để tạo cấu trúc Diptych
-        const img1 = showcaseProducts[0]?.images?.[0]?.url || FALLBACK_1;
-        const img2 = showcaseProducts[1]?.images?.[0]?.url || showcaseProducts[0]?.images?.[1]?.url || FALLBACK_2;
+        const img1 = getUrl(getImages(showcaseProducts[0])[0]) || FALLBACK_1;
+        const img2 = getUrl(getImages(showcaseProducts[1])[0]) || getUrl(getImages(showcaseProducts[0])[1]) || FALLBACK_2;
 
         const isReversed = index % 2 !== 0;
 
