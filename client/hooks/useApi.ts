@@ -80,10 +80,6 @@ export function useProductsByCollection(collectionId: string) {
   return useApi<Product[]>(() => productApi.getByCollection(collectionId), [collectionId]);
 }
 
-export function useProductsByCollection(collectionId: string) {
-  return useApi<Product[]>(() => productApi.getByCollection(collectionId), [collectionId]);
-}
-
 export interface ProductFilters {
   category?: string;
   brand?: string;

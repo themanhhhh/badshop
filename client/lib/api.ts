@@ -190,9 +190,6 @@ export const productApi = {
   getByCollection: (collectionId: string): Promise<Product[]> =>
     fetchApi(`/products/collection/${collectionId}`),
 
-  getByCollection: (collectionId: string): Promise<Product[]> =>
-    fetchApi(),
-
   getById: (id: string): Promise<Product> => 
     fetchApi(`/products/${id}`),
   
