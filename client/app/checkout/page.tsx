@@ -43,8 +43,6 @@ interface Ward {
 const paymentMethods = [
   { id: 'cod', name: 'Thanh toán khi nhận hàng (COD)', icon: Truck },
   { id: 'banking', name: 'Chuyển khoản ngân hàng', icon: Building2 },
-  { id: 'momo', name: 'Ví MoMo', icon: Wallet },
-  { id: 'vnpay', name: 'VNPay', icon: CreditCard },
 ];
 
 export default function CheckoutPage() {

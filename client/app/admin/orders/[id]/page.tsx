@@ -40,8 +40,6 @@ const statusLabels: Record<string, string> = {
 const paymentMethodLabels: Record<string, string> = {
   cod: 'Thanh toán khi nhận hàng (COD)',
   banking: 'Chuyển khoản ngân hàng',
-  momo: 'Ví MoMo',
-  vnpay: 'VNPAY',
 };
 
 const paymentStatusLabels: Record<string, string> = {

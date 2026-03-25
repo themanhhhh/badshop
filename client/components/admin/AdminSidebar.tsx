@@ -56,6 +56,7 @@ const menuItems: MenuItem[] = [
       { label: 'Thêm sản phẩm', href: '/admin/products/new' },
       { label: 'Danh mục', href: '/admin/categories' },
       { label: 'Thương hiệu', href: '/admin/brands' },
+      { label: 'Bộ sưu tập', href: '/admin/collections' },
     ]
   },
   { icon: FileText, label: 'Bài viết', href: '/admin/posts' },
@@ -157,7 +158,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
                         <Link href={item.href!}>
                           <item.icon className="h-5 w-5" aria-hidden="true" />
-                          <span>{item.label}</span>
+                          <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                         </Link>
                       </SidebarMenuButton>
                     )}
@@ -177,7 +178,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuButton asChild tooltip={item.label}>
                     <Link href={item.href!}>
                       <item.icon className="h-5 w-5" aria-hidden="true" />
-                      <span>{item.label}</span>
+                      <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -206,7 +207,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               logout();
               router.push('/login');
             }}
-            className="p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-950 rounded transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-950 rounded transition-colors group-data-[collapsible=icon]:hidden"
             title="Đăng xuất"
           >
             <LogOut className="h-4 w-4" />

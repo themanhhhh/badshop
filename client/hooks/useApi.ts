@@ -15,6 +15,7 @@ import {
   statsApi,
   postApi,
   fulfillmentApi,
+  collectionApi,
 } from '@/lib/api';
 import type {
   User,
@@ -29,6 +30,7 @@ import type {
   FlashSale,
   Post,
   Shipment,
+  Collection,
 } from '@/lib/types';
 
 // Generic hook state type
@@ -72,6 +74,14 @@ export function useApi<T>(
 // ============================================
 export function useProducts(limit?: number) {
   return useApi<Product[]>(() => productApi.getAll(limit));
+}
+
+export function useProductsByCollection(collectionId: string) {
+  return useApi<Product[]>(() => productApi.getByCollection(collectionId), [collectionId]);
+}
+
+export function useProductsByCollection(collectionId: string) {
+  return useApi<Product[]>(() => productApi.getByCollection(collectionId), [collectionId]);
 }
 
 export interface ProductFilters {
@@ -333,4 +343,11 @@ export function usePost(id: string) {
 
 export function usePostBySlug(slug: string) {
   return useApi<Post>(() => postApi.getBySlug(slug), [slug]);
+}
+
+// ============================================
+// COLLECTION HOOKS
+// ============================================
+export function useCollections() {
+  return useApi<Collection[]>(() => collectionApi.getAll());
 }

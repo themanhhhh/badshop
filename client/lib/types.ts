@@ -252,6 +252,19 @@ export interface Post {
 }
 
 // API Response types
+export interface Collection {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  country?: string;
+  sport?: string;
+  achievement?: string;
+  thumbnail?: string;
+  is_active: boolean;
+  products?: Product[];
+}
+
 export interface ApiResponse<T> {
   data: T;
   message?: string;

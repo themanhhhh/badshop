@@ -11,6 +11,7 @@ import {
   FlashSale,
   Post,
   Shipment,
+  Collection,
 } from './types';
 import { getToken } from './auth';
 
@@ -185,6 +186,12 @@ export const productApi = {
 
   getByBrand: (brandId: string): Promise<Product[]> =>
     fetchApi(`/products/brand/${brandId}`),
+
+  getByCollection: (collectionId: string): Promise<Product[]> =>
+    fetchApi(`/products/collection/${collectionId}`),
+
+  getByCollection: (collectionId: string): Promise<Product[]> =>
+    fetchApi(),
 
   getById: (id: string): Promise<Product> => 
     fetchApi(`/products/${id}`),
@@ -618,6 +625,35 @@ export const postApi = {
     fetchApi(`/posts/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// COLLECTION API
+// ============================================
+export const collectionApi = {
+  getAll: (): Promise<Collection[]> => 
+    fetchApi('/collections'),
+  
+  getById: (id: string): Promise<Collection> => 
+    fetchApi(`/collections/${id}`),
+  
+  getBySlug: (slug: string): Promise<Collection> => 
+    fetchApi(`/collections/slug/${slug}`),
+  
+  create: (data: Partial<Collection>): Promise<Collection> => 
+    fetchApi('/collections', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  
+  update: (id: string, data: Partial<Collection>): Promise<Collection> => 
+    fetchApi(`/collections/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  
+  delete: (id: string): Promise<void> => 
+    fetchApi(`/collections/${id}`, { method: 'DELETE' }),
+};
+
 // Export all APIs as a single object for convenience
 export const api = {
   users: userApi,
@@ -633,6 +669,7 @@ export const api = {
   stats: statsApi,
   posts: postApi,
   fulfillment: fulfillmentApi,
+  collections: collectionApi,
 };
 
 export default api;

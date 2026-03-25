@@ -1,33 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
-
-const athletes = [
-  {
-    id: 1,
-    name: 'Viktor Axelsen',
-    country: 'Denmark',
-    sport: 'Men\'s Singles',
-    achievement: 'Olympic Gold Medalist',
-  },
-  {
-    id: 2,
-    name: 'An Se-young',
-    country: 'South Korea',
-    sport: 'Women\'s Singles',
-    achievement: 'World Champion',
-  },
-  {
-    id: 3,
-    name: 'Fajar Alfian',
-    country: 'Indonesia',
-    sport: 'Men\'s Doubles',
-    achievement: 'World Tour Finals Winner',
-  },
-];
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { useCollections } from '@/hooks/useApi';
+import type { Collection } from '@/lib/types';
 
 export function AthleteSpotlight() {
+  const { data: collections, loading } = useCollections();
+  
+  // Lọc chỉ lấy những collection đang active
+  const activeCollections = collections?.filter((c: Collection) => c.is_active) || [];
+
   return (
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -82,40 +65,63 @@ export function AthleteSpotlight() {
         </div>
 
         {/* Athlete Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {athletes.map((athlete) => (
-            <div
-              key={athlete.id}
-              className="group bg-white p-6 hover:shadow-lg transition-shadow duration-300"
-            >
-              {/* Avatar Placeholder */}
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-200 to-slate-100 flex items-center justify-center mb-4">
-                <span className="text-xl font-bold text-slate-400">
-                  {athlete.name.charAt(0)}
-                </span>
-              </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+             <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-6">
+            {activeCollections.map((athlete: Collection) => (
+              <div
+                key={athlete.id}
+                className="group bg-white p-6 hover:shadow-lg transition-shadow duration-300 flex flex-col h-full"
+              >
+                {/* Avatar / Thumbnail */}
+                {athlete.thumbnail ? (
+                  <div className="w-16 h-16 rounded-full overflow-hidden mb-4 border-2 border-gray-100">
+                    <img 
+                      src={athlete.thumbnail} 
+                      alt={athlete.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-200 to-slate-100 flex items-center justify-center mb-4">
+                    <span className="text-xl font-bold text-slate-400">
+                      {athlete.name.charAt(0)}
+                    </span>
+                  </div>
+                )}
 
-              {/* Info */}
-              <h3 className="text-lg font-bold uppercase tracking-wide mb-1">
-                {athlete.name}
-              </h3>
-              <p className="text-xs uppercase tracking-wider text-gray-400 mb-3">
-                {athlete.country} • {athlete.sport}
-              </p>
-              <p className="text-sm text-gray-600">
-                {athlete.achievement}
-              </p>
+                {/* Info */}
+                <h3 className="text-lg font-bold uppercase tracking-wide mb-1">
+                  {athlete.name}
+                </h3>
+                <p className="text-xs uppercase tracking-wider text-gray-400 mb-3 block min-h-[16px]">
+                  {athlete.country || 'Global'} • {athlete.sport || 'Professional'}
+                </p>
+                <div className="flex-grow">
+                  <p className="text-sm font-medium text-black mb-2">
+                    {athlete.achievement}
+                  </p>
+                  <p className="text-sm text-gray-600 line-clamp-3">
+                    {athlete.description}
+                  </p>
+                </div>
 
-              {/* Hover indicator */}
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-xs uppercase tracking-wider text-gray-400">
-                  View Collection
-                </span>
-                <ArrowRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                {/* Hover indicator */}
+                <Link href={`/products?collection=${athlete.slug}`}>
+                  <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                    <span className="text-xs uppercase tracking-wider text-gray-400">
+                      View Collection
+                    </span>
+                    <ArrowRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                  </div>
+                </Link>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
