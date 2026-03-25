@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Search, Filter, Eye, MoreHorizontal, Download, Loader2, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useOrdersWithFilters } from '@/hooks/useApi';
+import { orderApi } from '@/lib/api';
+import { exportOrdersToExcel } from '@/lib/exportOrdersToExcel';
 import { formatPrice } from '@/lib/productMapper';
 import { AdminLoading } from '@/components/admin/AdminLoading';
 import { Button } from '@/components/ui/button';
@@ -13,6 +15,7 @@ export default function AdminOrdersPage() {
   const [dateInput, setDateInput] = useState('');
   const [filters, setFilters] = useState({ search: '', status: 'all', date: '' });
   const [currentPage, setCurrentPage] = useState(1);
+  const [exporting, setExporting] = useState(false);
   const itemsPerPage = 10;
 
   const { data, loading, error, refetch } = useOrdersWithFilters({
@@ -36,6 +39,30 @@ export default function AdminOrdersPage() {
   const handleStatusTabClick = (status: string) => {
     setFilters(prev => ({ ...prev, status }));
     setCurrentPage(1);
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      setExporting(true);
+
+      const exportLimit = Math.max(filteredOrdersCount, displayOrders.length, 1);
+      const exportData = await orderApi.getWithFilters({
+        page: 1,
+        limit: exportLimit,
+        search: filters.search,
+        status: filters.status,
+        date: filters.date,
+      });
+
+      const today = new Date();
+      const dateStamp = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      await exportOrdersToExcel(exportData.data || [], `smashx-orders-${dateStamp}.xlsx`);
+    } catch (error) {
+      console.error('Failed to export orders:', error);
+      window.alert('Khong the xuat file Excel. Vui long thu lai.');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const statusColors: Record<string, string> = {
@@ -74,9 +101,13 @@ export default function AdminOrdersPage() {
         </div>
         <div className="flex gap-2">
          
-          <button className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-card hover:bg-accent hover:text-accent-foreground font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring">
-            <Download className="h-4 w-4" aria-hidden="true" />
-            Xuất Excel
+          <button
+            onClick={handleExportExcel}
+            disabled={exporting || filteredOrdersCount === 0}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-input bg-card hover:bg-accent hover:text-accent-foreground font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none"
+          >
+            {exporting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Download className="h-4 w-4" aria-hidden="true" />}
+            {exporting ? 'Đang xuất...' : 'Xuất Excel'}
           </button>
         </div>
       </div>
