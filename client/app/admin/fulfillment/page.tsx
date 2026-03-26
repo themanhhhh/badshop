@@ -251,7 +251,7 @@ export default function AdminFulfillmentPage() {
 
               {!filteredOrders.length && (
                 <div className="rounded-2xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
-                  Khong tim thay don hang phu hop.
+                  Không tìm thấy đơn hàng phù hợp.
                 </div>
               )}
             </div>
@@ -395,7 +395,7 @@ export default function AdminFulfillmentPage() {
                     }))}
                   >
                     {busyAction === 'createShipment' ? <Loader2 className="h-4 w-4 animate-spin" /> : <PackageCheck className="h-4 w-4" />}
-                    Tao shipment cho don hang
+                    Tạo shipment cho đơn hàng
                   </Button>
                 </CardContent>
               </Card>

@@ -1,14 +1,34 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { DollarSign, ShoppingCart, Users, Package, MoreHorizontal, Eye, BarChart3, Loader2 } from 'lucide-react';
+import { DollarSign, ShoppingCart, Users, Package, MoreHorizontal, Eye } from 'lucide-react';
+import { RevenueChart } from '@/components/admin/RevenueChart';
 import { StatsCard } from '@/components/admin/StatsCard';
-import { useOrders, useProducts, useUsers, useDashboardStats } from '@/hooks/useApi';
+import { useOrders, useProducts, useDashboardStats } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
 import { AdminLoading } from '@/components/admin/AdminLoading';
 import { AdminSelect } from '@/components/admin/AdminSelect';
 
 export default function AdminDashboardPage() {
+  const monthOptions = [
+    { value: '0', label: 'Tháng 1' },
+    { value: '1', label: 'Tháng 2' },
+    { value: '2', label: 'Tháng 3' },
+    { value: '3', label: 'Tháng 4' },
+    { value: '4', label: 'Tháng 5' },
+    { value: '5', label: 'Tháng 6' },
+    { value: '6', label: 'Tháng 7' },
+    { value: '7', label: 'Tháng 8' },
+    { value: '8', label: 'Tháng 9' },
+    { value: '9', label: 'Tháng 10' },
+    { value: '10', label: 'Tháng 11' },
+    { value: '11', label: 'Tháng 12' },
+  ];
+
+  const [chartView, setChartView] = useState<'year' | 'month' | 'week'>('month');
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
   const { data: stats, loading: statsLoading } = useDashboardStats();
   const { data: orders, loading: ordersLoading } = useOrders();
   const { data: products, loading: productsLoading } = useProducts();
@@ -16,6 +36,121 @@ export default function AdminDashboardPage() {
   // Use API data only - no mock fallback
   const recentOrders = orders?.slice(0, 5) || [];
   const loading = statsLoading || ordersLoading || productsLoading; // Keep others for lists for now
+
+  const availableYears = useMemo(() => {
+    const years = new Set<number>();
+    (orders || []).forEach((order: any) => {
+      const rawDate = order.created_at || order.createdAt;
+      if (!rawDate) return;
+      const date = new Date(rawDate);
+      if (!Number.isNaN(date.getTime())) {
+        years.add(date.getFullYear());
+      }
+    });
+
+    if (years.size === 0) {
+      years.add(new Date().getFullYear());
+    }
+
+    return Array.from(years).sort((a, b) => b - a);
+  }, [orders]);
+
+  const revenueChartData = useMemo(() => {
+    if (chartView === 'year') {
+      const initial = availableYears
+        .slice()
+        .sort((a, b) => a - b)
+        .map((year) => ({ label: `${year}`, revenue: 0, orders: 0 }));
+
+      (orders || []).forEach((order: any) => {
+        if (order.status === 'cancelled') return;
+
+        const rawDate = order.created_at || order.createdAt;
+        if (!rawDate) return;
+
+        const date = new Date(rawDate);
+        if (Number.isNaN(date.getTime())) return;
+
+        const bucket = initial.find((item) => item.label === `${date.getFullYear()}`);
+        if (!bucket) return;
+        bucket.revenue += Number(order.total || 0);
+        bucket.orders += 1;
+      });
+
+      return initial;
+    }
+
+    if (chartView === 'week') {
+      const initial = [
+        { label: 'W1', revenue: 0, orders: 0 },
+        { label: 'W2', revenue: 0, orders: 0 },
+        { label: 'W3', revenue: 0, orders: 0 },
+        { label: 'W4', revenue: 0, orders: 0 },
+        { label: 'W5', revenue: 0, orders: 0 },
+      ];
+
+      (orders || []).forEach((order: any) => {
+        if (order.status === 'cancelled') return;
+
+        const rawDate = order.created_at || order.createdAt;
+        if (!rawDate) return;
+
+        const date = new Date(rawDate);
+        if (
+          Number.isNaN(date.getTime()) ||
+          date.getFullYear().toString() !== selectedYear ||
+          date.getMonth().toString() !== selectedMonth
+        ) {
+          return;
+        }
+
+        const weekIndex = Math.min(4, Math.floor((date.getDate() - 1) / 7));
+        initial[weekIndex].revenue += Number(order.total || 0);
+        initial[weekIndex].orders += 1;
+      });
+
+      return initial;
+    }
+
+    const monthLabels = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
+    const initial = monthLabels.map((label) => ({ label, revenue: 0, orders: 0 }));
+
+    (orders || []).forEach((order: any) => {
+      if (order.status === 'cancelled') return;
+
+      const rawDate = order.created_at || order.createdAt;
+      if (!rawDate) return;
+
+      const date = new Date(rawDate);
+      if (Number.isNaN(date.getTime()) || date.getFullYear().toString() !== selectedYear) return;
+
+      const monthIndex = date.getMonth();
+      initial[monthIndex].revenue += Number(order.total || 0);
+      initial[monthIndex].orders += 1;
+    });
+
+    return initial;
+  }, [availableYears, chartView, orders, selectedMonth, selectedYear]);
+
+  const selectedScopeRevenue = useMemo(
+    () => revenueChartData.reduce((sum, item) => sum + item.revenue, 0),
+    [revenueChartData]
+  );
+
+  const chartTitle = useMemo(() => {
+    if (chartView === 'year') return 'Doanh thu theo năm';
+    if (chartView === 'week') return 'Doanh thu theo tuần';
+    return 'Doanh thu theo tháng';
+  }, [chartView]);
+
+  const chartDescription = useMemo(() => {
+    if (chartView === 'year') return `${formatPrice(selectedScopeRevenue)} trên toàn bộ các năm hiện có`;
+    if (chartView === 'week') {
+      const monthLabel = monthOptions.find((item) => item.value === selectedMonth)?.label || '';
+      return `${formatPrice(selectedScopeRevenue)} trong ${monthLabel.toLowerCase()} năm ${selectedYear}`;
+    }
+    return `${formatPrice(selectedScopeRevenue)} trong năm ${selectedYear}`;
+  }, [chartView, monthOptions, selectedMonth, selectedScopeRevenue, selectedYear]);
 
   const dynamicStats = {
     totalRevenue: stats?.totalRevenue || 0,
@@ -96,23 +231,40 @@ export default function AdminDashboardPage() {
         {/* Revenue Chart Placeholder */}
         <div className="lg:col-span-2 bg-sidebar rounded-2xl p-6 border border-border">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Doanh thu theo tháng</h2>
-            <AdminSelect
-              value="2026"
-              onValueChange={() => {}}
-              className="w-[130px]"
-              options={[
-                { value: '2026', label: 'Năm 2026' },
-                { value: '2025', label: 'Năm 2025' },
-              ]}
-            />
-          </div>
-          <div className="h-64 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
-            <div className="text-center text-muted-foreground">
-              <BarChart3 className="h-16 w-16 text-blue-500 mx-auto mb-4" aria-hidden="true" />
-              <p>Biểu đồ doanh thu sẽ hiển thị ở đây</p>
+            <div>
+              <h2 className="text-lg font-semibold">{chartTitle}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{chartDescription}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <AdminSelect
+                value={chartView}
+                onValueChange={(value) => setChartView(value as 'year' | 'month' | 'week')}
+                className="w-[130px]"
+                options={[
+                  { value: 'year', label: 'Theo năm' },
+                  { value: 'month', label: 'Theo tháng' },
+                  { value: 'week', label: 'Theo tuần' },
+                ]}
+              />
+              {chartView !== 'year' && (
+                <AdminSelect
+                  value={selectedYear}
+                  onValueChange={setSelectedYear}
+                  className="w-[130px]"
+                  options={availableYears.map((year) => ({ value: year.toString(), label: `Nam ${year}` }))}
+                />
+              )}
+              {chartView === 'week' && (
+                <AdminSelect
+                  value={selectedMonth}
+                  onValueChange={setSelectedMonth}
+                  className="w-[130px]"
+                  options={monthOptions}
+                />
+              )}
             </div>
           </div>
+          <RevenueChart data={revenueChartData} />
         </div>
 
         {/* Top Products */}

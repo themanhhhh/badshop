@@ -58,15 +58,15 @@ export default function OrdersPage() {
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
                 <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-sky-700">
-                  Don hang cua toi
+                  Đơn hàng của tôi
                 </div>
-                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900">Theo doi don hang va giao nhan</h1>
+                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900">Theo dõi đơn hàng và giao nhận</h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                  Xem tien do fulfillment, ma van don va truy cap trang tracking chi tiet cho tung don.
+                  Xem tiến độ fulfillment, mã vận đơn và truy cập trang tracking chi tiết cho từng đơn.
                 </p>
               </div>
               <div className="rounded-2xl border border-white/70 bg-white/80 px-5 py-4 text-sm text-slate-600 backdrop-blur">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Tong don</div>
+                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Tổng đơn</div>
                 <div className="mt-2 text-2xl font-semibold text-slate-900">{displayOrders.length}</div>
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function OrdersPage() {
           {(loading || authLoading) && (
             <div className="flex min-h-[240px] items-center justify-center">
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <Loader2 className="h-5 w-5 animate-spin" /> Dang tai don hang...
+                <Loader2 className="h-5 w-5 animate-spin" /> Đang tải đơn hàng...
               </div>
             </div>
           )}

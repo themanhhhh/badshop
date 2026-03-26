@@ -66,7 +66,7 @@ export default function TrackingPage({ params }: { params: Promise<{ trackingNum
             <Button asChild variant="outline">
               <Link href="/account/orders">
                 <ArrowLeft className="h-4 w-4" />
-                Ve danh sach don hang
+                Về danh sách đơn hàng
               </Link>
             </Button>
           </div>
@@ -75,7 +75,7 @@ export default function TrackingPage({ params }: { params: Promise<{ trackingNum
             <Card>
               <CardContent className="flex min-h-[240px] items-center justify-center">
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <CircleDashed className="h-4 w-4 animate-spin" /> Dang tai tracking...
+                  <CircleDashed className="h-4 w-4 animate-spin" /> Đang tải tracking...
                 </div>
               </CardContent>
             </Card>
