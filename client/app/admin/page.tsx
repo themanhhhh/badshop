@@ -164,13 +164,13 @@ export default function AdminDashboardPage() {
   };
 
   const statusColors: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
-    processing: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    shipped: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-    delivered: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-    cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-    confirmed: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
-    shipping: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
+    pending: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
+    processing: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    shipped: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+    delivered: 'bg-black text-white dark:bg-white dark:text-black',
+    cancelled: 'bg-gray-100 text-gray-500 dark:bg-slate-900 dark:text-slate-400',
+    confirmed: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    shipping: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
   };
 
   const statusLabels: Record<string, string> = {
@@ -229,7 +229,7 @@ export default function AdminDashboardPage() {
       {/* Charts and Recent Orders */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Chart Placeholder */}
-        <div className="lg:col-span-2 bg-sidebar rounded-2xl p-6 border border-border">
+        <div className="rounded-2xl border border-border bg-sidebar p-6 dark:border-slate-800 dark:bg-slate-950 lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-lg font-semibold">{chartTitle}</h2>
@@ -268,15 +268,15 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Top Products */}
-        <div className="bg-sidebar rounded-2xl p-6 border border-border">
+        <div className="rounded-2xl border border-border bg-sidebar p-6 dark:border-slate-800 dark:bg-slate-950">
           <h2 className="text-lg font-semibold mb-4">Sản phẩm bán chạy</h2>
           <div className="space-y-4">
             {(products?.slice(0, 3) || ['Yonex Astrox 99 Pro', 'Victor Thruster K 9900', 'Yonex Power Cushion 65Z3']).map((product, i) => (
               <div key={typeof product === 'string' ? product : product.id} className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold ${
-                  i === 0 ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400' :
-                  i === 1 ? 'bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground' :
-                  'bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg font-bold ${
+                  i === 0 ? 'bg-black text-white dark:bg-white dark:text-black' :
+                  i === 1 ? 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white' :
+                  'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300'
                 }`}>
                   {i + 1}
                 </div>
@@ -293,10 +293,10 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-sidebar rounded-2xl border border-border overflow-hidden">
+      <div className="overflow-hidden rounded-2xl border border-border bg-sidebar dark:border-slate-800 dark:bg-slate-950">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <h2 className="text-lg font-semibold">Đơn hàng gần đây</h2>
-          <Link href="/admin/orders" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/admin/orders" className="text-sm font-medium text-foreground hover:text-muted-foreground">
             Xem tất cả
           </Link>
         </div>

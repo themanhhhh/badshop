@@ -18,13 +18,13 @@ import {
 } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
-  processing: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-  shipped: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-  delivered: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-  cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-  confirmed: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
-  shipping: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
+  pending: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
+  processing: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+  shipped: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+  delivered: 'bg-black text-white dark:bg-white dark:text-black',
+  cancelled: 'bg-gray-100 text-gray-500 dark:bg-slate-900 dark:text-slate-400',
+  confirmed: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+  shipping: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
 };
 
 const statusLabels: Record<string, string> = {
@@ -50,10 +50,10 @@ const paymentStatusLabels: Record<string, string> = {
 };
 
 const paymentStatusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-700',
-  paid: 'bg-green-100 text-green-700',
-  failed: 'bg-red-100 text-red-700',
-  refunded: 'bg-gray-100 text-gray-700',
+  pending: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
+  paid: 'bg-black text-white dark:bg-white dark:text-black',
+  failed: 'bg-gray-100 text-gray-500 dark:bg-slate-900 dark:text-slate-400',
+  refunded: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
 };
 
 export default function OrderDetailPage() {
@@ -70,7 +70,7 @@ export default function OrderDetailPage() {
   if (error || !order) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-        <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+        <AlertCircle className="mb-4 h-12 w-12 text-foreground" />
         <h2 className="text-xl font-bold mb-2">Không tìm thấy đơn hàng</h2>
         <p className="text-muted-foreground mb-6">
           Đơn hàng bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
@@ -109,7 +109,7 @@ export default function OrderDetailPage() {
         </div>
         <div className="flex gap-2">
           {order.status === 'pending' && (
-            <Button variant="default" className="bg-teal-600 hover:bg-teal-700">
+            <Button variant="default" className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200">
               Xác nhận đơn
             </Button>
           )}
@@ -162,7 +162,7 @@ export default function OrderDetailPage() {
                         </div>
                       </div>
                       <div className="flex justify-end mt-2">
-                        <p className="font-semibold text-primary">{formatPrice(price * item.quantity)}</p>
+                        <p className="font-semibold text-foreground">{formatPrice(price * item.quantity)}</p>
                       </div>
                     </div>
                   </div>
@@ -185,14 +185,14 @@ export default function OrderDetailPage() {
                 <span>{formatPrice(order.shippingFee || (order as any).shipping_fee || 0)}</span>
               </div>
               {order.discount > 0 && (
-                <div className="flex justify-between text-green-600">
+                <div className="flex justify-between text-foreground">
                   <span>Giảm giá</span>
                   <span>-{formatPrice(order.discount)}</span>
                 </div>
               )}
               <div className="border-t border-border pt-3 mt-3 flex justify-between items-center">
                 <span className="font-semibold text-lg">Tổng cộng</span>
-                <span className="font-bold text-xl text-primary">{formatPrice(order.total)}</span>
+                <span className="font-bold text-xl text-foreground">{formatPrice(order.total)}</span>
               </div>
             </div>
           </div>
@@ -213,7 +213,7 @@ export default function OrderDetailPage() {
                 <p className="text-muted-foreground">{order.user.phone || 'Chưa cung cấp SĐT'}</p>
                 
                 <div className="pt-3 border-t border-border mt-3">
-                  <Link href={`/admin/customers/${order.user.id}`} className="text-primary hover:underline font-medium">
+                  <Link href={`/admin/customers/${order.user.id}`} className="font-medium text-foreground hover:text-muted-foreground hover:underline">
                     Xem hồ sơ khách hàng
                   </Link>
                 </div>
@@ -269,9 +269,9 @@ export default function OrderDetailPage() {
 
           {/* Internal Note */}
           {(order.note || (order as any).customer_note) && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-900/50 rounded-xl overflow-hidden p-4 sm:p-6">
-              <h2 className="text-lg font-semibold text-yellow-800 dark:text-yellow-500 mb-2">Ghi chú của khách</h2>
-              <p className="text-sm text-yellow-700 dark:text-yellow-600">
+            <div className="overflow-hidden rounded-xl border border-border bg-card p-4 sm:p-6">
+              <h2 className="mb-2 text-lg font-semibold">Ghi chú của khách</h2>
+              <p className="text-sm text-muted-foreground">
                 {order.note || (order as any).customer_note}
               </p>
             </div>

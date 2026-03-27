@@ -220,15 +220,15 @@ export default function AdminProductsPage() {
                       <td className="px-6 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                           ((product.stock ?? product.stock_quantity ?? 0) > 0)
-                            ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400' 
-                            : 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
+                            ? 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white' 
+                            : 'bg-gray-100 text-gray-500 dark:bg-slate-900 dark:text-slate-400'
                         }`}>
                           {(product.stock ?? product.stock_quantity) !== undefined ? `${product.stock ?? product.stock_quantity} sp` : 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                          <Star className="h-4 w-4 fill-black text-black dark:fill-white dark:text-white" />
                           <span className="font-medium">{product.rating || '-'}</span>
                           <span className="text-muted-foreground text-sm">({(product as any).reviews?.length || 0})</span>
                         </div>
@@ -323,7 +323,7 @@ export default function AdminProductsPage() {
             <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDelete} 
-              className="bg-red-600 hover:bg-red-700"
+               className="bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-slate-200"
               disabled={isDeleting}
             >
               {isDeleting ? (

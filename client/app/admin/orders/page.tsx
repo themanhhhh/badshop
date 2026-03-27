@@ -136,19 +136,19 @@ export default function AdminOrdersPage() {
   };
 
   const statusColors: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
-    processing: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    shipped: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-    delivered: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-    cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-    confirmed: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
-    shipping: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
-    pending_payment: 'bg-amber-100 text-amber-700',
-    paid: 'bg-emerald-100 text-emerald-700',
-    awaiting_shipment: 'bg-sky-100 text-sky-700',
-    awaiting_collection: 'bg-cyan-100 text-cyan-700',
-    in_transit: 'bg-violet-100 text-violet-700',
-    completed: 'bg-lime-100 text-lime-700',
+    pending: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
+    processing: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    shipped: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+    delivered: 'bg-black text-white dark:bg-white dark:text-black',
+    cancelled: 'bg-gray-100 text-gray-500 dark:bg-slate-900 dark:text-slate-400',
+    confirmed: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    shipping: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+    pending_payment: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
+    paid: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    awaiting_shipment: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+    awaiting_collection: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    in_transit: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+    completed: 'bg-black text-white dark:bg-white dark:text-black',
   };
 
   const statusLabels: Record<string, string> = {
@@ -188,7 +188,7 @@ export default function AdminOrdersPage() {
             <button
               onClick={handleBulkDelete}
               disabled={bulkDeleting}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-input bg-card px-4 py-2.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               {bulkDeleting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Trash2 className="h-4 w-4" aria-hidden="true" />}
               {bulkDeleting ? 'Đang xóa...' : `Xóa đã chọn (${selectedOrderIds.length})`}

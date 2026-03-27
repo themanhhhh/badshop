@@ -62,7 +62,7 @@ export function AdminHeader() {
             <div className="text-sm font-medium">Admin User</div>
             <div className="text-xs text-muted-foreground">Super Admin</div>
           </div>
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black font-bold text-white dark:bg-white dark:text-black">
             A
           </div>
         </div>

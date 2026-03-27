@@ -218,7 +218,7 @@ export default function AdminCollectionsPage() {
             className="h-12 w-12 rounded-full border-2 border-gray-100 object-cover shadow-sm dark:border-slate-700"
           />
         ) : (
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border bg-gradient-to-br from-indigo-100 to-blue-50 text-lg font-bold text-blue-500 shadow-sm dark:border-slate-700 dark:from-slate-800 dark:to-slate-700 dark:text-sky-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border bg-gradient-to-br from-gray-100 to-gray-50 text-lg font-bold text-gray-700 shadow-sm dark:border-slate-700 dark:from-slate-800 dark:to-slate-700 dark:text-white">
             {collection.name.charAt(0)}
           </div>
         )}
@@ -228,12 +228,12 @@ export default function AdminCollectionsPage() {
           <div className="flex items-center gap-2">
             <h3 className="truncate text-base font-bold text-gray-900 dark:text-white">{collection.name}</h3>
             {collection.is_active ? (
-              <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">Đang hiển thị</span>
+              <span className="rounded-full bg-black px-2 py-0.5 text-xs font-medium text-white dark:bg-white dark:text-black">Đang hiển thị</span>
             ) : (
-              <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">Đã ẩn</span>
+              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-slate-800 dark:text-slate-300">Đã ẩn</span>
             )}
             {collection.products && collection.products.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium flex items-center gap-1">
+              <span className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-slate-800 dark:text-slate-300">
                 <Package className="h-3 w-3" />
                 {collection.products.length} SP
               </span>
@@ -248,7 +248,7 @@ export default function AdminCollectionsPage() {
 
         {/* Achievement Badge */}
         {collection.achievement && (
-          <div className="mr-4 hidden items-center gap-1.5 rounded-lg border border-amber-100 bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300 md:flex">
+          <div className="mr-4 hidden items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 md:flex">
             <Trophy className="h-4 w-4" />
             <span className="truncate max-w-[200px]">{collection.achievement}</span>
           </div>
@@ -260,7 +260,7 @@ export default function AdminCollectionsPage() {
             variant="ghost"
             size="sm"
             onClick={() => handleOpenEdit(collection)}
-            className="text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+            className="text-gray-500 hover:bg-gray-100 hover:text-black dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -268,7 +268,7 @@ export default function AdminCollectionsPage() {
             variant="ghost"
             size="sm"
             onClick={() => handleOpenDelete(collection)}
-            className="text-gray-500 hover:bg-red-50 hover:text-red-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-red-300"
+            className="text-gray-500 hover:bg-gray-100 hover:text-black dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -292,7 +292,7 @@ export default function AdminCollectionsPage() {
       </div>
 
       {/* Search */}
-      <Card>
+      <Card className="border-border/80 bg-card dark:border-slate-800 dark:bg-slate-950/80">
         <CardContent className="pt-6">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -300,16 +300,16 @@ export default function AdminCollectionsPage() {
               placeholder="Tìm theo tên, quốc gia, thể thao..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Collections List */}
-      <Card>
+      <Card className="border-border/80 bg-card dark:border-slate-800 dark:bg-slate-950/80">
         <CardHeader>
-          <CardTitle className="text-base">
+          <CardTitle className="text-base dark:text-white">
             Tất cả bộ sưu tập ({collections?.length || 0})
           </CardTitle>
         </CardHeader>
@@ -337,80 +337,87 @@ export default function AdminCollectionsPage() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto dark:border-slate-800 dark:bg-slate-950">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="dark:text-white">
               {editingCollection ? 'Chỉnh sửa bộ sưu tập' : 'Thêm bộ sưu tập mới'}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Tên tuyển thủ / Bộ sưu tập *</Label>
+                <Label htmlFor="name" className="dark:text-slate-200">Tên tuyển thủ / Bộ sưu tập *</Label>
                 <Input
                   id="name"
                   required
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
                   placeholder="VD: Viktor Axelsen"
+                  className="dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="slug">Đường dẫn tĩnh (Slug)</Label>
+                <Label htmlFor="slug" className="dark:text-slate-200">Đường dẫn tĩnh (Slug)</Label>
                 <Input
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => handleSlugChange(e.target.value)}
                   placeholder="viktor-axelsen"
+                  className="dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="country">Quốc gia</Label>
+                <Label htmlFor="country" className="dark:text-slate-200">Quốc gia</Label>
                 <Input
                   id="country"
                   value={formData.country}
                   onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                   placeholder="VD: Denmark"
+                  className="dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sport">Môn thể thao / Hạng mục</Label>
+                <Label htmlFor="sport" className="dark:text-slate-200">Môn thể thao / Hạng mục</Label>
                 <Input
                   id="sport"
                   value={formData.sport}
                   onChange={(e) => setFormData({ ...formData, sport: e.target.value })}
                   placeholder="VD: Men's Singles"
+                  className="dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="achievement">Thành tích nổi bật</Label>
+              <Label htmlFor="achievement" className="dark:text-slate-200">Thành tích nổi bật</Label>
               <Input
                 id="achievement"
                 value={formData.achievement}
                 onChange={(e) => setFormData({ ...formData, achievement: e.target.value })}
                 placeholder="VD: Olympic Gold Medalist"
+                className="dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Mô tả tóm tắt</Label>
+              <Label htmlFor="description" className="dark:text-slate-200">Mô tả tóm tắt</Label>
               <Input
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Thông tin ngắn về tuyển thủ/bộ sưu tập"
+                className="dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="thumbnail">URL Hình đại diện (Thumbnail)</Label>
+              <Label htmlFor="thumbnail" className="dark:text-slate-200">URL Hình đại diện (Thumbnail)</Label>
               <Input
                 id="thumbnail"
                 value={formData.thumbnail}
                 onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
                 placeholder="https://..."
+                className="dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
               />
               {formData.thumbnail && (
                 <div className="mt-2">
@@ -426,21 +433,21 @@ export default function AdminCollectionsPage() {
                 type="checkbox"
                 checked={formData.is_active}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="w-4 h-4 cursor-pointer accent-blue-600 rounded"
+                className="h-4 w-4 cursor-pointer rounded accent-black dark:accent-white"
               />
-              <Label htmlFor="is_active" className="cursor-pointer font-medium cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label htmlFor="is_active" className="cursor-pointer font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-slate-200">
                 Hiển thị trên trang chủ
               </Label>
             </div>
 
             <div className="space-y-4 border-t pt-4 dark:border-slate-800">
-              <Label>Sản phẩm thuộc Bộ sưu tập (Tùy chọn)</Label>
+              <Label className="dark:text-slate-200">Sản phẩm thuộc Bộ sưu tập (Tùy chọn)</Label>
               
               {/* Đã chọn */}
               {selectedProducts.length > 0 && (
                 <div className="mb-3 flex flex-wrap gap-2">
                   {selectedProducts.map((p: any) => (
-                    <div key={p.id} className="flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-sm text-blue-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300">
+                    <div key={p.id} className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-sm text-gray-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
                       <span className="truncate max-w-[150px] font-medium" title={p.name}>{p.name}</span>
                       <button 
                         type="button" 
@@ -448,7 +455,7 @@ export default function AdminCollectionsPage() {
                           ...prev,
                           productIds: prev.productIds.filter(id => id !== p.id)
                         }))}
-                        className="rounded-full p-0.5 transition-colors hover:bg-blue-200 dark:hover:bg-sky-500/20"
+                        className="rounded-full p-0.5 transition-colors hover:bg-gray-200 dark:hover:bg-slate-700"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -464,7 +471,7 @@ export default function AdminCollectionsPage() {
                   placeholder="Gõ tên sản phẩm để tìm và thêm..."
                   value={productSearch}
                   onChange={(e) => setProductSearch(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
                 />
               </div>
 
@@ -506,10 +513,10 @@ export default function AdminCollectionsPage() {
             </div>
 
             <DialogFooter className="border-t pt-4 dark:border-slate-800">
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
                 Hủy
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting} className="dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200">
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -536,7 +543,7 @@ export default function AdminCollectionsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">
+            <AlertDialogAction onClick={handleDelete} className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200">
               Xóa vĩnh viễn
             </AlertDialogAction>
           </AlertDialogFooter>

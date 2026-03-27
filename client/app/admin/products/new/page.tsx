@@ -173,7 +173,7 @@ export default function AddProductPage() {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg">
+        <div className="rounded-lg bg-gray-100 p-4 text-gray-700 dark:bg-slate-900 dark:text-slate-300">
           {error}
         </div>
       )}
@@ -280,12 +280,12 @@ export default function AddProductPage() {
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 rounded-full bg-black p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white dark:text-black"
                     >
                       <X className="h-3 w-3" />
                     </button>
                     {index === 0 && (
-                      <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded">
+                      <span className="absolute bottom-2 left-2 rounded bg-black px-2 py-0.5 text-xs text-white dark:bg-white dark:text-black">
                         Ảnh chính
                       </span>
                     )}
@@ -296,11 +296,11 @@ export default function AddProductPage() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="aspect-square border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50"
+                    className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 transition-colors hover:border-black hover:bg-gray-50 disabled:opacity-50 dark:hover:border-white dark:hover:bg-slate-900"
                   >
                     {isUploading ? (
                       <>
-                        <Loader2 className="h-6 w-6 text-blue-500 animate-spin" />
+                        <Loader2 className="h-6 w-6 animate-spin text-foreground" />
                         <span className="text-xs text-gray-500">Đang tải...</span>
                       </>
                     ) : (

@@ -191,7 +191,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* Footer with User Info */}
       <SidebarFooter className="border-t border-sidebar-border p-3">
         <div className="flex items-center gap-3 px-1 group-data-[collapsible=icon]:justify-center">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-rose-500 font-semibold text-white text-sm">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black text-sm font-semibold text-white dark:bg-white dark:text-black">
             {user?.name?.charAt(0).toUpperCase() || 'A'}
           </div>
           <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
@@ -207,7 +207,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               logout();
               router.push('/login');
             }}
-            className="p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-950 rounded transition-colors group-data-[collapsible=icon]:hidden"
+            className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground group-data-[collapsible=icon]:hidden"
             title="Đăng xuất"
           >
             <LogOut className="h-4 w-4" />

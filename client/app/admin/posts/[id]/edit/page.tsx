@@ -153,7 +153,7 @@ export default function EditPostPage() {
           {/* Title */}
           <div className="bg-white rounded-xl p-6 border border-border">
             <label className="block text-sm font-medium mb-2">
-              Tiêu đề <span className="text-red-500">*</span>
+              Tiêu đề <span className="text-foreground">*</span>
             </label>
             <input
               type="text"
@@ -207,7 +207,7 @@ export default function EditPostPage() {
           {/* Content */}
           <div className="bg-white rounded-xl p-6 border border-border">
             <label className="block text-sm font-medium mb-2">
-              Nội dung <span className="text-red-500">*</span>
+              Nội dung <span className="text-foreground">*</span>
             </label>
             <TiptapEditor content={content} onChange={setContent} />
           </div>
@@ -228,7 +228,7 @@ export default function EditPostPage() {
                 <button
                   type="button"
                   onClick={() => setFeaturedImage('')}
-                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                  className="absolute top-2 right-2 rounded-full bg-black p-1 text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
                 >
                   <X className="h-4 w-4" />
                 </button>

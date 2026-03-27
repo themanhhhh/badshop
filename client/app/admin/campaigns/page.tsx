@@ -44,10 +44,10 @@ export default function AdminCampaignsPage() {
 
   const statusColors: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-700 dark:bg-muted dark:text-muted-foreground',
-    scheduled: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    active: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-    paused: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
-    ended: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+    scheduled: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    active: 'bg-black text-white dark:bg-white dark:text-black',
+    paused: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+    ended: 'bg-gray-100 text-gray-500 dark:bg-slate-900 dark:text-slate-400',
   };
 
   const statusLabels: Record<string, string> = {
@@ -81,14 +81,14 @@ export default function AdminCampaignsPage() {
   };
 
   const typeColors: Record<string, string> = {
-    flash_sale: 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400',
-    voucher: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-    banner: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-400',
-    seasonal: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-    combo: 'bg-pink-100 text-pink-700 dark:bg-pink-500/20 dark:text-pink-400',
-    percentage: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-    fixed: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    free_shipping: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400',
+    flash_sale: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
+    voucher: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    banner: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+    seasonal: 'bg-black text-white dark:bg-white dark:text-black',
+    combo: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
+    percentage: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+    fixed: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+    free_shipping: 'bg-black text-white dark:bg-white dark:text-black',
   };
 
   if (loading) {
@@ -107,7 +107,7 @@ export default function AdminCampaignsPage() {
         </div>
         <Link
           href="/admin/campaigns/new"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2.5 font-medium text-white transition-colors hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-white dark:text-black dark:hover:bg-slate-200"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           Tạo chiến dịch
@@ -118,8 +118,8 @@ export default function AdminCampaignsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
-              <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+            <div className="rounded-lg bg-gray-100 p-2 dark:bg-slate-800">
+              <Target className="h-5 w-5 text-black dark:text-white" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Tổng chiến dịch</p>
@@ -129,19 +129,19 @@ export default function AdminCampaignsPage() {
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
-              <Play className="h-5 w-5 text-green-600 dark:text-green-400" aria-hidden="true" />
+            <div className="rounded-lg bg-gray-100 p-2 dark:bg-slate-800">
+              <Play className="h-5 w-5 text-black dark:text-white" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Đang hoạt động</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{dynamicStats.activeCampaigns}</p>
+              <p className="text-2xl font-bold">{dynamicStats.activeCampaigns}</p>
             </div>
           </div>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
-              <DollarSign className="h-5 w-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+            <div className="rounded-lg bg-gray-100 p-2 dark:bg-slate-800">
+              <DollarSign className="h-5 w-5 text-black dark:text-white" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Tổng ngân sách</p>
@@ -151,12 +151,12 @@ export default function AdminCampaignsPage() {
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-100 dark:bg-orange-900/40 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" aria-hidden="true" />
+            <div className="rounded-lg bg-gray-100 p-2 dark:bg-slate-800">
+              <TrendingUp className="h-5 w-5 text-black dark:text-white" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Doanh thu từ chiến dịch</p>
-              <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{formatPrice(dynamicStats.totalRevenue)}</p>
+              <p className="text-xl font-bold">{formatPrice(dynamicStats.totalRevenue)}</p>
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function AdminCampaignsPage() {
           <button
             key={tab}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              i === 0 ? 'bg-blue-600 text-white dark:bg-blue-600 dark:text-white' : 'bg-card border border-input hover:bg-accent hover:text-accent-foreground'
+               i === 0 ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-card border border-input hover:bg-accent hover:text-accent-foreground'
             }`}
           >
             {tab}

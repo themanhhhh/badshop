@@ -43,7 +43,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 underline',
+          class: 'text-black underline dark:text-white',
         },
       }),
       Underline,
@@ -93,7 +93,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       onClick={onClick}
       title={title}
       className={`p-2 rounded hover:bg-gray-100 transition-colors ${
-        active ? 'bg-blue-100 text-blue-600' : 'text-gray-600'
+        active ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-gray-600 dark:text-slate-300'
       }`}
     >
       {children}

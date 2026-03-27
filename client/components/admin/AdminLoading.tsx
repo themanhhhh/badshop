@@ -19,7 +19,7 @@ export function AdminLoading({ text = 'Đang tải...', fullPage = false }: Admi
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-foreground" />
           <span className="text-sm text-muted-foreground">{text}</span>
         </div>
       </div>

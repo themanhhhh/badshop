@@ -207,7 +207,7 @@ export default function NewCampaignPage() {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg">
+        <div className="rounded-lg bg-gray-100 p-4 text-gray-700 dark:bg-slate-900 dark:text-slate-300">
           {error}
         </div>
       )}
@@ -228,17 +228,17 @@ export default function NewCampaignPage() {
                       key={type.id}
                       type="button"
                       onClick={() => handleTypeSelect(type.id)}
-                      className={`p-4 rounded-xl border-2 text-center transition-all hover:border-blue-300 ${
+                      className={`rounded-xl border-2 p-4 text-center transition-all hover:border-black dark:hover:border-white ${
                         selectedType === type.id 
-                          ? 'border-blue-500 bg-blue-50' 
+                          ? 'border-black bg-gray-100 dark:border-white dark:bg-slate-900' 
                           : 'border-border'
                       }`}
                     >
-                      <type.icon className={`h-6 w-6 mx-auto mb-2 ${
-                        selectedType === type.id ? 'text-blue-600' : 'text-muted-foreground'
+                      <type.icon className={`mx-auto mb-2 h-6 w-6 ${
+                        selectedType === type.id ? 'text-foreground' : 'text-muted-foreground'
                       }`} />
                       <p className={`text-sm font-medium ${
-                        selectedType === type.id ? 'text-blue-600' : ''
+                        selectedType === type.id ? 'text-foreground' : ''
                       }`}>{type.name}</p>
                     </button>
                   ))}
@@ -365,7 +365,7 @@ export default function NewCampaignPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base">Chọn sản phẩm cho chiến dịch</CardTitle>
-                  <span className="text-sm text-blue-600 font-medium">
+                  <span className="text-sm font-medium text-foreground">
                     Đã chọn: {selectedProducts.length} sản phẩm
                   </span>
                 </div>
@@ -384,14 +384,14 @@ export default function NewCampaignPage() {
 
                 {/* Selected Products Tags */}
                 {selectedProducts.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-3 bg-blue-50 rounded-lg">
+                  <div className="flex flex-wrap gap-2 rounded-lg bg-gray-100 p-3 dark:bg-slate-900">
                     {selectedProducts.map(id => {
                       const product = (allProducts || []).find((p: Product) => p.id === id);
                       if (!product) return null;
                       return (
-                        <div key={id} className="flex items-center gap-1 px-2 py-1 bg-white border border-blue-200 rounded-full text-sm">
+                        <div key={id} className="flex items-center gap-1 rounded-full border border-gray-300 bg-white px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-950">
                           <span className="max-w-40 truncate">{product.name}</span>
-                          <button type="button" onClick={() => toggleProduct(id)} className="text-gray-400 hover:text-red-600">
+                          <button type="button" onClick={() => toggleProduct(id)} className="text-gray-400 hover:text-foreground">
                             <X className="h-3 w-3" />
                           </button>
                         </div>
@@ -417,12 +417,12 @@ export default function NewCampaignPage() {
                         key={product.id}
                         onClick={() => toggleProduct(product.id)}
                         className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
-                          selectedProducts.includes(product.id) ? 'bg-blue-50' : ''
+                          selectedProducts.includes(product.id) ? 'bg-gray-100 dark:bg-slate-900' : ''
                         }`}
                       >
                         <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
                           selectedProducts.includes(product.id) 
-                            ? 'bg-blue-600 border-blue-600 text-white' 
+                            ? 'bg-black border-black text-white dark:bg-white dark:border-white dark:text-black' 
                             : 'border-gray-300'
                         }`}>
                           {selectedProducts.includes(product.id) && <Check className="h-3 w-3" />}
@@ -525,7 +525,7 @@ export default function NewCampaignPage() {
                       <button
                         type="button"
                         onClick={() => setFormData({ ...formData, image_url: '' })}
-                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-sm"
+                        className="absolute top-2 right-2 rounded-full bg-black p-1.5 text-white shadow-sm transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -533,17 +533,17 @@ export default function NewCampaignPage() {
                   ) : (
                     <div 
                       onClick={() => fileInputRef.current?.click()}
-                      className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"
+                      className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 p-6 transition-all hover:border-black hover:bg-gray-50 dark:hover:border-white dark:hover:bg-slate-900"
                     >
                       {isUploading ? (
                         <>
-                          <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+                          <Loader2 className="h-8 w-8 animate-spin text-foreground" />
                           <p className="text-sm text-muted-foreground">Đang tải lên...</p>
                         </>
                       ) : (
                         <>
-                          <div className="p-3 bg-blue-100/50 rounded-full">
-                            <ImageIcon className="h-6 w-6 text-blue-600" />
+                          <div className="rounded-full bg-gray-100 p-3 dark:bg-slate-800">
+                            <ImageIcon className="h-6 w-6 text-foreground" />
                           </div>
                           <div className="text-center">
                             <p className="text-sm font-medium text-gray-700">Tải ảnh banner</p>

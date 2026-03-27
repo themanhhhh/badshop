@@ -34,7 +34,7 @@ export default function AdminPostsPage() {
 
   const statusColors: Record<string, string> = {
     draft: 'bg-secondary text-secondary-foreground',
-    published: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+    published: 'bg-black text-white dark:bg-white dark:text-black',
   };
 
   const statusLabels: Record<string, string> = {
@@ -245,7 +245,7 @@ export default function AdminPostsPage() {
                         className="p-2 hover:bg-muted rounded-lg transition-colors"
                         title="Sửa"
                       >
-                        <Edit className="h-4 w-4 text-primary" />
+                          <Edit className="h-4 w-4 text-foreground" />
                       </Link>
                       <button
                         onClick={() => handleToggleStatus(post)}
@@ -255,7 +255,7 @@ export default function AdminPostsPage() {
                         {post.status === 'published' ? (
                           <EyeOff className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <Eye className="h-4 w-4 text-green-600 dark:text-green-400" />
+                          <Eye className="h-4 w-4 text-foreground" />
                         )}
                       </button>
                       <button
