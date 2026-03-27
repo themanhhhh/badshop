@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowRight, SlidersHorizontal, ChevronDown, Loader2, AlertCircle, X, Check, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -71,6 +71,7 @@ function ProductsContent() {
   const brandSlug = searchParams.get('brand');
   const collectionSlug = searchParams.get('collection');
   const pageParam = searchParams.get('page');
+  const searchQueryParam = searchParams.get('q') || '';
   
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
@@ -79,6 +80,7 @@ function ProductsContent() {
     const parsed = Number(pageParam || '1');
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
   });
+  const productsGridRef = useRef<HTMLDivElement | null>(null);
   
   // Fetch categories and brands to get actual IDs
   const { data: categories } = useCategories();
@@ -153,8 +155,16 @@ function ProductsContent() {
   const displayProducts = useMemo(() => {
     const sourceProducts = collectionSlug ? collectionProducts : apiProducts;
     const mapped = sourceProducts ? mapProductsForDisplay(sourceProducts) : [];
-    return sortProducts(mapped, sortBy);
-  }, [apiProducts, collectionProducts, collectionSlug, sortBy]);
+    const normalizedSearch = searchQueryParam.trim().toLowerCase();
+    const searched = normalizedSearch
+      ? mapped.filter((product) =>
+          [product.name, product.brand, product.category]
+            .filter(Boolean)
+            .some((value) => value.toLowerCase().includes(normalizedSearch))
+        )
+      : mapped;
+    return sortProducts(searched, sortBy);
+  }, [apiProducts, collectionProducts, collectionSlug, searchQueryParam, sortBy]);
 
   const errorState = collectionSlug ? collectionProductsError : error;
   const refetchProducts = collectionSlug ? refetchCollectionProducts : refetch;
@@ -250,6 +260,56 @@ function ProductsContent() {
 
     return Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
   }, [currentPage, totalPages]);
+
+  const paginationItems = useMemo(() => {
+    if (totalPages <= 5) {
+      return visiblePaginationPages.map((page) => ({ type: 'page' as const, value: page }));
+    }
+
+    const items: Array<{ type: 'page' | 'ellipsis'; value: number | string }> = [];
+    const firstVisible = visiblePaginationPages[0];
+    const lastVisible = visiblePaginationPages[visiblePaginationPages.length - 1];
+
+    if (firstVisible > 1) {
+      items.push({ type: 'page', value: 1 });
+    }
+
+    if (firstVisible > 2) {
+      items.push({ type: 'ellipsis', value: 'start-ellipsis' });
+    }
+
+    visiblePaginationPages.forEach((page) => {
+      items.push({ type: 'page', value: page });
+    });
+
+    if (lastVisible < totalPages - 1) {
+      items.push({ type: 'ellipsis', value: 'end-ellipsis' });
+    }
+
+    if (lastVisible < totalPages) {
+      items.push({ type: 'page', value: totalPages });
+    }
+
+    return items;
+  }, [totalPages, visiblePaginationPages]);
+
+  const scrollToProducts = () => {
+    if (!productsGridRef.current) return;
+
+    const filterOffset = 210;
+    const top = productsGridRef.current.getBoundingClientRect().top + window.scrollY - filterOffset;
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: 'smooth',
+    });
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    updatePageQuery(page);
+    scrollToProducts();
+  };
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
@@ -482,7 +542,7 @@ function ProductsContent() {
             )}
 
             {/* Products Grid */}
-            <div className="flex-1">
+            <div className="flex-1" ref={productsGridRef}>
               {loading ? (
                 <div className="flex items-center justify-center py-20">
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -542,41 +602,36 @@ function ProductsContent() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {
-                        const nextPage = Math.max(1, currentPage - 1);
-                        setCurrentPage(nextPage);
-                        updatePageQuery(nextPage);
-                      }}
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
 
                     <div className="flex items-center gap-1">
-                      {visiblePaginationPages.map((page) => (
-                        <Button
-                          key={page}
-                          variant={page === currentPage ? 'default' : 'outline'}
-                          size="sm"
-                          className="h-9 w-9 p-0"
-                          onClick={() => {
-                            setCurrentPage(page);
-                            updatePageQuery(page);
-                          }}
-                        >
-                          {page}
-                        </Button>
-                      ))}
+                      {paginationItems.map((item) =>
+                        item.type === 'ellipsis' ? (
+                          <span key={item.value} className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground">
+                            ...
+                          </span>
+                        ) : (
+                          <Button
+                            key={item.value}
+                            variant={item.value === currentPage ? 'default' : 'outline'}
+                            size="sm"
+                            className="h-9 w-9 p-0"
+                            onClick={() => handlePageChange(item.value as number)}
+                          >
+                            {item.value}
+                          </Button>
+                        )
+                      )}
                     </div>
 
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {
-                        const nextPage = Math.min(totalPages, currentPage + 1);
-                        setCurrentPage(nextPage);
-                        updatePageQuery(nextPage);
-                      }}
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage === totalPages}
                     >
                       <ChevronRight className="h-4 w-4" />

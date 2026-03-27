@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ShoppingBag, Search, Menu, User, LogIn } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { ThemeToggle } from './ThemeToggle';
@@ -10,8 +11,12 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { itemCount } = useCart();
   const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+  const searchContainerRef = useRef<HTMLDivElement | null>(null);
 
   const navLinks = [
     { href: '/products', label: 'ALL PRODUCT' },
@@ -23,6 +28,44 @@ export function Header() {
     { href: '/products?sale=true', label: 'SALE OFF' },
   ];
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    if (url.pathname === '/products') {
+      setSearchQuery(url.searchParams.get('q') || '');
+    } else {
+      setSearchQuery('');
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const currentUrl = typeof window !== 'undefined' ? new URL(window.location.href) : null;
+    const isProductsPage = currentUrl?.pathname === '/products';
+    const params = new URLSearchParams(isProductsPage ? currentUrl?.searchParams.toString() : '');
+    if (searchQuery.trim()) {
+      params.set('q', searchQuery.trim());
+    } else {
+      params.delete('q');
+    }
+    params.delete('page');
+    const queryString = params.toString();
+    router.push(queryString ? `/products?${queryString}` : '/products');
+    setIsSearchOpen(false);
+  };
+
   return (
     <>
       <header className="sticky top-0 z-40 w-full bg-white">
@@ -32,7 +75,7 @@ export function Header() {
         </div>
 
         {/* Main Header */}
-        <div className="border-b border-gray-100">
+        <div className="border-b border-gray-100 relative">
           <div className="container mx-auto px-4">
             <div className="flex h-16 items-center justify-between">
               {/* Left - Menu */}
@@ -47,6 +90,7 @@ export function Header() {
                 <button 
                   className="p-2 hover:opacity-60 transition-opacity hidden sm:block focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                   aria-label="Tìm kiếm"
+                  onClick={() => setIsSearchOpen((prev) => !prev)}
                 >
                   <Search className="h-5 w-5" aria-hidden="true" />
                 </button>
@@ -65,6 +109,7 @@ export function Header() {
                 <button
                   className="p-2 hover:opacity-60 transition-opacity sm:hidden focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                   aria-label="Tìm kiếm"
+                  onClick={() => setIsSearchOpen((prev) => !prev)}
                 >
                   <Search className="h-5 w-5" aria-hidden="true" />
                 </button>
@@ -110,6 +155,53 @@ export function Header() {
               </div>
             </div>
           </div>
+
+          {isSearchOpen && (
+            <div ref={searchContainerRef} className="absolute inset-x-0 top-full z-50 border-t border-gray-100 bg-white shadow-[0_22px_40px_-28px_rgba(15,23,42,0.35)]">
+              <div className="container mx-auto px-4 py-4">
+                <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <div className="relative flex-1">
+                    <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <input
+                      autoFocus
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Tìm sản phẩm, thương hiệu..."
+                      className="h-12 w-full rounded-full border border-gray-200 bg-white pl-11 pr-4 text-sm outline-none transition focus:border-black"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setIsSearchOpen(false);
+                        if (typeof window !== 'undefined') {
+                          const url = new URL(window.location.href);
+                          if (url.pathname === '/products' && url.searchParams.get('q')) {
+                            const params = new URLSearchParams(url.searchParams.toString());
+                            params.delete('q');
+                            params.delete('page');
+                            const queryString = params.toString();
+                            router.push(queryString ? `/products?${queryString}` : '/products');
+                          }
+                        }
+                      }}
+                      className="h-12 rounded-full border border-gray-200 px-5 text-xs font-medium uppercase tracking-widest text-gray-600 transition hover:bg-gray-50"
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      type="submit"
+                      className="h-12 rounded-full bg-black px-6 text-xs font-medium uppercase tracking-widest text-white transition hover:bg-gray-800"
+                    >
+                      Tìm kiếm
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Desktop Navigation */}
