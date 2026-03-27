@@ -86,7 +86,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Image */}
       <Link href={`/products/${product.id}`} className="block">
-        <div className="aspect-[3/4] bg-gray-50 overflow-hidden mb-4">
+        <div className="aspect-[3/4] bg-gray-50 overflow-hidden mb-4 relative">
           {product.image ? (
             <Image
               src={product.image}
@@ -114,6 +114,9 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h3>
         </Link>
+        <p className="text-xs text-gray-400 uppercase tracking-wider">
+          {product.brand}
+        </p>
         
         {/* Price */}
         <div className="flex items-center gap-2">

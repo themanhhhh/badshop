@@ -105,7 +105,7 @@ export default function AddProductPage() {
         description: formData.description || undefined,
         price: Number(formData.price),
         original_price: formData.original_price ? Number(formData.original_price) : undefined,
-        stock: formData.stock ? Number(formData.stock) : undefined,
+        stock_quantity: formData.stock ? Number(formData.stock) : 0,
         sku: formData.sku || undefined,
         brand_id: formData.brand_id || undefined,
         category_id: formData.category_id || undefined,
