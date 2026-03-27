@@ -82,6 +82,7 @@ const menuItems: MenuItem[] = [
 ];
 
 const bottomLinks = [
+  { label: 'Blog', href: '/blog' },
   { label: 'Về chúng tôi', href: '/about' },
   { label: 'Liên hệ', href: '/contact' },
   { label: 'Chính sách đổi trả', href: '/policy' },

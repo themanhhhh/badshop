@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -36,6 +37,7 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               {children}
+              <Toaster position="top-right" richColors closeButton />
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>
