@@ -209,16 +209,16 @@ export default function AdminCollectionsPage() {
 
   const renderCollectionRow = (collection: Collection) => {
     return (
-      <div key={collection.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 border-b transition-colors relative">
+      <div key={collection.id} className="relative flex items-center gap-4 border-b p-4 transition-colors hover:bg-gray-50 dark:border-slate-800 dark:hover:bg-slate-900/60">
         {/* Avatar/Thumbnail */}
         {collection.thumbnail ? (
           <img
             src={collection.thumbnail}
             alt={collection.name}
-            className="w-12 h-12 rounded-full object-cover border-2 border-gray-100 shadow-sm"
+            className="h-12 w-12 rounded-full border-2 border-gray-100 object-cover shadow-sm dark:border-slate-700"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-100 to-blue-50 border shadow-sm flex items-center justify-center text-blue-500 font-bold text-lg">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border bg-gradient-to-br from-indigo-100 to-blue-50 text-lg font-bold text-blue-500 shadow-sm dark:border-slate-700 dark:from-slate-800 dark:to-slate-700 dark:text-sky-300">
             {collection.name.charAt(0)}
           </div>
         )}
@@ -226,7 +226,7 @@ export default function AdminCollectionsPage() {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-bold text-gray-900 truncate text-base">{collection.name}</h3>
+            <h3 className="truncate text-base font-bold text-gray-900 dark:text-white">{collection.name}</h3>
             {collection.is_active ? (
               <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">Đang hiển thị</span>
             ) : (
@@ -239,16 +239,16 @@ export default function AdminCollectionsPage() {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
+          <div className="mt-1 flex items-center gap-3 text-sm text-gray-500 dark:text-slate-300">
             <span className="truncate">{collection.country || 'Chưa cập nhật quốc gia'}</span>
-            <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+            <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-slate-500"></span>
             <span className="truncate">{collection.sport || 'Chưa cập nhật môn thể thao'}</span>
           </div>
         </div>
 
         {/* Achievement Badge */}
         {collection.achievement && (
-          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium border border-amber-100 mr-4">
+          <div className="mr-4 hidden items-center gap-1.5 rounded-lg border border-amber-100 bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300 md:flex">
             <Trophy className="h-4 w-4" />
             <span className="truncate max-w-[200px]">{collection.achievement}</span>
           </div>
@@ -260,7 +260,7 @@ export default function AdminCollectionsPage() {
             variant="ghost"
             size="sm"
             onClick={() => handleOpenEdit(collection)}
-            className="text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+            className="text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-300"
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -268,7 +268,7 @@ export default function AdminCollectionsPage() {
             variant="ghost"
             size="sm"
             onClick={() => handleOpenDelete(collection)}
-            className="text-gray-500 hover:text-red-600 hover:bg-red-50"
+            className="text-gray-500 hover:bg-red-50 hover:text-red-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-red-300"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -283,7 +283,7 @@ export default function AdminCollectionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Danh sách Bộ sưu tập (Tuyển thủ)</h1>
-          <p className="text-muted-foreground">Quản lý các bộ sưu tập, tuyển thủ nổi bật trên trang chủ</p>
+          <p className="text-muted-foreground dark:text-slate-300">Quản lý các bộ sưu tập, tuyển thủ nổi bật trên trang chủ</p>
         </div>
         <Button onClick={handleOpenCreate}>
           <Plus className="h-4 w-4 mr-2" />
@@ -316,19 +316,19 @@ export default function AdminCollectionsPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+              <Loader2 className="mx-auto h-8 w-8 animate-spin text-gray-400 dark:text-slate-400" />
             </div>
           ) : searchQuery && filteredCollections.length === 0 ? (
-            <div className="p-12 text-center text-muted-foreground">
+            <div className="p-12 text-center text-muted-foreground dark:text-slate-300">
               Không tìm thấy bộ sưu tập nào phù hợp
             </div>
           ) : filteredCollections.length === 0 ? (
-            <div className="p-12 text-center text-muted-foreground flex flex-col items-center">
-              <Trophy className="h-12 w-12 text-gray-300 mb-4" />
+            <div className="flex flex-col items-center p-12 text-center text-muted-foreground dark:text-slate-300">
+              <Trophy className="mb-4 h-12 w-12 text-gray-300 dark:text-slate-500" />
               <p>Chưa có bộ sưu tập nào. Nhấn "Thêm bộ sưu tập" để tạo mới.</p>
             </div>
           ) : (
-            <div className="divide-y">
+            <div className="divide-y dark:divide-slate-800">
               {filteredCollections.map(renderCollectionRow)}
             </div>
           )}
@@ -415,12 +415,12 @@ export default function AdminCollectionsPage() {
               {formData.thumbnail && (
                 <div className="mt-2">
                   <p className="text-xs text-muted-foreground mb-1">Xem trước:</p>
-                  <img src={formData.thumbnail} alt="Preview" className="h-16 w-16 rounded-full object-cover border" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                   <img src={formData.thumbnail} alt="Preview" className="h-16 w-16 rounded-full border object-cover dark:border-slate-700" onError={(e) => (e.currentTarget.style.display = 'none')} />
                 </div>
               )}
             </div>
 
-            <div className="flex items-center space-x-2 pt-2 border-t">
+            <div className="flex items-center space-x-2 border-t pt-2 dark:border-slate-800">
               <input
                 id="is_active"
                 type="checkbox"
@@ -433,14 +433,14 @@ export default function AdminCollectionsPage() {
               </Label>
             </div>
 
-            <div className="space-y-4 pt-4 border-t">
+            <div className="space-y-4 border-t pt-4 dark:border-slate-800">
               <Label>Sản phẩm thuộc Bộ sưu tập (Tùy chọn)</Label>
               
               {/* Đã chọn */}
               {selectedProducts.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="mb-3 flex flex-wrap gap-2">
                   {selectedProducts.map((p: any) => (
-                    <div key={p.id} className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full border border-blue-100 text-sm">
+                    <div key={p.id} className="flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-sm text-blue-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300">
                       <span className="truncate max-w-[150px] font-medium" title={p.name}>{p.name}</span>
                       <button 
                         type="button" 
@@ -448,7 +448,7 @@ export default function AdminCollectionsPage() {
                           ...prev,
                           productIds: prev.productIds.filter(id => id !== p.id)
                         }))}
-                        className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                        className="rounded-full p-0.5 transition-colors hover:bg-blue-200 dark:hover:bg-sky-500/20"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -470,7 +470,7 @@ export default function AdminCollectionsPage() {
 
               {/* Kết quả tìm kiếm */}
               {productSearch && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded-md bg-gray-50/50 mt-2">
+                <div className="mt-2 grid max-h-48 grid-cols-1 gap-2 overflow-y-auto rounded-md border bg-gray-50/50 p-2 dark:border-slate-800 dark:bg-slate-900/40 sm:grid-cols-2">
                   {searchResults.map((p: any) => (
                     <div 
                       key={p.id} 
@@ -481,23 +481,23 @@ export default function AdminCollectionsPage() {
                         }));
                         setProductSearch(''); // Reset search after pick
                       }}
-                      className="flex items-center gap-3 p-2 bg-white rounded border shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                      className="flex cursor-pointer items-center gap-3 rounded border bg-white p-2 shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
                     >
                       {p.images && p.images[0] ? (
-                        <img src={p.images[0].url} className="w-8 h-8 rounded object-cover shrink-0" />
+                        <img src={p.images[0].url} className="h-8 w-8 shrink-0 rounded object-cover" />
                       ) : (
-                        <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center shrink-0">
-                          <Package className="h-4 w-4 text-gray-400" />
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-gray-100 dark:bg-slate-800">
+                          <Package className="h-4 w-4 text-gray-400 dark:text-slate-400" />
                         </div>
                       )}
-                      <span className="text-sm font-medium truncate flex-1" title={p.name}>{p.name}</span>
+                      <span className="flex-1 truncate text-sm font-medium dark:text-white" title={p.name}>{p.name}</span>
                       <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0 shrink-0">
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
                   ))}
                   {searchResults.length === 0 && (
-                    <div className="col-span-full text-center text-sm text-gray-500 py-4">
+                    <div className="col-span-full py-4 text-center text-sm text-gray-500 dark:text-slate-400">
                       Không tìm thấy sản phẩm nào phù hợp
                     </div>
                   )}
@@ -505,7 +505,7 @@ export default function AdminCollectionsPage() {
               )}
             </div>
 
-            <DialogFooter className="pt-4 border-t">
+            <DialogFooter className="border-t pt-4 dark:border-slate-800">
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Hủy
               </Button>
