@@ -48,6 +48,7 @@ export default function AdminCollectionsPage() {
   const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
   const [deletingCollection, setDeletingCollection] = useState<Collection | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   
   const [formData, setFormData] = useState<{
     name: string;
@@ -98,6 +99,7 @@ export default function AdminCollectionsPage() {
   const handleOpenCreate = () => {
     setEditingCollection(null);
     setProductSearch('');
+    setIsSlugManuallyEdited(false);
     setFormData({ 
       name: '', 
       slug: '', 
@@ -115,6 +117,7 @@ export default function AdminCollectionsPage() {
   const handleOpenEdit = (collection: Collection) => {
     setEditingCollection(collection);
     setProductSearch('');
+    setIsSlugManuallyEdited(true);
     setFormData({
       name: collection.name,
       slug: collection.slug,
@@ -145,11 +148,19 @@ export default function AdminCollectionsPage() {
   };
 
   const handleNameChange = (name: string) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       name,
-      slug: formData.slug || generateSlug(name),
-    });
+      slug: isSlugManuallyEdited ? prev.slug : generateSlug(name),
+    }));
+  };
+
+  const handleSlugChange = (slug: string) => {
+    setIsSlugManuallyEdited(slug.trim().length > 0);
+    setFormData((prev) => ({
+      ...prev,
+      slug: generateSlug(slug),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -349,7 +360,7 @@ export default function AdminCollectionsPage() {
                 <Input
                   id="slug"
                   value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  onChange={(e) => handleSlugChange(e.target.value)}
                   placeholder="viktor-axelsen"
                 />
               </div>
