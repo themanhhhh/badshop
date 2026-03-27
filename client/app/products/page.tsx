@@ -227,7 +227,7 @@ function ProductsContent() {
         </div>
 
         {/* Filter Bar */}
-        <div className="border-y border-gray-100 sticky top-[105px] bg-white z-30">
+        <div className="border-y border-gray-100 sticky top-[130px] bg-white z-30">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between py-4">
               <Button 
