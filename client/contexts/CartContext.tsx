@@ -72,7 +72,7 @@ async function cartFetch(url: string, options: RequestInit = {}): Promise<any> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || 'Cart API error');
+    throw new Error(error.message || error.error?.message || 'Cart API error');
   }
 
   return response.json();
@@ -87,6 +87,10 @@ export function CartProvider({ children }: CartProviderProps) {
   // Calculate derived values
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const matchCartItem = useCallback((item: CartItem, identifier: string) => {
+    return item.productId === identifier || item.id === identifier;
+  }, []);
 
   // Load cart from API on mount or when auth changes
   useEffect(() => {
@@ -155,15 +159,15 @@ export function CartProvider({ children }: CartProviderProps) {
     }
   }, [cartId, user?.id]);
 
-  const removeFromCart = useCallback(async (productId: string) => {
+  const removeFromCart = useCallback(async (identifier: string) => {
     if (!cartId) return;
 
     // Optimistic update
     const previousItems = [...items];
-    setItems(prev => prev.filter(i => i.productId !== productId));
+    setItems(prev => prev.filter(i => !matchCartItem(i, identifier)));
 
     try {
-      const result = await cartFetch(`/carts/${cartId}/items/${productId}`, {
+      const result = await cartFetch(`/carts/${cartId}/items/${identifier}`, {
         method: 'DELETE',
       });
       if (result.data) {
@@ -173,25 +177,25 @@ export function CartProvider({ children }: CartProviderProps) {
       console.error('Failed to remove from cart:', error);
       setItems(previousItems); // Revert
     }
-  }, [cartId, items]);
+  }, [cartId, items, matchCartItem]);
 
-  const updateQuantity = useCallback(async (productId: string, quantity: number) => {
+  const updateQuantity = useCallback(async (identifier: string, quantity: number) => {
     if (!cartId) return;
 
     if (quantity <= 0) {
-      return removeFromCart(productId);
+      return removeFromCart(identifier);
     }
 
     // Optimistic update
     const previousItems = [...items];
     setItems(prev =>
       prev.map(i =>
-        i.productId === productId ? { ...i, quantity } : i
+        matchCartItem(i, identifier) ? { ...i, quantity } : i
       )
     );
 
     try {
-      const result = await cartFetch(`/carts/${cartId}/items/${productId}`, {
+      const result = await cartFetch(`/carts/${cartId}/items/${identifier}`, {
         method: 'PUT',
         body: JSON.stringify({ quantity }),
       });
@@ -202,7 +206,7 @@ export function CartProvider({ children }: CartProviderProps) {
       console.error('Failed to update quantity:', error);
       setItems(previousItems); // Revert
     }
-  }, [cartId, items, removeFromCart]);
+  }, [cartId, items, matchCartItem, removeFromCart]);
 
   const clearCart = useCallback(async () => {
     if (!cartId) return;

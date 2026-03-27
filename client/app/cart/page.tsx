@@ -25,14 +25,14 @@ export default function CartPage() {
   const shipping = subtotal >= 500000 ? 0 : 30000;
   const total = subtotal + shipping;
 
-  const handleRemove = async (productId: string) => {
-    setRemovingId(productId);
-    await removeFromCart(productId);
+  const handleRemove = async (itemId: string) => {
+    setRemovingId(itemId);
+    await removeFromCart(itemId);
     setRemovingId(null);
   };
 
-  const handleQuantityChange = async (productId: string, newQuantity: number) => {
-    await updateQuantity(productId, newQuantity);
+  const handleQuantityChange = async (itemId: string, newQuantity: number) => {
+    await updateQuantity(itemId, newQuantity);
   };
 
   if (loading) {
@@ -113,8 +113,8 @@ export default function CartPage() {
                             variant="ghost" 
                             size="sm" 
                             className="mt-2 h-auto p-0 text-xs text-muted-foreground hover:text-foreground md:hidden"
-                            onClick={() => handleRemove(item.productId)}
-                            disabled={removingId === item.productId}
+                            onClick={() => handleRemove(item.id)}
+                            disabled={removingId === item.id}
                           >
                             <X className="h-3 w-3 mr-1" /> Xóa
                           </Button>
@@ -133,7 +133,7 @@ export default function CartPage() {
                             variant="ghost" 
                             size="icon" 
                             className="h-8 w-8"
-                            onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
+                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                             disabled={item.quantity <= 1}
                           >
                             <Minus className="h-3 w-3" />
@@ -143,7 +143,7 @@ export default function CartPage() {
                             variant="ghost" 
                             size="icon" 
                             className="h-8 w-8"
-                            onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
+                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -159,8 +159,8 @@ export default function CartPage() {
                           variant="ghost" 
                           size="icon" 
                           className="hidden md:flex h-8 w-8 text-muted-foreground hover:text-foreground"
-                          onClick={() => handleRemove(item.productId)}
-                          disabled={removingId === item.productId}
+                          onClick={() => handleRemove(item.id)}
+                          disabled={removingId === item.id}
                         >
                           <X className="h-4 w-4" />
                         </Button>

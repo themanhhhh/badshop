@@ -4,9 +4,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Check } from 'lucide-react';
+import { ShoppingCart, Check, CircleAlert } from 'lucide-react';
 import { type DisplayProduct, formatPrice } from '@/lib/productMapper';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -20,6 +28,8 @@ export function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
   const [isAdding, setIsAdding] = useState(false);
   const [added, setAdded] = useState(false);
+  const [showOutOfStockDialog, setShowOutOfStockDialog] = useState(false);
+  const isOutOfStock = !product.inStock;
 
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
@@ -28,6 +38,11 @@ export function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (isOutOfStock) {
+      setShowOutOfStockDialog(true);
+      return;
+    }
     
     if (!isAuthenticated) {
       router.push('/login');
@@ -53,9 +68,38 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group relative">
+    <>
+      <Dialog open={showOutOfStockDialog} onOpenChange={setShowOutOfStockDialog}>
+        <DialogContent className="max-w-md rounded-[28px] border border-slate-200 bg-white p-0 shadow-[0_30px_80px_-35px_rgba(15,23,42,0.35)]">
+          <div className="bg-[linear-gradient(135deg,_#f8fafc,_#f1f5f9_55%,_#e2e8f0)] p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-white">
+              <CircleAlert className="h-5 w-5" />
+            </div>
+            <DialogHeader className="mt-4">
+              <DialogTitle className="text-xl font-semibold text-slate-950">San pham tam het hang</DialogTitle>
+              <DialogDescription className="text-sm leading-6 text-slate-600">
+                <span className="font-medium text-slate-900">{product.name}</span> hien khong con ton kho. Vui long chon san pham khac hoac quay lai sau khi cua hang cap nhat hang moi.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <DialogFooter className="border-t border-slate-200 px-6 py-5 sm:justify-between">
+            <Button variant="outline" onClick={() => setShowOutOfStockDialog(false)}>
+              Dong
+            </Button>
+            <Button asChild className="bg-slate-950 text-white hover:bg-slate-800">
+              <Link href={`/products/${product.id}`}>Xem chi tiet</Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className={`group relative rounded-[28px] p-3 transition-all ${isOutOfStock ? 'bg-slate-100/90 ring-1 ring-slate-200' : 'bg-white'}`}>
       {/* Badge */}
-      {product.badge && (
+      {isOutOfStock ? (
+        <div className="absolute top-6 left-6 z-10 rounded-full bg-slate-950 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-white">
+          Het hang
+        </div>
+      ) : product.badge && (
         <div className={`absolute top-3 left-3 z-10 px-3 py-1 text-[10px] font-medium uppercase tracking-wider ${
           product.badge === 'hot' ? 'bg-black text-white' :
           product.badge === 'new' ? 'bg-white text-black border border-black' :
@@ -71,13 +115,17 @@ export function ProductCard({ product }: ProductCardProps) {
       <Button
         size="icon"
         variant={added ? "default" : "secondary"}
-        className={`absolute top-3 right-3 z-10 h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
-          added ? 'bg-green-600 hover:bg-green-700' : ''
+        className={`absolute top-6 right-6 z-10 h-10 w-10 transition-opacity duration-200 ${
+          isOutOfStock
+            ? 'bg-white text-slate-500 opacity-100 shadow-sm hover:bg-white'
+            : `opacity-0 group-hover:opacity-100 ${added ? 'bg-green-600 hover:bg-green-700' : ''}`
         }`}
         onClick={handleAddToCart}
         disabled={isAdding}
       >
-        {added ? (
+        {isOutOfStock ? (
+          <CircleAlert className="h-4 w-4" />
+        ) : added ? (
           <Check className="h-4 w-4" />
         ) : (
           <ShoppingCart className="h-4 w-4" />
@@ -86,22 +134,27 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Image */}
       <Link href={`/products/${product.id}`} className="block">
-        <div className="aspect-[3/4] bg-gray-50 overflow-hidden mb-4 relative">
+        <div className={`aspect-[3/4] overflow-hidden mb-4 relative rounded-[24px] ${isOutOfStock ? 'bg-slate-200' : 'bg-gray-50'}`}>
           {product.image ? (
             <Image
               src={product.image}
               alt={product.name}
               fill
               unoptimized
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className={`object-cover transition-transform duration-500 ${isOutOfStock ? 'grayscale opacity-55' : 'group-hover:scale-105'}`}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-gray-400 text-3xl font-light">
+            <div className={`w-full h-full flex items-center justify-center ${isOutOfStock ? 'bg-gradient-to-br from-slate-200 to-slate-100' : 'bg-gradient-to-br from-gray-100 to-gray-50'}`}>
+              <div className={`w-24 h-24 rounded-full flex items-center justify-center ${isOutOfStock ? 'bg-slate-300' : 'bg-gray-200'}`}>
+                <span className={`${isOutOfStock ? 'text-slate-500' : 'text-gray-400'} text-3xl font-light`}>
                   {product.brand.charAt(0)}
                 </span>
               </div>
+            </div>
+          )}
+          {isOutOfStock && (
+            <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/90 px-3 py-2 text-center text-xs font-medium uppercase tracking-[0.18em] text-slate-700 backdrop-blur">
+              Tam het hang
             </div>
           )}
         </div>
@@ -110,26 +163,27 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Content */}
       <div className="space-y-2">
         <Link href={`/products/${product.id}`} className="block">
-          <h3 className="text-sm font-medium text-gray-900 uppercase tracking-wide line-clamp-1 group-hover:underline">
+          <h3 className={`text-sm font-medium uppercase tracking-wide line-clamp-1 ${isOutOfStock ? 'text-slate-500' : 'text-gray-900 group-hover:underline'}`}>
             {product.name}
           </h3>
         </Link>
-        <p className="text-xs text-gray-400 uppercase tracking-wider">
+        <p className={`text-xs uppercase tracking-wider ${isOutOfStock ? 'text-slate-400' : 'text-gray-400'}`}>
           {product.brand}
         </p>
         
         {/* Price */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">
+          <span className={`text-sm font-medium ${isOutOfStock ? 'text-slate-500' : ''}`}>
             {formatPrice(product.price)}
           </span>
           {product.originalPrice && (
-            <span className="text-sm text-gray-400 line-through">
+            <span className={`text-sm line-through ${isOutOfStock ? 'text-slate-400' : 'text-gray-400'}`}>
               {formatPrice(product.originalPrice)}
             </span>
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
