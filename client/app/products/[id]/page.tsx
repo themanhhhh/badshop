@@ -3,7 +3,7 @@
 import { useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Minus, Plus, Heart, Truck, Shield, RotateCcw, Loader2 } from 'lucide-react';
+import { Minus, Plus, Heart, Truck, Shield, RotateCcw, Loader2, Zap } from 'lucide-react';
 import { Header } from '@/components/shop/Header';
 import { Footer } from '@/components/shop/Footer';
 import { ProductCard } from '@/components/shop/ProductCard';
@@ -25,6 +25,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
 
   if (loading) {
     return (
@@ -86,6 +87,24 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       quantity,
     });
     setIsAdding(false);
+  };
+
+  const handleBuyNow = async () => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    setIsBuying(true);
+    await addToCart({
+      productId: product.id,
+      name: product.name,
+      brand: displayProduct.brand,
+      price: displayProduct.price,
+      image: displayProduct.image || '/products/placeholder.jpg',
+      quantity,
+    });
+    setIsBuying(false);
+    router.push('/checkout');
   };
 
   // Get current main image URL
@@ -228,9 +247,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </div>
 
               {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex gap-3">
                 <Button 
-                  className="flex-1 h-12 sm:h-12 text-sm sm:text-base" 
+                  className="flex-1 h-12 text-sm sm:text-base bg-black hover:bg-gray-800 text-white" 
                   onClick={handleAddToCart}
                   disabled={isAdding || !displayProduct.inStock}
                 >
@@ -244,9 +263,27 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   )}
                 </Button>
                 <Button 
+                  variant="outline"
+                  className="flex-1 h-12 text-sm sm:text-base border-black text-black bg-white hover:bg-gray-100"
+                  onClick={handleBuyNow}
+                  disabled={isBuying || !displayProduct.inStock}
+                >
+                  {isBuying ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    <>
+                      
+                      Mua ngay
+                    </>
+                  )}
+                </Button>
+                <Button 
                   variant="outline" 
                   size="icon" 
-                  className="h-12 w-12 sm:h-12 sm:w-12"
+                  className="h-12 w-12 shrink-0"
                 >
                   <Heart className="h-5 w-5" />
                 </Button>
