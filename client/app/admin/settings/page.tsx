@@ -275,11 +275,11 @@ export default function AdminSettingsPage() {
               <SectionTitle title="Cai dat thong bao" description="Quản lý cac canh bao van hanh quan trong de doi van hanh không bo lo đơn hàng mới, hủy đơn hay canh bao ton kho." />
               <div className="mt-6 space-y-4">
                 {[
-                  { name: 'Thong bao don hang moi', desc: 'Nhan thong bao khi co don hang moi', enabled: true },
-                  { name: 'Thong bao huy don', desc: 'Nhan thong bao khi khach huy don hang', enabled: true },
-                  { name: 'Thong bao het hang', desc: 'Nhan thong bao khi san pham het hang', enabled: true },
-                  { name: 'Thong bao danh gia', desc: 'Nhan thong bao khi co danh gia moi', enabled: false },
-                  { name: 'Bao cao hang tuan', desc: 'Nhan bao cao doanh thu hang tuan qua email', enabled: true },
+                  { name: 'Thông báo đơn hàng mới', desc: 'Nhận thông báo khi có đơn hàng mới', enabled: true },
+                  { name: 'Thông báo hủy đơn', desc: 'Nhận thông báo khi khách hủy đơn hàng', enabled: true },
+                  { name: 'Thông báo hết hàng', desc: 'Nhận thông báo khi sản phẩm hết hàng', enabled: true },
+                  { name: 'Thông báo đánh giá', desc: 'Nhận thông báo khi có đánh giá mới', enabled: false },
+                  { name: 'Báo cáo hàng tuần', desc: 'Nhận báo cáo doanh thu hàng tuần qua email', enabled: true },
                 ].map((notif) => (
                   <div key={notif.name} className="flex items-center justify-between rounded-3xl border border-slate-200 bg-white px-5 py-4">
                     <div>

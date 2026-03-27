@@ -1,9 +1,9 @@
 'use client';
 
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowRight, SlidersHorizontal, ChevronDown, Loader2, AlertCircle, X, Check } from 'lucide-react';
+import { ArrowRight, SlidersHorizontal, ChevronDown, Loader2, AlertCircle, X, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Header } from '@/components/shop/Header';
 import { Footer } from '@/components/shop/Footer';
 import { ProductCard } from '@/components/shop/ProductCard';
@@ -62,14 +62,23 @@ function sortProducts(products: DisplayProduct[], sort: SortOption): DisplayProd
 }
 
 function ProductsContent() {
+  const INITIAL_PRODUCT_COUNT = 20;
+  const EXPANDED_PRODUCT_COUNT = 30;
+  const PAGINATION_PAGE_SIZE = 30;
   const searchParams = useSearchParams();
   const router = useRouter();
   const categorySlug = searchParams.get('category');
   const brandSlug = searchParams.get('brand');
   const collectionSlug = searchParams.get('collection');
+  const pageParam = searchParams.get('page');
   
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [hasExpandedAllProducts, setHasExpandedAllProducts] = useState(false);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const parsed = Number(pageParam || '1');
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+  });
   
   // Fetch categories and brands to get actual IDs
   const { data: categories } = useCategories();
@@ -166,6 +175,88 @@ function ProductsContent() {
   };
 
   const activeFilterCount = (categorySlug ? 1 : 0) + (brandSlug ? 1 : 0) + (collectionSlug ? 1 : 0);
+  const isAllProductsView = activeFilterCount === 0;
+
+  const updatePageQuery = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page <= 1) {
+      params.delete('page');
+    } else {
+      params.set('page', page.toString());
+    }
+    const queryString = params.toString();
+    router.replace(queryString ? `/products?${queryString}` : '/products', { scroll: false });
+  };
+
+  useEffect(() => {
+    const parsed = Number(pageParam || '1');
+    const nextPage = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+    setCurrentPage(nextPage);
+  }, [pageParam]);
+
+  useEffect(() => {
+    if (!pageParam && currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, pageParam]);
+
+  useEffect(() => {
+    if (!isAllProductsView) {
+      setHasExpandedAllProducts(false);
+      if (pageParam) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('page');
+        const queryString = params.toString();
+        router.replace(queryString ? `/products?${queryString}` : '/products', { scroll: false });
+      }
+    }
+  }, [isAllProductsView, categorySlug, brandSlug, collectionSlug, sortBy, pageParam, router, searchParams]);
+
+  const paginatedProducts = useMemo(() => {
+    if (!isAllProductsView) {
+      return displayProducts;
+    }
+
+    if (!hasExpandedAllProducts) {
+      return displayProducts.slice(0, INITIAL_PRODUCT_COUNT);
+    }
+
+    if (currentPage === 1) {
+      return displayProducts.slice(0, EXPANDED_PRODUCT_COUNT);
+    }
+
+    const startIndex = EXPANDED_PRODUCT_COUNT + (currentPage - 2) * PAGINATION_PAGE_SIZE;
+    const endIndex = startIndex + PAGINATION_PAGE_SIZE;
+    return displayProducts.slice(startIndex, endIndex);
+  }, [currentPage, displayProducts, hasExpandedAllProducts, isAllProductsView]);
+
+  const totalPages = useMemo(() => {
+    if (!isAllProductsView || !hasExpandedAllProducts || displayProducts.length <= EXPANDED_PRODUCT_COUNT) {
+      return 1;
+    }
+
+    return 1 + Math.ceil((displayProducts.length - EXPANDED_PRODUCT_COUNT) / PAGINATION_PAGE_SIZE);
+  }, [displayProducts.length, hasExpandedAllProducts, isAllProductsView]);
+
+  const visiblePaginationPages = useMemo(() => {
+    const maxVisible = 5;
+    if (totalPages <= maxVisible) {
+      return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    startPage = Math.max(1, endPage - maxVisible + 1);
+
+    return Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
+  }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+      updatePageQuery(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   // Get page title based on filter
   const getPageTitle = () => {
@@ -222,7 +313,7 @@ function ProductsContent() {
             {getPageTitle()}
           </h1>
           <p className="text-sm text-muted-foreground text-center">
-            {loading ? 'Đang tải...' : `${displayProducts.length} sản phẩm`}
+            {loading ? 'Đang tải...' : `${displayProducts.length} sản phẩm${isAllProductsView ? ' trong danh mục tổng' : ''}`}
           </p>
         </div>
 
@@ -420,9 +511,77 @@ function ProductsContent() {
                     ? 'grid-cols-2 lg:grid-cols-3' 
                     : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
                 }`}>
-                  {displayProducts.map((product) => (
+                  {paginatedProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
+                </div>
+              )}
+
+              {!loading && !errorState && displayProducts.length > 0 && isAllProductsView && !hasExpandedAllProducts && displayProducts.length > INITIAL_PRODUCT_COUNT && (
+                <div className="mt-10 flex justify-center">
+                  <Button
+                    onClick={() => {
+                      setHasExpandedAllProducts(true);
+                      setCurrentPage(1);
+                      updatePageQuery(1);
+                    }}
+                    className="h-12 rounded-full bg-black px-8 text-sm uppercase tracking-[0.18em] text-white hover:bg-gray-800"
+                  >
+                    Xem thêm
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
+              {!loading && !errorState && isAllProductsView && hasExpandedAllProducts && totalPages > 1 && (
+                <div className="mt-10 flex flex-col items-center gap-4">
+                  <p className="text-sm text-muted-foreground">
+                    Trang {currentPage}/{totalPages}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const nextPage = Math.max(1, currentPage - 1);
+                        setCurrentPage(nextPage);
+                        updatePageQuery(nextPage);
+                      }}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+
+                    <div className="flex items-center gap-1">
+                      {visiblePaginationPages.map((page) => (
+                        <Button
+                          key={page}
+                          variant={page === currentPage ? 'default' : 'outline'}
+                          size="sm"
+                          className="h-9 w-9 p-0"
+                          onClick={() => {
+                            setCurrentPage(page);
+                            updatePageQuery(page);
+                          }}
+                        >
+                          {page}
+                        </Button>
+                      ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const nextPage = Math.min(totalPages, currentPage + 1);
+                        setCurrentPage(nextPage);
+                        updatePageQuery(nextPage);
+                      }}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>

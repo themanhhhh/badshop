@@ -70,34 +70,37 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <>
       <Dialog open={showOutOfStockDialog} onOpenChange={setShowOutOfStockDialog}>
-        <DialogContent className="max-w-md rounded-[28px] border border-slate-200 bg-white p-0 shadow-[0_30px_80px_-35px_rgba(15,23,42,0.35)]">
-          <div className="bg-[linear-gradient(135deg,_#f8fafc,_#f1f5f9_55%,_#e2e8f0)] p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-white">
+        <DialogContent className="max-w-md rounded-[28px] border border-slate-200/80 bg-slate-50 p-0 shadow-[0_30px_80px_-35px_rgba(15,23,42,0.22)]">
+          <div className="bg-[linear-gradient(135deg,_#f8fafc,_#f1f5f9_55%,_#e5e7eb)] p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-200 text-slate-700">
               <CircleAlert className="h-5 w-5" />
             </div>
             <DialogHeader className="mt-4">
-              <DialogTitle className="text-xl font-semibold text-slate-950">San pham tam het hang</DialogTitle>
+              <DialogTitle className="text-xl font-semibold text-slate-950">Sản phẩm hết hàng</DialogTitle>
               <DialogDescription className="text-sm leading-6 text-slate-600">
-                <span className="font-medium text-slate-900">{product.name}</span> hien khong con ton kho. Vui long chon san pham khac hoac quay lai sau khi cua hang cap nhat hang moi.
+                <span className="font-medium text-slate-900">{product.name}</span> hiện không còn tồn kho. Vui lòng chọn sản phẩm khác hoặc quay lại sau khi cửa hàng cập nhật hàng mới.
               </DialogDescription>
             </DialogHeader>
           </div>
-          <DialogFooter className="border-t border-slate-200 px-6 py-5 sm:justify-between">
-            <Button variant="outline" onClick={() => setShowOutOfStockDialog(false)}>
-              Dong
+          <DialogFooter className="border-t border-slate-200/80 bg-white/70 px-6 py-5 sm:justify-between">
+            <Button variant="outline" className="border-slate-300 bg-white text-slate-700 hover:bg-slate-100" onClick={() => setShowOutOfStockDialog(false)}>
+              Đóng
             </Button>
-            <Button asChild className="bg-slate-950 text-white hover:bg-slate-800">
-              <Link href={`/products/${product.id}`}>Xem chi tiet</Link>
+            <Button asChild className="bg-slate-700 text-white hover:bg-slate-600">
+              <Link href={`/products/${product.id}`}>Xem chi tiết</Link>
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <div className={`group relative rounded-[28px] p-3 transition-all ${isOutOfStock ? 'bg-slate-100/90 ring-1 ring-slate-200' : 'bg-white'}`}>
+      <div
+        className={`group relative p-3 transition-all ${isOutOfStock ? 'shadow-inner opacity-75' : 'bg-white'}`}
+        style={isOutOfStock ? { backgroundColor: '#EAEFEF' } : undefined}
+      >
       {/* Badge */}
       {isOutOfStock ? (
-        <div className="absolute top-6 left-6 z-10 rounded-full bg-slate-950 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-white">
-          Het hang
+        <div className="absolute top-6 left-6 z-10  bg-slate-950 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-white">
+          Out of Stock
         </div>
       ) : product.badge && (
         <div className={`absolute top-3 left-3 z-10 px-3 py-1 text-[10px] font-medium uppercase tracking-wider ${
@@ -134,29 +137,31 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Image */}
       <Link href={`/products/${product.id}`} className="block">
-        <div className={`aspect-[3/4] overflow-hidden mb-4 relative rounded-[24px] ${isOutOfStock ? 'bg-slate-200' : 'bg-gray-50'}`}>
+        <div
+          className={`aspect-[3/4] overflow-hidden mb-4 relative rounded-[24px] ${isOutOfStock ? '' : 'bg-gray-50'}`}
+          style={isOutOfStock ? { backgroundColor: '#EAEFEF' } : undefined}
+        >
           {product.image ? (
             <Image
               src={product.image}
               alt={product.name}
               fill
               unoptimized
-              className={`object-cover transition-transform duration-500 ${isOutOfStock ? 'grayscale opacity-55' : 'group-hover:scale-105'}`}
+              className={`object-cover transition-transform duration-500 ${isOutOfStock ? 'grayscale opacity-35' : 'group-hover:scale-105'}`}
             />
           ) : (
-            <div className={`w-full h-full flex items-center justify-center ${isOutOfStock ? 'bg-gradient-to-br from-slate-200 to-slate-100' : 'bg-gradient-to-br from-gray-100 to-gray-50'}`}>
-              <div className={`w-24 h-24 rounded-full flex items-center justify-center ${isOutOfStock ? 'bg-slate-300' : 'bg-gray-200'}`}>
+            <div
+              className={`w-full h-full flex items-center justify-center ${isOutOfStock ? '' : 'bg-gradient-to-br from-gray-100 to-gray-50'}`}
+              style={isOutOfStock ? { backgroundColor: '#EAEFEF' } : undefined}
+            >
+              <div className={`w-24 h-24 rounded-full flex items-center justify-center ${isOutOfStock ? 'bg-[#d9e0e0]' : 'bg-gray-200'}`}>
                 <span className={`${isOutOfStock ? 'text-slate-500' : 'text-gray-400'} text-3xl font-light`}>
                   {product.brand.charAt(0)}
                 </span>
               </div>
             </div>
           )}
-          {isOutOfStock && (
-            <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/90 px-3 py-2 text-center text-xs font-medium uppercase tracking-[0.18em] text-slate-700 backdrop-blur">
-              Tam het hang
-            </div>
-          )}
+          
         </div>
       </Link>
 
