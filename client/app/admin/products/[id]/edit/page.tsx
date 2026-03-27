@@ -51,6 +51,7 @@ export default function EditProductPage() {
     sku: '',
     brand_id: '',
     category_id: '',
+    badge: 'new',
   });
 
   // Fetch product data
@@ -68,6 +69,7 @@ export default function EditProductPage() {
           sku: product.sku || '',
           brand_id: product.brand?.id || product.brand_id || '',
           category_id: product.category?.id || product.category_id || '',
+          badge: product.badge || 'new',
         });
         setImages(product.product_images?.map((img: any) => img.image_url || img.url) || product.images?.map((img: any) => img.url || img.image_url) || []);
       } catch (err) {
@@ -139,6 +141,7 @@ export default function EditProductPage() {
         sku: formData.sku || undefined,
         brand_id: formData.brand_id || undefined,
         category_id: formData.category_id || undefined,
+        badge: formData.badge,
         images: images.map((url, index) => ({ url, display_order: index })) as any,
       });
       
@@ -414,6 +417,32 @@ export default function EditProductPage() {
                   onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                   placeholder="0"
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Badge */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Nhãn sản phẩm</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label>Badge</Label>
+                <Select
+                  value={formData.badge}
+                  onValueChange={(value) => setFormData({ ...formData, badge: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn nhãn" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">New (Mới)</SelectItem>
+                    <SelectItem value="bestseller">Best Seller (Bán chạy)</SelectItem>
+                    <SelectItem value="sale">Sale (Giảm giá)</SelectItem>
+                    <SelectItem value="none">Không có</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>

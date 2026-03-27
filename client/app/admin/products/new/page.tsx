@@ -48,6 +48,7 @@ export default function AddProductPage() {
     sku: '',
     brand_id: '',
     category_id: '',
+    badge: 'new',
   });
 
   const generateSlug = (name: string) => {
@@ -109,6 +110,7 @@ export default function AddProductPage() {
         sku: formData.sku || undefined,
         brand_id: formData.brand_id || undefined,
         category_id: formData.category_id || undefined,
+        badge: formData.badge,
         images: images.map((url, index) => ({ url, display_order: index })) as any,
       });
       
@@ -376,6 +378,32 @@ export default function AddProductPage() {
                   onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                   placeholder="0"
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Badge */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Nhãn sản phẩm</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label>Badge</Label>
+                <Select
+                  value={formData.badge}
+                  onValueChange={(value) => setFormData({ ...formData, badge: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn nhãn" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">New (Mới)</SelectItem>
+                    <SelectItem value="bestseller">Best Seller (Bán chạy)</SelectItem>
+                    <SelectItem value="sale">Sale (Giảm giá)</SelectItem>
+                    <SelectItem value="none">Không có</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
