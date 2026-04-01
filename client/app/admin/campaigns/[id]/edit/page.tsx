@@ -18,11 +18,22 @@ import {
   Upload,
   Image as ImageIcon
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Select,
   SelectContent,
@@ -63,6 +74,8 @@ export default function EditCampaignPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingCampaign, setIsDeletingCampaign] = useState(false);
   const [selectedType, setSelectedType] = useState('collection');
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [productSearch, setProductSearch] = useState('');
@@ -142,7 +155,7 @@ export default function EditCampaignPage() {
       setFormData(prev => ({ ...prev, image_url: result.url }));
     } catch (err: any) {
       setError('Không thể tải ảnh banner. Vui lòng thử lại.');
-      alert(err.message || 'Lỗi tải ảnh');
+      toast.error(err.message || 'Lỗi tải ảnh');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -216,29 +229,32 @@ export default function EditCampaignPage() {
         }
       }
 
-      alert('Cập nhật chiến dịch thành công');
+      toast.success('Cập nhật chiến dịch thành công');
       router.push('/admin/campaigns');
     } catch (err: any) {
       setError(err.message);
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
-      if (!confirm('Bạn có chắc chắn muốn xóa chiến dịch này không?')) return;
       try {
+          setIsDeletingCampaign(true);
           const token = getToken();
           const response = await fetch(`${API_BASE_URL}/campaigns/${id}`, {
               method: 'DELETE',
               headers: { 'Authorization': `Bearer ${token}` },
           });
           if (!response.ok) throw new Error('Không thể xóa chiến dịch');
-          alert('Đã xóa chiến dịch');
+          toast.success('Đã xóa chiến dịch');
+          setIsDeleteDialogOpen(false);
           router.push('/admin/campaigns');
       } catch (err: any) {
-          alert(err.message);
+          toast.error(err.message);
+      } finally {
+          setIsDeletingCampaign(false);
       }
   }
 
@@ -266,7 +282,7 @@ export default function EditCampaignPage() {
             <p className="text-muted-foreground">{formData.name}</p>
             </div>
         </div>
-        <Button variant="destructive" size="sm" onClick={handleDelete}>
+        <Button variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
             <Trash2 className="h-4 w-4 mr-2" />
             Xóa chiến dịch
         </Button>
@@ -277,6 +293,34 @@ export default function EditCampaignPage() {
           {error}
         </div>
       )}
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa chiến dịch</AlertDialogTitle>
+            <AlertDialogDescription>
+              Chiến dịch hiện tại sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingCampaign}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeletingCampaign}
+              className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
+              onClick={handleDelete}
+            >
+              {isDeletingCampaign ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xóa...
+                </>
+              ) : (
+                'Xóa chiến dịch'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <form onSubmit={handleSubmit}>
         <div className="grid lg:grid-cols-3 gap-6">

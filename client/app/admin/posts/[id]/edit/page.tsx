@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Save, Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { TiptapEditor } from '@/components/admin/TiptapEditor';
 import { uploadApi, postApi } from '@/lib/api';
 import { AdminLoading } from '@/components/admin/AdminLoading';
@@ -46,7 +47,7 @@ export default function EditPostPage() {
         setMetaTitle(post.meta_title || '');
         setMetaDescription(post.meta_description || '');
       } catch (error) {
-        alert('Không thể tải bài viết');
+        toast.error('Không thể tải bài viết');
         router.push('/admin/posts');
       } finally {
         setFetching(false);
@@ -67,7 +68,7 @@ export default function EditPostPage() {
       const result = await uploadApi.uploadImage(file);
       setFeaturedImage(result.url);
     } catch (error) {
-      alert('Không thể tải lên hình ảnh');
+      toast.error('Không thể tải lên hình ảnh');
     } finally {
       setUploadingImage(false);
     }
@@ -77,38 +78,27 @@ export default function EditPostPage() {
     e.preventDefault();
     
     if (!title.trim()) {
-      alert('Vui lòng nhập tiêu đề bài viết');
+      toast.error('Vui lòng nhập tiêu đề bài viết');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'}/posts/${postId}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title,
-            slug: slug || undefined,
-            excerpt,
-            content,
-            featured_image: featuredImage || null,
-            status,
-            meta_title: metaTitle || null,
-            meta_description: metaDescription || null,
-          }),
-        }
-      );
+      await postApi.update(postId, {
+        title,
+        slug: slug || undefined,
+        excerpt,
+        content,
+        featured_image: featuredImage || null,
+        status,
+        meta_title: metaTitle || null,
+        meta_description: metaDescription || null,
+      } as any);
 
-      if (response.ok) {
-        alert('Cập nhật bài viết thành công!');
-        router.push('/admin/posts');
-      } else {
-        alert('Không thể cập nhật bài viết');
-      }
+      toast.success('Cập nhật bài viết thành công');
+      router.push('/admin/posts');
     } catch (error) {
-      alert('Có lỗi xảy ra');
+      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }

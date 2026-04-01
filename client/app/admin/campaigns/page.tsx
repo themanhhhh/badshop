@@ -22,14 +22,27 @@ import {
   Target,
   Loader2
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useCampaigns } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
 import { AdminSelect } from '@/components/admin/AdminSelect';
 import { AdminLoading } from '@/components/admin/AdminLoading';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AdminCampaignsPage() {
   const { data: campaigns, loading } = useCampaigns();
   const [typeFilter, setTypeFilter] = useState('all');
+  const [deletingCampaign, setDeletingCampaign] = useState<any | null>(null);
+  const [isDeletingCampaign, setIsDeletingCampaign] = useState(false);
 
   // Use API data directly
   const displayCampaigns = campaigns || [];
@@ -330,23 +343,7 @@ export default function AdminCampaignsPage() {
                         <button 
                           className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring group" 
                           aria-label={`Xóa ${campaign.name}`}
-                          onClick={async () => {
-                            if (confirm('Bạn có chắc muốn xóa chiến dịch này?')) {
-                              try {
-                                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'}/campaigns/${campaign.id}`, {
-                                  method: 'DELETE',
-                                });
-                                if (response.ok) {
-                                  alert('Đã xóa chiến dịch');
-                                  window.location.reload(); 
-                                } else {
-                                  alert('Không thể xóa chiến dịch');
-                                }
-                              } catch (error) {
-                                alert('Có lỗi xảy ra');
-                              }
-                            }
-                          }}
+                          onClick={() => setDeletingCampaign(campaign)}
                         >
                           <Trash2 className="h-4 w-4" aria-hidden="true" />
                         </button>
@@ -377,6 +374,53 @@ export default function AdminCampaignsPage() {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={!!deletingCampaign} onOpenChange={(open) => !open && setDeletingCampaign(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa chiến dịch</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deletingCampaign?.name ? `Chiến dịch "${deletingCampaign.name}" sẽ bị xóa vĩnh viễn.` : 'Chiến dịch này sẽ bị xóa vĩnh viễn.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingCampaign}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeletingCampaign}
+              className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
+              onClick={async () => {
+                if (!deletingCampaign) return;
+                try {
+                  setIsDeletingCampaign(true);
+                  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'}/campaigns/${deletingCampaign.id}`, {
+                    method: 'DELETE',
+                  });
+                  if (response.ok) {
+                    toast.success('Đã xóa chiến dịch');
+                    setDeletingCampaign(null);
+                    window.location.reload();
+                  } else {
+                    toast.error('Không thể xóa chiến dịch');
+                  }
+                } catch {
+                  toast.error('Có lỗi xảy ra');
+                } finally {
+                  setIsDeletingCampaign(false);
+                }
+              }}
+            >
+              {isDeletingCampaign ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xóa...
+                </>
+              ) : (
+                'Xóa chiến dịch'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

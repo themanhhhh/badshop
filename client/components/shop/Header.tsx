@@ -105,7 +105,6 @@ export function Header() {
 
               {/* Right - Actions */}
               <div className="flex items-center gap-1">
-                <ThemeToggle />
                 <button
                   className="p-2 hover:opacity-60 transition-opacity sm:hidden focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                   aria-label="Tìm kiếm"

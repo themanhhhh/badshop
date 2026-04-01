@@ -11,6 +11,16 @@ import { formatPrice } from '@/lib/productMapper';
 import { AdminLoading } from '@/components/admin/AdminLoading';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AdminOrdersPage() {
   const [searchInput, setSearchInput] = useState('');
@@ -21,6 +31,7 @@ export default function AdminOrdersPage() {
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
   const [statusState, setStatusState] = useState<Record<string, string>>({});
   const itemsPerPage = 10;
 
@@ -118,14 +129,12 @@ export default function AdminOrdersPage() {
   const handleBulkDelete = async () => {
     if (selectedOrderIds.length === 0) return;
 
-    const confirmed = window.confirm(`Ban co chac chan muon xoa ${selectedOrderIds.length} don hang da chon?`);
-    if (!confirmed) return;
-
     try {
       setBulkDeleting(true);
       await Promise.all(selectedOrderIds.map((orderId) => orderApi.delete(orderId)));
       toast.success(`Da xoa ${selectedOrderIds.length} don hang.`);
       setSelectedOrderIds([]);
+      setIsBulkDeleteDialogOpen(false);
       await refetch();
     } catch (error) {
       console.error('Failed to bulk delete orders:', error);
@@ -186,8 +195,8 @@ export default function AdminOrdersPage() {
         <div className="flex gap-2">
           {selectedOrderIds.length > 0 && (
             <button
-              onClick={handleBulkDelete}
               disabled={bulkDeleting}
+              onClick={() => setIsBulkDeleteDialogOpen(true)}
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-input bg-card px-4 py-2.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               {bulkDeleting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Trash2 className="h-4 w-4" aria-hidden="true" />}
@@ -205,6 +214,34 @@ export default function AdminOrdersPage() {
           </button>
         </div>
       </div>
+
+      <AlertDialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa đơn hàng</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`Bạn sắp xóa ${selectedOrderIds.length} đơn hàng đã chọn. Hành động này không thể hoàn tác.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkDeleting}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={bulkDeleting}
+              className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
+              onClick={handleBulkDelete}
+            >
+              {bulkDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xóa...
+                </>
+              ) : (
+                'Xóa đã chọn'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Status Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2">

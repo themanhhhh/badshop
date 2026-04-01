@@ -14,14 +14,27 @@ import {
   Check,
   X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { usePosts } from '@/hooks/useApi';
 import { AdminLoading } from '@/components/admin/AdminLoading';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AdminPostsPage() {
   const [page, setPage] = useState(1);
   const { data, loading, refetch } = usePosts(page, 10);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
+  const [isDeletingPost, setIsDeletingPost] = useState(false);
 
   const posts = data?.data || [];
   const pagination = data?.pagination || { page: 1, totalPages: 1, total: 0 };
@@ -43,21 +56,23 @@ export default function AdminPostsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return;
-    
     try {
+      setIsDeletingPost(true);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'}/posts/${id}`,
         { method: 'DELETE' }
       );
       if (response.ok) {
-        alert('Đã xóa bài viết');
+        toast.success('Đã xóa bài viết');
+        setDeletingPostId(null);
         refetch();
       } else {
-        alert('Không thể xóa bài viết');
+        toast.error('Không thể xóa bài viết');
       }
     } catch (error) {
-      alert('Có lỗi xảy ra');
+      toast.error('Có lỗi xảy ra');
+    } finally {
+      setIsDeletingPost(false);
     }
   };
 
@@ -76,10 +91,10 @@ export default function AdminPostsPage() {
       if (response.ok) {
         refetch();
       } else {
-        alert('Không thể cập nhật trạng thái');
+        toast.error('Không thể cập nhật trạng thái');
       }
     } catch (error) {
-      alert('Có lỗi xảy ra');
+      toast.error('Có lỗi xảy ra');
     }
   };
 
@@ -259,7 +274,7 @@ export default function AdminPostsPage() {
                         )}
                       </button>
                       <button
-                        onClick={() => handleDelete(post.id)}
+                        onClick={() => setDeletingPostId(post.id)}
                         className="p-2 hover:bg-destructive/10 rounded-lg transition-colors group"
                         title="Xóa"
                       >
@@ -298,6 +313,34 @@ export default function AdminPostsPage() {
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!deletingPostId} onOpenChange={(open) => !open && setDeletingPostId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa bài viết</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bài viết đã chọn sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingPost}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeletingPost}
+              className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
+              onClick={() => deletingPostId && handleDelete(deletingPostId)}
+            >
+              {isDeletingPost ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xóa...
+                </>
+              ) : (
+                'Xóa bài viết'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

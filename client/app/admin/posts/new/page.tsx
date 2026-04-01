@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Save, Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { TiptapEditor } from '@/components/admin/TiptapEditor';
-import { uploadApi } from '@/lib/api';
+import { postApi, uploadApi } from '@/lib/api';
 import {
   Select,
   SelectContent,
@@ -49,7 +50,7 @@ export default function NewPostPage() {
       const result = await uploadApi.uploadImage(file);
       setFeaturedImage(result.url);
     } catch (error) {
-      alert('Không thể tải lên hình ảnh');
+      toast.error('Không thể tải lên hình ảnh');
     } finally {
       setUploadingImage(false);
     }
@@ -59,39 +60,27 @@ export default function NewPostPage() {
     e.preventDefault();
     
     if (!title.trim()) {
-      alert('Vui lòng nhập tiêu đề bài viết');
+      toast.error('Vui lòng nhập tiêu đề bài viết');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'}/posts`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title,
-            slug: slug || undefined,
-            excerpt,
-            content,
-            featured_image: featuredImage || null,
-            status,
-            meta_title: metaTitle || null,
-            meta_description: metaDescription || null,
-          }),
-        }
-      );
+      await postApi.create({
+        title,
+        slug: slug || undefined,
+        excerpt,
+        content,
+        featured_image: featuredImage || null,
+        status,
+        meta_title: metaTitle || null,
+        meta_description: metaDescription || null,
+      } as any);
 
-      if (response.ok) {
-        const data = await response.json();
-        alert('Tạo bài viết thành công!');
-        router.push('/admin/posts');
-      } else {
-        alert('Không thể tạo bài viết');
-      }
+      toast.success('Tạo bài viết thành công');
+      router.push('/admin/posts');
     } catch (error) {
-      alert('Có lỗi xảy ra');
+      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }

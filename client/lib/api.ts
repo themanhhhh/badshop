@@ -594,11 +594,45 @@ export const statsApi = {
 // POST API
 // ============================================
 export const postApi = {
-  getAll: (page: number = 1, limit: number = 10): Promise<{ data: Post[]; pagination: any }> => 
-    fetchApi(`/posts?page=${page}&limit=${limit}`),
+  getAll: async (page: number = 1, limit: number = 10): Promise<{ data: Post[]; pagination: any }> => {
+    const response = await fetch(`${API_BASE_URL}/posts?page=${page}&limit=${limit}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const json = await response.json();
+    return {
+      data: json.data || [],
+      pagination: json.pagination || { page, limit, total: 0, totalPages: 1 },
+    };
+  },
   
-  getPublished: (page: number = 1, limit: number = 10): Promise<{ data: Post[]; pagination: any }> => 
-    fetchApi(`/posts/published?page=${page}&limit=${limit}`),
+  getPublished: async (page: number = 1, limit: number = 10): Promise<{ data: Post[]; pagination: any }> => {
+    const response = await fetch(`${API_BASE_URL}/posts/published?page=${page}&limit=${limit}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const json = await response.json();
+    return {
+      data: json.data || [],
+      pagination: json.pagination || { page, limit, total: 0, totalPages: 1 },
+    };
+  },
   
   getById: (id: string): Promise<Post> => 
     fetchApi(`/posts/${id}`),
