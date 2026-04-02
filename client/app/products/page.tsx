@@ -70,6 +70,7 @@ function ProductsContent() {
   const categorySlug = searchParams.get('category');
   const brandSlug = searchParams.get('brand');
   const collectionSlug = searchParams.get('collection');
+  const saleParam = searchParams.get('sale');
   const pageParam = searchParams.get('page');
   const searchQueryParam = searchParams.get('q') || '';
   
@@ -155,16 +156,19 @@ function ProductsContent() {
   const displayProducts = useMemo(() => {
     const sourceProducts = collectionSlug ? collectionProducts : apiProducts;
     const mapped = sourceProducts ? mapProductsForDisplay(sourceProducts) : [];
+    const saleFiltered = saleParam === 'true'
+      ? mapped.filter((product) => (product.originalPrice && product.originalPrice > product.price) || product.badge === 'sale')
+      : mapped;
     const normalizedSearch = searchQueryParam.trim().toLowerCase();
     const searched = normalizedSearch
-      ? mapped.filter((product) =>
+      ? saleFiltered.filter((product) =>
           [product.name, product.brand, product.category]
             .filter(Boolean)
             .some((value) => value.toLowerCase().includes(normalizedSearch))
         )
-      : mapped;
+      : saleFiltered;
     return sortProducts(searched, sortBy);
-  }, [apiProducts, collectionProducts, collectionSlug, searchQueryParam, sortBy]);
+  }, [apiProducts, collectionProducts, collectionSlug, saleParam, searchQueryParam, sortBy]);
 
   const errorState = collectionSlug ? collectionProductsError : error;
   const refetchProducts = collectionSlug ? refetchCollectionProducts : refetch;
@@ -184,7 +188,7 @@ function ProductsContent() {
     router.push('/products');
   };
 
-  const activeFilterCount = (categorySlug ? 1 : 0) + (brandSlug ? 1 : 0) + (collectionSlug ? 1 : 0);
+  const activeFilterCount = (categorySlug ? 1 : 0) + (brandSlug ? 1 : 0) + (collectionSlug ? 1 : 0) + (saleParam === 'true' ? 1 : 0);
   const isAllProductsView = activeFilterCount === 0;
 
   const updatePageQuery = (page: number) => {
@@ -220,7 +224,7 @@ function ProductsContent() {
         router.replace(queryString ? `/products?${queryString}` : '/products', { scroll: false });
       }
     }
-  }, [isAllProductsView, categorySlug, brandSlug, collectionSlug, sortBy, pageParam, router, searchParams]);
+  }, [isAllProductsView, categorySlug, brandSlug, collectionSlug, saleParam, sortBy, pageParam, router, searchParams]);
 
   const paginatedProducts = useMemo(() => {
     if (!isAllProductsView) {
@@ -331,6 +335,9 @@ function ProductsContent() {
       const collection = collections?.find((c: any) => c.slug === collectionSlug || c.name?.toLowerCase() === collectionSlug.toLowerCase());
       return collection?.name || collectionSlug;
     }
+    if (saleParam === 'true') {
+      return 'Sale Off';
+    }
     return 'Tất cả sản phẩm';
   };
 
@@ -361,6 +368,12 @@ function ProductsContent() {
                 <>
                   <span>/</span>
                   <span className="text-foreground">{getPageTitle()}</span>
+                </>
+              )}
+              {saleParam === 'true' && !collectionSlug && (
+                <>
+                  <span>/</span>
+                  <span className="text-foreground">Sale Off</span>
                 </>
               )}
             </nav>
@@ -462,6 +475,19 @@ function ProductsContent() {
                           className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-sm hover:bg-gray-200 transition-colors"
                         >
                           {getPageTitle()}
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                      {saleParam === 'true' && (
+                        <button
+                          onClick={() => {
+                            const params = new URLSearchParams(searchParams.toString());
+                            params.delete('sale');
+                            router.push(params.toString() ? `/products?${params.toString()}` : '/products');
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                        >
+                          Sale Off
                           <X className="h-3 w-3" />
                         </button>
                       )}
