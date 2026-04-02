@@ -279,12 +279,12 @@ export default function AdminFulfillmentPage() {
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-3">
                     <div className="rounded-2xl bg-muted/50 p-4">
-                      <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Tong gia tri</div>
+                      <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Tổng giá trị</div>
                       <div className="mt-2 text-lg font-semibold text-foreground">{formatPrice((selectedOrder as any).total || 0)}</div>
                     </div>
                     <div className="rounded-2xl bg-muted/50 p-4">
                       <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Shipment</div>
-                      <div className="mt-2 text-lg font-semibold text-foreground">{shipment ? 'Da tao' : 'Chua co'}</div>
+                      <div className="mt-2 text-lg font-semibold text-foreground">{shipment ? 'Đã tạo' : 'Chưa có'}</div>
                     </div>
                     <div className="rounded-2xl bg-muted/50 p-4">
                       <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Tracking</div>
