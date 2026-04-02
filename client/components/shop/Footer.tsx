@@ -2,6 +2,14 @@ import Link from 'next/link';
 import { Facebook, Instagram, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 
 export function Footer() {
+  const supportLinks = [
+    { label: 'Hướng dẫn mua hàng', href: '/faq' },
+    { label: 'Chính sách đổi trả', href: '/policy' },
+    { label: 'Chính sách vận chuyển', href: '/policy' },
+    { label: 'Chính sách bảo hành', href: '/policy' },
+    { label: 'Câu hỏi thường gặp', href: '/faq' },
+  ];
+
   return (
     <footer className="bg-white border-t border-gray-100">
       {/* Newsletter Section */}
@@ -85,13 +93,13 @@ export function Footer() {
               Hỗ trợ
             </h4>
             <nav className="flex flex-col gap-3">
-              {['Hướng dẫn mua hàng', 'Chính sách đổi trả', 'Chính sách vận chuyển', 'Chính sách bảo hành', 'Câu hỏi thường gặp'].map((link) => (
+              {supportLinks.map((link) => (
                 <Link
-                  key={link}
-                  href="#"
+                  key={link.label}
+                  href={link.href}
                   className="text-sm text-gray-600 hover:text-black transition-colors"
                 >
-                  {link}
+                  {link.label}
                 </Link>
               ))}
             </nav>

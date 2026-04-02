@@ -233,32 +233,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
         </div>
 
-        {/* Bottom Links - Fixed at bottom */}
-        <div className="shrink-0 border-t border-gray-100 bg-gray-50">
-          {bottomLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              onClick={handleClose}
-              className="block px-5 py-3.5 text-xs text-gray-500 hover:text-black transition-colors min-h-[44px]"
-            >
-              {link.label}
-            </Link>
-          ))}
-
-          {/* Social Links */}
-          <div className="flex gap-4 px-5 py-4 border-t border-gray-100">
-            <a href="#" className="text-gray-400 hover:text-black transition-colors p-2" aria-label="Facebook">
-              <Facebook className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-gray-400 hover:text-black transition-colors p-2" aria-label="Instagram">
-              <Instagram className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-gray-400 hover:text-black transition-colors p-2" aria-label="Youtube">
-              <Youtube className="h-5 w-5" />
-            </a>
-          </div>
-        </div>
       </div>
     </>
   );
