@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Search, Filter, Eye, MoreHorizontal, Download, Loader2, AlertCircle, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Search, Filter, Eye, Download, Loader2, AlertCircle, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useOrdersWithFilters } from '@/hooks/useApi';
 import { orderApi } from '@/lib/api';
@@ -32,6 +32,8 @@ export default function AdminOrdersPage() {
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
+  const [isDeletingOrder, setIsDeletingOrder] = useState(false);
   const [statusState, setStatusState] = useState<Record<string, string>>({});
   const itemsPerPage = 10;
 
@@ -47,6 +49,10 @@ export default function AdminOrdersPage() {
   const pagination = data?.pagination || { total: 0, totalPages: 1 };
   const filteredOrdersCount = pagination.total;
   const totalPages = pagination.totalPages;
+  const displayOrderIds = useMemo(
+    () => displayOrders.map((order: any) => order.id || order.orderNumber),
+    [displayOrders]
+  );
   const allVisibleSelected = displayOrders.length > 0 && displayOrders.every((order: any) => selectedOrderIds.includes(order.id || order.orderNumber));
 
   useEffect(() => {
@@ -54,12 +60,30 @@ export default function AdminOrdersPage() {
     displayOrders.forEach((order: any) => {
       nextState[order.id || order.orderNumber] = order.status;
     });
-    setStatusState(nextState);
+
+    setStatusState((prev) => {
+      const prevKeys = Object.keys(prev);
+      const nextKeys = Object.keys(nextState);
+
+      if (prevKeys.length === nextKeys.length && nextKeys.every((key) => prev[key] === nextState[key])) {
+        return prev;
+      }
+
+      return nextState;
+    });
   }, [displayOrders]);
 
   useEffect(() => {
-    setSelectedOrderIds((prev) => prev.filter((id) => displayOrders.some((order: any) => (order.id || order.orderNumber) === id)));
-  }, [displayOrders]);
+    setSelectedOrderIds((prev) => {
+      const nextSelected = prev.filter((id) => displayOrderIds.includes(id));
+
+      if (nextSelected.length === prev.length && nextSelected.every((id, index) => id === prev[index])) {
+        return prev;
+      }
+
+      return nextSelected;
+    });
+  }, [displayOrderIds]);
 
   const handleApplyFilters = () => {
     setFilters(prev => ({ ...prev, search: searchInput, date: dateInput }));
@@ -141,6 +165,24 @@ export default function AdminOrdersPage() {
       toast.error('Khong the xoa tat ca don hang da chon. Vui long thu lai.');
     } finally {
       setBulkDeleting(false);
+    }
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!deletingOrderId) return;
+
+    try {
+      setIsDeletingOrder(true);
+      await orderApi.delete(deletingOrderId);
+      toast.success('Da xoa don hang.');
+      setSelectedOrderIds((prev) => prev.filter((id) => id !== deletingOrderId));
+      setDeletingOrderId(null);
+      await refetch();
+    } catch (error) {
+      console.error('Failed to delete order:', error);
+      toast.error('Khong the xoa don hang. Vui long thu lai.');
+    } finally {
+      setIsDeletingOrder(false);
     }
   };
 
@@ -237,6 +279,34 @@ export default function AdminOrdersPage() {
                 </>
               ) : (
                 'Xóa đã chọn'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deletingOrderId} onOpenChange={(open) => !open && !isDeletingOrder && setDeletingOrderId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa đơn hàng</AlertDialogTitle>
+            <AlertDialogDescription>
+              Đơn hàng đã chọn sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingOrder}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeletingOrder}
+              className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
+              onClick={handleDeleteOrder}
+            >
+              {isDeletingOrder ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xóa...
+                </>
+              ) : (
+                'Xóa đơn hàng'
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -391,9 +461,10 @@ export default function AdminOrdersPage() {
                       </Link>
                       <button 
                         className="p-2 hover:bg-accent rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-ring"
-                        aria-label={`Tùy chọn khác cho đơn hàng ${order.id || order.orderNumber}`}
+                        aria-label={`Xóa đơn hàng ${order.id || order.orderNumber}`}
+                        onClick={() => setDeletingOrderId(order.id || order.orderNumber)}
                       >
-                        <MoreHorizontal className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                        <Trash2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       </button>
                     </div>
                   </td>
