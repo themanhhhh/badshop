@@ -18,7 +18,7 @@ const statusMap: Record<string, { label: string; variant: 'default' | 'secondary
   awaiting_shipment: { label: 'Chuẩn bị giao', variant: 'default' },
   awaiting_collection: { label: 'Chờ lấy hàng', variant: 'default' },
   in_transit: { label: 'Đang vận chuyển', variant: 'default' },
-  delivered: { label: 'Đã giao', variant: 'outline' },
+  delivered: { label: 'Hoàn tất', variant: 'outline' },
   completed: { label: 'Hoàn tất', variant: 'outline' },
   cancelled: { label: 'Đã hủy', variant: 'destructive' },
   confirmed: { label: 'Đã xác nhận', variant: 'default' },

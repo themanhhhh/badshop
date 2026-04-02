@@ -108,7 +108,18 @@ export interface Order {
   shippingFee: number;
   discount: number;
   total: number;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipping' | 'delivered' | 'cancelled';
+  status:
+    | 'pending'
+    | 'pending_payment'
+    | 'paid'
+    | 'awaiting_shipment'
+    | 'awaiting_collection'
+    | 'in_transit'
+    | 'delivered'
+    | 'completed'
+    | 'confirmed'
+    | 'shipping'
+    | 'cancelled';
   paymentMethod: 'cod' | 'banking' | 'momo' | 'vnpay';
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
   note?: string;

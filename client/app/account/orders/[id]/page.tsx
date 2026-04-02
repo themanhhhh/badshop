@@ -25,11 +25,10 @@ const statusConfig: Record<string, { label: string; color: 'default' | 'secondar
   awaiting_shipment: { label: 'Đang chuẩn bị hàng', color: 'default', icon: Package },
   awaiting_collection: { label: 'Chờ lấy hàng', color: 'default', icon: Truck },
   in_transit: { label: 'Đang vận chuyển', color: 'default', icon: Truck },
+  completed: { label: 'Hoàn tất', color: 'outline', icon: CheckCircle2 },
   confirmed: { label: 'Đã xác nhận', color: 'default', icon: CheckCircle2 },
-  processing: { label: 'Đang xử lý', color: 'default', icon: Package },
   shipping: { label: 'Đang giao hàng', color: 'default', icon: Truck },
-  shipped: { label: 'Đang giao hàng', color: 'default', icon: Truck },
-  delivered: { label: 'Đã giao hàng', color: 'outline', icon: CheckCircle2 },
+  delivered: { label: 'Hoàn tất', color: 'outline', icon: CheckCircle2 },
   cancelled: { label: 'Đã hủy', color: 'destructive', icon: XCircle },
 };
 

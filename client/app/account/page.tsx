@@ -42,11 +42,17 @@ function formatDate(dateString: string): string {
 
 // Status labels for order display
 const statusLabels: Record<string, { label: string; color: string }> = {
-  pending: { label: 'Chờ xác nhận', color: 'bg-yellow-100 text-yellow-800' },
-  processing: { label: 'Đang xử lý', color: 'bg-blue-100 text-blue-800' },
-  shipped: { label: 'Đang giao', color: 'bg-purple-100 text-purple-800' },
-  delivered: { label: 'Đã giao', color: 'bg-green-100 text-green-800' },
-  cancelled: { label: 'Đã hủy', color: 'bg-red-100 text-red-800' },
+  pending: { label: 'Chờ xác nhận', color: 'bg-gray-100 text-gray-800' },
+  pending_payment: { label: 'Chờ thanh toán', color: 'bg-gray-100 text-gray-800' },
+  paid: { label: 'Đã thanh toán', color: 'bg-gray-200 text-gray-800' },
+  awaiting_shipment: { label: 'Chờ tạo shipment', color: 'bg-gray-200 text-gray-800' },
+  awaiting_collection: { label: 'Chờ lấy hàng', color: 'bg-gray-200 text-gray-800' },
+  in_transit: { label: 'Đang vận chuyển', color: 'bg-gray-300 text-gray-800' },
+  confirmed: { label: 'Đã xác nhận', color: 'bg-gray-200 text-gray-800' },
+  shipping: { label: 'Đang giao', color: 'bg-gray-300 text-gray-800' },
+  delivered: { label: 'Hoàn tất', color: 'bg-black text-white' },
+  completed: { label: 'Hoàn tất', color: 'bg-black text-white' },
+  cancelled: { label: 'Đã hủy', color: 'bg-gray-100 text-gray-500' },
 };
 
 // Change Password Section Component

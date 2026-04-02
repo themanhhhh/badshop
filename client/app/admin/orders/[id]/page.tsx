@@ -19,9 +19,13 @@ import {
 
 const statusColors: Record<string, string> = {
   pending: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
-  processing: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
-  shipped: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+  pending_payment: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
+  paid: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+  awaiting_shipment: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
+  awaiting_collection: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
+  in_transit: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
   delivered: 'bg-black text-white dark:bg-white dark:text-black',
+  completed: 'bg-black text-white dark:bg-white dark:text-black',
   cancelled: 'bg-gray-100 text-gray-500 dark:bg-slate-900 dark:text-slate-400',
   confirmed: 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white',
   shipping: 'bg-gray-300 text-gray-800 dark:bg-slate-600 dark:text-white',
@@ -29,9 +33,13 @@ const statusColors: Record<string, string> = {
 
 const statusLabels: Record<string, string> = {
   pending: 'Chờ xử lý',
-  processing: 'Đang xử lý',
-  shipped: 'Đang giao',
-  delivered: 'Hoàn thành',
+  pending_payment: 'Chờ thanh toán',
+  paid: 'Đã thanh toán',
+  awaiting_shipment: 'Chờ tạo shipment',
+  awaiting_collection: 'Chờ lấy hàng',
+  in_transit: 'Đang trung chuyển',
+  delivered: 'Hoàn tất',
+  completed: 'Hoàn tất',
   cancelled: 'Đã hủy',
   confirmed: 'Đã xác nhận',
   shipping: 'Đang vận chuyển',

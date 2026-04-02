@@ -47,7 +47,7 @@ const orderStageLabel: Record<string, string> = {
   awaiting_shipment: 'Chờ tạo shipment',
   awaiting_collection: 'Chờ hãng vận chuyển lấy hàng',
   in_transit: 'Đang vận chuyển',
-  delivered: 'Đã giao',
+  delivered: 'Hoàn tất',
   completed: 'Hoàn tất',
   confirmed: 'Đã xác nhận',
   shipping: 'Đang giao',
