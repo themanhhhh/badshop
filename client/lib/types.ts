@@ -5,6 +5,7 @@ export interface User {
   name: string;
   phone?: string;
   role: 'admin' | 'customer';
+  is_active?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -26,6 +26,7 @@ export default function EditPostPage() {
   
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(true);
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
   const [featuredImage, setFeaturedImage] = useState('');
@@ -34,12 +35,30 @@ export default function EditPostPage() {
   const [metaDescription, setMetaDescription] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  const handleSlugChange = (value: string) => {
+    setSlug(value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+    );
+  };
+
+  const handleSlugInputChange = (value: string) => {
+    setIsSlugManuallyEdited(value.trim().length > 0);
+    handleSlugChange(value);
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const post = await postApi.getById(postId);
         setTitle(post.title || '');
         setSlug(post.slug || '');
+        setIsSlugManuallyEdited(true);
         setExcerpt(post.excerpt || '');
         setContent(post.content || '');
         setFeaturedImage(post.featured_image || '');
@@ -150,16 +169,8 @@ export default function EditPostPage() {
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
-                if (!slug) {
-                  setSlug(e.target.value
-                    .toLowerCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-z0-9\s-]/g, '')
-                    .trim()
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-')
-                  );
+                if (!isSlugManuallyEdited) {
+                  handleSlugChange(e.target.value);
                 }
               }}
               placeholder="Nhập tiêu đề bài viết..."
@@ -173,7 +184,7 @@ export default function EditPostPage() {
             <input
               type="text"
               value={slug}
-              onChange={(e) => setSlug(e.target.value)}
+              onChange={(e) => handleSlugInputChange(e.target.value)}
               placeholder="slug-duoc-tao-tu-dong"
               className="w-full h-10 px-4 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring font-mono text-sm"
             />

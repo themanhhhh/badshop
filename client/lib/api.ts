@@ -127,8 +127,25 @@ export const uploadApi = {
 // USER API
 // ============================================
 export const userApi = {
-  getAll: (): Promise<User[]> => 
-    fetchApi('/users'),
+  getAll: async (page: number = 1, limit: number = 1000): Promise<{ data: User[]; pagination: any }> => {
+    const response = await fetch(`${API_BASE_URL}/users?page=${page}&limit=${limit}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const json = await response.json();
+    return {
+      data: json.data || [],
+      pagination: json.pagination || { page, limit, total: 0, totalPages: 1 },
+    };
+  },
   
   getById: (id: string): Promise<User> => 
     fetchApi(`/users/${id}`),

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Search, Edit, Trash2, Eye, Star, Loader2, Image as ImageIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Eye, Star, Loader2, Image as ImageIcon, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { useProducts, useBrands, useCategories } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,8 @@ import {
 import { api } from '@/lib/api';
 import type { Product } from '@/lib/types';
 import { AdminLoading } from '@/components/admin/AdminLoading';
+import { exportProductsToExcel } from '@/lib/exportProductsToExcel';
+import { createExcelFileName } from '@/lib/excelExportUtils';
 
 export default function AdminProductsPage() {
   const { data: products, loading, refetch } = useProducts();
@@ -39,6 +41,7 @@ export default function AdminProductsPage() {
   const [brandFilter, setBrandFilter] = useState('all');
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -89,6 +92,15 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      setExporting(true);
+      await exportProductsToExcel(filteredProducts, createExcelFileName('san-pham'));
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return <AdminLoading fullPage text="Đang tải sản phẩm..." />;
   }
@@ -103,12 +115,22 @@ export default function AdminProductsPage() {
             Tổng cộng {filteredProducts.length} sản phẩm
           </p>
         </div>
-        <Link href="/admin/products/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Thêm sản phẩm
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleExportExcel}
+            disabled={exporting || filteredProducts.length === 0}
+          >
+            {exporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+            {exporting ? 'Đang xuất...' : 'Xuất Excel'}
           </Button>
-        </Link>
+          <Link href="/admin/products/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Thêm sản phẩm
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}

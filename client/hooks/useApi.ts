@@ -170,8 +170,8 @@ export function useBrandBySlug(slug: string) {
 // ============================================
 // USER HOOKS
 // ============================================
-export function useUsers() {
-  return useApi<User[]>(() => userApi.getAll());
+export function useUsers(page: number = 1, limit: number = 1000) {
+  return useApi<{ data: User[]; pagination: any }>(() => userApi.getAll(page, limit), [page, limit]);
 }
 
 export function useUser(id: string) {

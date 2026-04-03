@@ -116,7 +116,8 @@ function getChartData(orders: any[], period: PeriodType, year: number, month: nu
 export default function AdminReportsPage() {
   const { data: orders, loading: ordersLoading } = useOrders();
   const { data: products, loading: productsLoading } = useProducts();
-  const { data: users, loading: usersLoading } = useUsers();
+  const { data: usersResponse, loading: usersLoading } = useUsers();
+  const users = usersResponse?.data || [];
 
   const now = new Date();
   const [period, setPeriod] = useState<PeriodType>('year');

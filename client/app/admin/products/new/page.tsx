@@ -51,6 +51,29 @@ export default function AddProductPage() {
     badge: 'new',
   });
 
+  const syncBadgeWithPricing = (nextPrice: string, nextOriginalPrice: string, currentBadge: string) => {
+    const price = Number(nextPrice || 0);
+    const originalPrice = Number(nextOriginalPrice || 0);
+    const hasDiscount = originalPrice > 0 && price > 0 && originalPrice > price;
+
+    if (hasDiscount) {
+      return 'sale';
+    }
+
+    return currentBadge === 'sale' ? 'none' : currentBadge;
+  };
+
+  const discountPercentage = (() => {
+    const price = Number(formData.price || 0);
+    const originalPrice = Number(formData.original_price || 0);
+
+    if (price <= 0 || originalPrice <= 0 || originalPrice <= price) {
+      return null;
+    }
+
+    return Math.round(((originalPrice - price) / originalPrice) * 100);
+  })();
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -335,7 +358,14 @@ export default function AddProductPage() {
                     type="number"
                     required
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    onChange={(e) => {
+                      const nextPrice = e.target.value;
+                      setFormData((prev) => ({
+                        ...prev,
+                        price: nextPrice,
+                        badge: syncBadgeWithPricing(nextPrice, prev.original_price, prev.badge),
+                      }));
+                    }}
                     placeholder="0"
                     className="pr-12"
                   />
@@ -351,7 +381,14 @@ export default function AddProductPage() {
                     id="original_price"
                     type="number"
                     value={formData.original_price}
-                    onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
+                    onChange={(e) => {
+                      const nextOriginalPrice = e.target.value;
+                      setFormData((prev) => ({
+                        ...prev,
+                        original_price: nextOriginalPrice,
+                        badge: syncBadgeWithPricing(prev.price, nextOriginalPrice, prev.badge),
+                      }));
+                    }}
                     placeholder="0"
                     className="pr-12"
                   />
@@ -359,6 +396,11 @@ export default function AddProductPage() {
                     VNĐ
                   </span>
                 </div>
+                {discountPercentage !== null && (
+                  <p className="text-xs text-muted-foreground">
+                    Đang giảm <span className="font-medium text-foreground">{discountPercentage}%</span> so với giá gốc.
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -400,10 +442,12 @@ export default function AddProductPage() {
                   <SelectContent>
                     <SelectItem value="new">New (Mới)</SelectItem>
                     <SelectItem value="bestseller">Best Seller (Bán chạy)</SelectItem>
-                    <SelectItem value="sale">Sale (Giảm giá)</SelectItem>
                     <SelectItem value="none">Không có</SelectItem>
                   </SelectContent>
                 </Select>
+                {formData.badge === 'sale' && (
+                  <p className="text-xs text-muted-foreground">Badge đang được tự động gán vì giá gốc lớn hơn giá bán.</p>
+                )}
               </div>
             </CardContent>
           </Card>

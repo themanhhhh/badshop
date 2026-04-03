@@ -18,6 +18,7 @@ import {
 export default function NewPostPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
@@ -39,6 +40,11 @@ export default function NewPostPage() {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
     );
+  };
+
+  const handleSlugInputChange = (value: string) => {
+    setIsSlugManuallyEdited(value.trim().length > 0);
+    handleSlugChange(value);
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,7 +151,7 @@ export default function NewPostPage() {
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
-                if (!slug) handleSlugChange(e.target.value);
+                if (!isSlugManuallyEdited) handleSlugChange(e.target.value);
               }}
               placeholder="Nhập tiêu đề bài viết..."
               className="w-full h-12 px-4 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
@@ -158,7 +164,7 @@ export default function NewPostPage() {
             <input
               type="text"
               value={slug}
-              onChange={(e) => setSlug(e.target.value)}
+              onChange={(e) => handleSlugInputChange(e.target.value)}
               placeholder="slug-duoc-tao-tu-dong"
               className="w-full h-10 px-4 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring font-mono text-sm"
             />

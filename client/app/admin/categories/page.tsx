@@ -61,6 +61,7 @@ export default function AdminCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   
   const [formData, setFormData] = useState({
@@ -117,12 +118,14 @@ export default function AdminCategoriesPage() {
 
   const handleOpenCreate = () => {
     setEditingCategory(null);
+    setIsSlugManuallyEdited(false);
     setFormData({ name: '', slug: '', description: '', image_url: '', parent_id: '' });
     setIsDialogOpen(true);
   };
 
   const handleOpenEdit = (category: Category) => {
     setEditingCategory(category);
+    setIsSlugManuallyEdited(true);
     setFormData({
       name: category.name,
       slug: category.slug,
@@ -149,11 +152,19 @@ export default function AdminCategoriesPage() {
   };
 
   const handleNameChange = (name: string) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       name,
-      slug: formData.slug || generateSlug(name),
-    });
+      slug: isSlugManuallyEdited ? prev.slug : generateSlug(name),
+    }));
+  };
+
+  const handleSlugChange = (slug: string) => {
+    setIsSlugManuallyEdited(slug.trim().length > 0);
+    setFormData((prev) => ({
+      ...prev,
+      slug: generateSlug(slug),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -350,7 +361,7 @@ export default function AdminCategoriesPage() {
               <Input
                 id="slug"
                 value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(e) => handleSlugChange(e.target.value)}
                 placeholder="vot-cau-long"
               />
             </div>

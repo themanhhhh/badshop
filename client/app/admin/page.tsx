@@ -163,6 +163,40 @@ export default function AdminDashboardPage() {
     productsGrowth: stats?.productsGrowth || 0,
   };
 
+  const topSellingProducts = useMemo(() => {
+    const productSales = new Map<string, { id: string; name: string; orders: number; quantity: number }>();
+
+    (orders || []).forEach((order: any) => {
+      if (order.status === 'cancelled') return;
+
+      const items = order.order_items || order.items || [];
+      items.forEach((item: any) => {
+        const productId = item.product?.id || item.product_id || item.productId;
+        if (!productId) return;
+
+        const existing = productSales.get(productId) || {
+          id: productId,
+          name: item.product?.name || 'San pham',
+          orders: 0,
+          quantity: 0,
+        };
+
+        existing.name = item.product?.name || existing.name;
+        existing.orders += 1;
+        existing.quantity += Number(item.quantity || 0);
+
+        productSales.set(productId, existing);
+      });
+    });
+
+    return Array.from(productSales.values())
+      .sort((a, b) => {
+        if (b.quantity !== a.quantity) return b.quantity - a.quantity;
+        return b.orders - a.orders;
+      })
+      .slice(0, 3);
+  }, [orders]);
+
   const statusColors: Record<string, string> = {
     pending: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
     pending_payment: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300',
@@ -279,8 +313,8 @@ export default function AdminDashboardPage() {
         <div className="rounded-2xl border border-border bg-sidebar p-6 dark:border-slate-800 dark:bg-slate-950">
           <h2 className="text-lg font-semibold mb-4">Sản phẩm bán chạy</h2>
           <div className="space-y-4">
-            {(products?.slice(0, 3) || ['Yonex Astrox 99 Pro', 'Victor Thruster K 9900', 'Yonex Power Cushion 65Z3']).map((product, i) => (
-              <div key={typeof product === 'string' ? product : product.id} className="flex items-center gap-3">
+            {topSellingProducts.length > 0 ? topSellingProducts.map((product, i) => (
+              <div key={product.id} className="flex items-center gap-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg font-bold ${
                   i === 0 ? 'bg-black text-white dark:bg-white dark:text-black' :
                   i === 1 ? 'bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-white' :
@@ -290,12 +324,16 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">
-                    {typeof product === 'string' ? product : product.name}
+                    {product.name}
                   </p>
-                  <p className="text-sm text-muted-foreground">{30 - i * 7} đơn hàng</p>
+                  <p className="text-sm text-muted-foreground">{product.quantity} sản phẩm / {product.orders} đơn</p>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+                Chưa có dữ liệu bán hàng để xếp hạng sản phẩm.
+              </div>
+            )}
           </div>
         </div>
       </div>
