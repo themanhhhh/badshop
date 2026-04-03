@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -33,36 +32,34 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
-          <AuthProvider>
-            <CartProvider>
-              {children}
-              <Toaster
-                position="top-right"
-                closeButton
-                toastOptions={{
-                  unstyled: false,
-                  classNames: {
-                    toast:
-                      'group border border-black/10 bg-white text-black shadow-lg dark:border-white/10 dark:bg-black dark:text-white',
-                    title: 'text-sm font-medium text-black dark:text-white',
-                    description: 'text-sm text-black/70 dark:text-white/70',
-                    actionButton:
-                      'bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-slate-200',
-                    cancelButton:
-                      'border border-black/10 bg-white text-black hover:bg-gray-100 dark:border-white/10 dark:bg-black dark:text-white dark:hover:bg-slate-900',
-                    closeButton:
-                      'border border-black/10 bg-white text-black hover:bg-gray-100 dark:border-white/10 dark:bg-black dark:text-white dark:hover:bg-slate-900',
-                    success: '!border-black/10 !bg-white !text-black dark:!border-white/10 dark:!bg-black dark:!text-white',
-                    error: '!border-black/10 !bg-white !text-black dark:!border-white/10 dark:!bg-black dark:!text-white',
-                    warning: '!border-black/10 !bg-white !text-black dark:!border-white/10 dark:!bg-black dark:!text-white',
-                    info: '!border-black/10 !bg-white !text-black dark:!border-white/10 dark:!bg-black dark:!text-white',
-                  },
-                }}
-              />
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
+            {children}
+            <Toaster
+              position="top-right"
+              closeButton
+              toastOptions={{
+                unstyled: false,
+                classNames: {
+                  toast:
+                    'group border border-black/10 bg-white text-black shadow-lg',
+                  title: 'text-sm font-medium text-black',
+                  description: 'text-sm text-black/70',
+                  actionButton:
+                    'bg-black text-white hover:bg-gray-800',
+                  cancelButton:
+                    'border border-black/10 bg-white text-black hover:bg-gray-100',
+                  closeButton:
+                    'border border-black/10 bg-white text-black hover:bg-gray-100',
+                  success: '!border-black/10 !bg-white !text-black',
+                  error: '!border-black/10 !bg-white !text-black',
+                  warning: '!border-black/10 !bg-white !text-black',
+                  info: '!border-black/10 !bg-white !text-black',
+                },
+              }}
+            />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShoppingBag, Search, Menu, User, LogIn } from 'lucide-react';
 import { Sidebar } from './Sidebar';
-import { ThemeToggle } from './ThemeToggle';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 
