@@ -52,7 +52,16 @@ interface Product {
   name: string;
   price: number;
   images?: { url: string }[];
+  product_images?: { image_url?: string; url?: string; is_primary?: boolean; is_delete?: boolean }[];
   brand?: { name: string };
+}
+
+function getProductThumbnail(product: Product): string {
+  const rawImages = (product.product_images || product.images || []) as Array<{ image_url?: string; url?: string; is_primary?: boolean; is_delete?: boolean }>;
+  const images = rawImages.filter((image: any) => !image.is_delete);
+  const primaryImage = images.find((image: any) => image.is_primary) || images[0];
+
+  return primaryImage?.image_url || primaryImage?.url || '/products/placeholder.jpg';
 }
 
 const campaignTypes = [
@@ -541,7 +550,7 @@ export default function EditCampaignPage() {
                           {selectedProducts.includes(product.id) && <Check className="h-3 w-3" />}
                         </div>
                         <img
-                          src={product.images?.[0]?.url || '/products/placeholder.jpg'}
+                          src={getProductThumbnail(product)}
                           alt={product.name}
                           className="w-12 h-12 object-cover rounded"
                         />
