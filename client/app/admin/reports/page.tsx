@@ -16,8 +16,41 @@ import { useOrders, useProducts, useUsers } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
 import { AdminSelect } from '@/components/admin/AdminSelect';
 import { AdminLoading } from '@/components/admin/AdminLoading';
+import { createExcelFileName } from '@/lib/excelExportUtils';
+import { exportReportsToExcel } from '@/lib/exportReportsToExcel';
 
 type PeriodType = 'week' | 'month' | 'year';
+
+type ReportOrder = {
+  id?: string;
+  order_number?: string;
+  orderNumber?: string;
+  total?: number | string;
+  status?: string;
+  payment_status?: string;
+  paymentStatus?: string;
+  created_at?: string | Date;
+  createdAt?: string | Date;
+  user?: { name?: string; email?: string };
+};
+
+type ReportProduct = {
+  id?: string;
+  name?: string;
+  price?: number | string;
+  rating?: number | string;
+  brand?: { name?: string } | string;
+  category?: { name?: string } | string;
+};
+
+function getOrderDate(order: ReportOrder): Date {
+  return new Date(order.created_at || order.createdAt || 0);
+}
+
+function getProductRelationName(value: ReportProduct['brand'] | ReportProduct['category']): string {
+  if (!value) return '';
+  return typeof value === 'string' ? value : value.name || '';
+}
 
 function getDateRange(period: PeriodType, year: number, month: number): { start: Date; end: Date } {
   const now = new Date();
@@ -61,15 +94,15 @@ function getPeriodLabel(period: PeriodType, year: number, month: number): string
 }
 
 // Generate chart data based on period
-function getChartData(orders: any[], period: PeriodType, year: number, month: number) {
+function getChartData(orders: ReportOrder[], period: PeriodType, year: number, month: number) {
   if (period === 'year') {
     // Monthly breakdown
     const months = Array.from({ length: 12 }, (_, i) => {
-      const monthOrders = orders.filter((o: any) => {
-        const d = new Date(o.created_at || o.createdAt);
+      const monthOrders = orders.filter((order) => {
+        const d = getOrderDate(order);
         return d.getMonth() === i;
       });
-      const revenue = monthOrders.reduce((sum: number, o: any) => sum + parseFloat(o.total || 0), 0);
+      const revenue = monthOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
       return { label: `T${i + 1}`, revenue, orders: monthOrders.length };
     });
     return months;
@@ -79,11 +112,11 @@ function getChartData(orders: any[], period: PeriodType, year: number, month: nu
     // Daily breakdown
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const days = Array.from({ length: daysInMonth }, (_, i) => {
-      const dayOrders = orders.filter((o: any) => {
-        const d = new Date(o.created_at || o.createdAt);
+      const dayOrders = orders.filter((order) => {
+        const d = getOrderDate(order);
         return d.getDate() === i + 1;
       });
-      const revenue = dayOrders.reduce((sum: number, o: any) => sum + parseFloat(o.total || 0), 0);
+      const revenue = dayOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
       return { label: `${i + 1}`, revenue, orders: dayOrders.length };
     });
     return days;
@@ -101,13 +134,13 @@ function getChartData(orders: any[], period: PeriodType, year: number, month: nu
     const targetDate = new Date(monday);
     targetDate.setDate(monday.getDate() + i);
     
-    const dayOrders = orders.filter((o: any) => {
-      const d = new Date(o.created_at || o.createdAt);
+    const dayOrders = orders.filter((order) => {
+      const d = getOrderDate(order);
       return d.getFullYear() === targetDate.getFullYear() && 
              d.getMonth() === targetDate.getMonth() && 
              d.getDate() === targetDate.getDate();
     });
-    const revenue = dayOrders.reduce((sum: number, o: any) => sum + parseFloat(o.total || 0), 0);
+    const revenue = dayOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
     return { label: dayNames[i], revenue, orders: dayOrders.length };
   });
   return days;
@@ -123,28 +156,28 @@ export default function AdminReportsPage() {
   const [period, setPeriod] = useState<PeriodType>('year');
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
+  const [exporting, setExporting] = useState(false);
 
   const loading = ordersLoading || productsLoading || usersLoading;
+  const reportOrders = useMemo(() => (orders || []) as ReportOrder[], [orders]);
+  const reportProducts = useMemo(() => (products || []) as ReportProduct[], [products]);
 
   // Filter orders by date range
   const filteredOrders = useMemo(() => {
-    if (!orders) return [];
     const { start, end } = getDateRange(period, selectedYear, selectedMonth);
-    return orders.filter((order: any) => {
-      const orderDate = new Date(order.created_at || order.createdAt);
+    return reportOrders.filter((order) => {
+      const orderDate = getOrderDate(order);
       return orderDate >= start && orderDate <= end;
     });
-  }, [orders, period, selectedYear, selectedMonth]);
+  }, [reportOrders, period, selectedYear, selectedMonth]);
 
   // Calculate stats from filtered orders
   const totalRevenue = filteredOrders.reduce(
-    (sum: number, order: any) => sum + parseFloat(order.total || 0), 0
+    (sum, order) => sum + Number(order.total || 0), 0
   );
 
   // Calculate previous period stats to compute growth
   const previousPeriodStats = useMemo(() => {
-    if (!orders) return { revenue: 0, orders: 0 };
-    
     let prevStart: Date, prevEnd: Date;
     
     if (period === 'year') {
@@ -163,16 +196,16 @@ export default function AdminReportsPage() {
       prevEnd.setMilliseconds(-1);
     }
     
-    const prevOrders = orders.filter((order: any) => {
-      const orderDate = new Date(order.created_at || order.createdAt);
+    const prevOrders = reportOrders.filter((order) => {
+      const orderDate = getOrderDate(order);
       return orderDate >= prevStart && orderDate <= prevEnd;
     });
     
     return {
-      revenue: prevOrders.reduce((sum: number, o: any) => sum + parseFloat(o.total || 0), 0),
+      revenue: prevOrders.reduce((sum, order) => sum + Number(order.total || 0), 0),
       orders: prevOrders.length,
     };
-  }, [orders, period, selectedYear, selectedMonth]);
+  }, [reportOrders, period, selectedYear, selectedMonth]);
 
   const calcGrowth = (current: number, previous: number) => {
     if (previous === 0) return current > 0 ? 100 : 0;
@@ -203,11 +236,11 @@ export default function AdminReportsPage() {
   // Category sales (simplified)
   const categorySales = useMemo(() => {
     const catMap = new Map<string, number>();
-    (products || []).forEach((p: any) => {
-      const catName = p.category?.name || 'Khác';
+    reportProducts.forEach((product) => {
+      const catName = getProductRelationName(product.category) || 'Khác';
       catMap.set(catName, (catMap.get(catName) || 0) + 1);
     });
-    const total = products?.length || 1;
+    const total = reportProducts.length || 1;
     const colors = ['bg-black', 'bg-gray-700', 'bg-gray-500', 'bg-gray-400', 'bg-gray-300', 'bg-gray-200 dark:bg-gray-600'];
     return Array.from(catMap.entries())
       .sort((a, b) => b[1] - a[1])
@@ -217,11 +250,28 @@ export default function AdminReportsPage() {
         sales: Math.round((count / total) * 100),
         color: colors[i % colors.length],
       }));
-  }, [products]);
+  }, [reportProducts]);
 
   // Display data
-  const displayProducts = products || [];
+  const displayProducts = reportProducts;
   const displayOrders = filteredOrders;
+
+  const handleExportReport = async () => {
+    try {
+      setExporting(true);
+      await exportReportsToExcel({
+        periodLabel: getPeriodLabel(period, selectedYear, selectedMonth),
+        stats,
+        chartData,
+        categorySales,
+        products: displayProducts,
+        orders: displayOrders,
+        fileName: createExcelFileName(`bao-cao-${period}`),
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   // Year options
   const yearOptions = Array.from({ length: 5 }, (_, i) => now.getFullYear() - i);
@@ -249,9 +299,14 @@ export default function AdminReportsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-input bg-card px-4 py-2.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-900">
-            <Download className="h-4 w-4" aria-hidden="true" />
-            Xuất báo cáo
+          <button
+            type="button"
+            onClick={handleExportReport}
+            disabled={exporting}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-input bg-card px-4 py-2.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-900"
+          >
+            {exporting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Download className="h-4 w-4" aria-hidden="true" />}
+            {exporting ? 'Đang xuất...' : 'Xuất báo cáo'}
           </button>
         </div>
       </div>
@@ -431,7 +486,7 @@ export default function AdminReportsPage() {
          <div className="rounded-2xl border border-border bg-card p-6 dark:border-slate-800 dark:bg-slate-950">
           <h2 className="text-lg font-semibold mb-4">Sản phẩm bán chạy</h2>
           <div className="space-y-4">
-            {displayProducts.slice(0, 5).map((product: any, i: number) => (
+            {displayProducts.slice(0, 5).map((product, i) => (
               <div key={product.id} className="flex items-center gap-4">
                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold ${
                    i === 0 ? 'bg-black text-white dark:bg-white dark:text-black' :
@@ -443,10 +498,10 @@ export default function AdminReportsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{product.name}</p>
-                  <p className="text-sm text-muted-foreground">{product.brand?.name || product.brand || ''}</p>
+                  <p className="text-sm text-muted-foreground">{getProductRelationName(product.brand)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">{formatPrice(product.price)}</p>
+                  <p className="font-medium">{formatPrice(Number(product.price || 0))}</p>
                   <p className="text-xs text-muted-foreground">{product.rating || 0} ⭐</p>
                 </div>
               </div>
@@ -468,7 +523,7 @@ export default function AdminReportsPage() {
                 Không có đơn hàng trong khoảng thời gian này
               </p>
             ) : (
-              displayOrders.slice(0, 5).map((order: any) => (
+              displayOrders.slice(0, 5).map((order) => (
                  <div key={order.id || order.order_number} className="flex items-start gap-4">
                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-slate-800">
                      <ShoppingCart className="h-4 w-4 text-black dark:text-white" aria-hidden="true" />
@@ -481,10 +536,10 @@ export default function AdminReportsPage() {
                     </p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                       <Calendar className="h-3 w-3" aria-hidden="true" />
-                      {(order.created_at || order.createdAt) ? new Date(order.created_at || order.createdAt).toLocaleDateString('vi-VN') : ''}
+                      {(order.created_at || order.createdAt) ? getOrderDate(order).toLocaleDateString('vi-VN') : ''}
                     </p>
                   </div>
-                  <span className="font-medium text-sm">{formatPrice(order.total)}</span>
+                  <span className="font-medium text-sm">{formatPrice(Number(order.total || 0))}</span>
                 </div>
               ))
             )}
