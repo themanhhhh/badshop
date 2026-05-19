@@ -8,6 +8,7 @@ import {
   Address,
   Review,
   Campaign,
+  Voucher,
   FlashSale,
   Post,
   Shipment,
@@ -52,7 +53,7 @@ async function fetchApi<T>(
   
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    throw new Error(error.error?.message || error.message || `HTTP error! status: ${response.status}`);
   }
   
   const json = await response.json() as ApiResponse<T>;
@@ -342,7 +343,7 @@ export const orderApi = {
   getByUser: (userId: string): Promise<Order[]> => 
     fetchApi(`/orders/user/${userId}`),
   
-  create: (data: Partial<Order>): Promise<Order> => 
+  create: (data: Record<string, unknown>): Promise<Order> => 
     fetchApi('/orders', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -702,6 +703,74 @@ export const collectionApi = {
     fetchApi(`/collections/${id}`, { method: 'DELETE' }),
 };
 
+// ============================================
+// VOUCHER API
+// ============================================
+export type VoucherPayload = Partial<Voucher> & {
+  productIds?: string[];
+  categoryIds?: string[];
+  brandIds?: string[];
+};
+
+export type VoucherValidationPayload = {
+  code?: string;
+  voucherId?: string;
+  userId?: string;
+  items: Array<{ productId: string; price: number; quantity: number }>;
+  subtotal: number;
+  shippingFee: number;
+};
+
+export type VoucherValidationResult = {
+  valid: boolean;
+  message: string;
+  voucher?: Voucher;
+  discountAmount: number;
+  shippingDiscount: number;
+  finalTotal: number;
+};
+
+export const voucherApi = {
+  getAll: (): Promise<Voucher[]> =>
+    fetchApi('/vouchers'),
+
+  getAvailable: (): Promise<Voucher[]> =>
+    fetchApi('/vouchers/available'),
+
+  getById: (id: string): Promise<Voucher> =>
+    fetchApi(`/vouchers/${id}`),
+
+  getByCode: (code: string): Promise<Voucher> =>
+    fetchApi(`/vouchers/code/${encodeURIComponent(code)}`),
+
+  create: (data: VoucherPayload): Promise<Voucher> =>
+    fetchApi('/vouchers', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  update: (id: string, data: VoucherPayload): Promise<Voucher> =>
+    fetchApi(`/vouchers/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  activate: (id: string): Promise<Voucher> =>
+    fetchApi(`/vouchers/${id}/activate`, { method: 'POST' }),
+
+  deactivate: (id: string): Promise<Voucher> =>
+    fetchApi(`/vouchers/${id}/deactivate`, { method: 'POST' }),
+
+  validate: (data: VoucherValidationPayload): Promise<VoucherValidationResult> =>
+    fetchApi('/vouchers/validate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string): Promise<void> =>
+    fetchApi(`/vouchers/${id}`, { method: 'DELETE' }),
+};
+
 // Export all APIs as a single object for convenience
 export const api = {
   users: userApi,
@@ -713,6 +782,7 @@ export const api = {
   addresses: addressApi,
   reviews: reviewApi,
   campaigns: campaignApi,
+  vouchers: voucherApi,
   flashSales: flashSaleApi,
   stats: statsApi,
   posts: postApi,

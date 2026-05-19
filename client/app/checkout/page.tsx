@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, CreditCard, Truck, Wallet, Building2, Loader2, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, Truck, Building2, Loader2, ShoppingBag, Ticket, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,8 +19,10 @@ import {
 } from '@/components/ui/select';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { orderApi } from '@/lib/api';
+import { orderApi, voucherApi, type VoucherValidationResult } from '@/lib/api';
 import { formatPrice } from '@/lib/productMapper';
+import { useAvailableVouchers } from '@/hooks/useApi';
+import type { Voucher } from '@/lib/types';
 
 // Vietnamese Address API
 const PROVINCES_API = 'https://provinces.open-api.vn/api';
@@ -49,9 +51,15 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { data: availableVouchers, loading: vouchersLoading } = useAvailableVouchers();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [manualVoucherCode, setManualVoucherCode] = useState('');
+  const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+  const [voucherResult, setVoucherResult] = useState<VoucherValidationResult | null>(null);
+  const [voucherError, setVoucherError] = useState('');
+  const [applyingVoucher, setApplyingVoucher] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -74,7 +82,21 @@ export default function CheckoutPage() {
   const [loadingWards, setLoadingWards] = useState(false);
 
   const shipping = subtotal >= 500000 ? 0 : 30000;
-  const total = subtotal + shipping;
+  const discountAmount = voucherResult?.discountAmount || 0;
+  const shippingDiscount = voucherResult?.shippingDiscount || 0;
+  const payableShipping = Math.max(0, shipping - shippingDiscount);
+  const total = Math.max(0, subtotal + shipping - discountAmount - shippingDiscount);
+
+  const voucherPayload = useMemo(() => ({
+    userId: user?.id,
+    items: items.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+    })),
+    subtotal,
+    shippingFee: shipping,
+  }), [items, shipping, subtotal, user?.id]);
 
   // Pre-fill user info
   useEffect(() => {
@@ -83,7 +105,7 @@ export default function CheckoutPage() {
         ...prev,
         name: prev.name || user.name || '',
         email: prev.email || user.email || '',
-        phone: prev.phone || (user as any).phone || '',
+        phone: prev.phone || user.phone || '',
       }));
     }
   }, [user]);
@@ -101,6 +123,12 @@ export default function CheckoutPage() {
       router.replace('/cart');
     }
   }, [authLoading, items, router, orderPlaced]);
+
+  useEffect(() => {
+    setSelectedVoucher(null);
+    setVoucherResult(null);
+    setVoucherError('');
+  }, [subtotal, shipping, items.length]);
 
   // Fetch provinces on mount
   useEffect(() => {
@@ -192,6 +220,58 @@ export default function CheckoutPage() {
     }
   };
 
+  const applyVoucher = async (voucher: Voucher) => {
+    setApplyingVoucher(true);
+    setVoucherError('');
+    try {
+      const result = await voucherApi.validate({
+        ...voucherPayload,
+        voucherId: voucher.id,
+      });
+      setSelectedVoucher(result.voucher || voucher);
+      setVoucherResult(result);
+      setManualVoucherCode(result.voucher?.code || voucher.code);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Voucher không hợp lệ';
+      setSelectedVoucher(null);
+      setVoucherResult(null);
+      setVoucherError(message);
+    } finally {
+      setApplyingVoucher(false);
+    }
+  };
+
+  const applyManualVoucher = async () => {
+    const code = manualVoucherCode.trim();
+    if (!code) return;
+
+    setApplyingVoucher(true);
+    setVoucherError('');
+    try {
+      const result = await voucherApi.validate({
+        ...voucherPayload,
+        code,
+      });
+      setSelectedVoucher(result.voucher || null);
+      setVoucherResult(result);
+      setManualVoucherCode(result.voucher?.code || code.toUpperCase());
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Voucher không hợp lệ';
+      setSelectedVoucher(null);
+      setVoucherResult(null);
+      setVoucherError(message);
+    } finally {
+      setApplyingVoucher(false);
+    }
+  };
+
+  const removeVoucher = () => {
+    setSelectedVoucher(null);
+    setVoucherResult(null);
+    setVoucherError('');
+    setManualVoucherCode('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -207,6 +287,10 @@ export default function CheckoutPage() {
       // Create order via API - only send fields that Order entity supports
       const orderData = {
         user_id: user.id,
+        subtotal,
+        shipping_fee: shipping,
+        voucher_id: selectedVoucher?.id,
+        voucher_code: selectedVoucher?.code || manualVoucherCode.trim() || undefined,
         total,
         status: 'pending',
         payment_status: 'pending',
@@ -218,11 +302,11 @@ export default function CheckoutPage() {
       };
 
       console.log('Creating order with data:', orderData);
-      const createdOrder = await orderApi.create(orderData as any);
+      const createdOrder = await orderApi.create(orderData);
       setOrderPlaced(true);
       await clearCart();
-      const orderNumber = (createdOrder as any)?.order_number || '';
-      const createdOrderId = (createdOrder as any)?.id || '';
+      const orderNumber = createdOrder.order_number || createdOrder.orderNumber || '';
+      const createdOrderId = createdOrder.id || '';
       router.push(`/checkout/verify?orderId=${createdOrderId}&order=${orderNumber}`);
     } catch (error) {
       console.error('Failed to create order:', error);
@@ -467,6 +551,71 @@ export default function CheckoutPage() {
 
                   <Separator />
 
+                  {/* Voucher Selection */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <Ticket className="h-4 w-4" />
+                      Voucher
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Input
+                        value={manualVoucherCode}
+                        onChange={(e) => setManualVoucherCode(e.target.value.toUpperCase())}
+                        placeholder="Nhập mã voucher"
+                        className="h-10"
+                      />
+                      <Button type="button" variant="outline" onClick={applyManualVoucher} disabled={applyingVoucher || !manualVoucherCode.trim()}>
+                        {applyingVoucher ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Áp dụng'}
+                      </Button>
+                    </div>
+
+                    {voucherError && (
+                      <p className="rounded-lg bg-red-50 p-2 text-xs text-red-600">{voucherError}</p>
+                    )}
+
+                    {selectedVoucher && voucherResult?.valid && (
+                      <div className="flex items-start justify-between gap-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800">
+                        <div>
+                          <p className="font-medium">Đã áp dụng {selectedVoucher.code}</p>
+                          <p className="text-xs">Tiết kiệm {formatPrice(discountAmount + shippingDiscount)}</p>
+                        </div>
+                        <button type="button" onClick={removeVoucher} className="rounded p-1 hover:bg-green-100" aria-label="Gỡ voucher">
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="max-h-44 space-y-2 overflow-y-auto">
+                      {vouchersLoading ? (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Đang tải voucher...
+                        </div>
+                      ) : (availableVouchers || []).length === 0 ? (
+                        <p className="text-xs text-muted-foreground">Hiện chưa có voucher khả dụng</p>
+                      ) : (
+                        (availableVouchers || []).slice(0, 5).map((voucher) => (
+                          <button
+                            key={voucher.id}
+                            type="button"
+                            onClick={() => applyVoucher(voucher)}
+                            disabled={applyingVoucher || selectedVoucher?.id === voucher.id}
+                            className="flex w-full items-center justify-between gap-3 rounded-lg border p-3 text-left text-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            <div>
+                              <p className="font-medium">{voucher.code}</p>
+                              <p className="text-xs text-muted-foreground">{voucher.name}</p>
+                            </div>
+                            <span className="text-xs font-medium">{selectedVoucher?.id === voucher.id ? 'Đã chọn' : 'Chọn'}</span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   {/* Totals */}
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
@@ -475,8 +624,26 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Phí vận chuyển</span>
-                      <span>{shipping === 0 ? 'Miễn phí' : formatPrice(shipping)}</span>
+                      <span>{payableShipping === 0 ? 'Miễn phí' : formatPrice(payableShipping)}</span>
                     </div>
+                    {discountAmount > 0 && (
+                      <div className="flex justify-between text-green-700">
+                        <span>Giảm giá voucher</span>
+                        <span>-{formatPrice(discountAmount)}</span>
+                      </div>
+                    )}
+                    {shippingDiscount > 0 && (
+                      <div className="flex justify-between text-green-700">
+                        <span>Giảm phí vận chuyển</span>
+                        <span>-{formatPrice(shippingDiscount)}</span>
+                      </div>
+                    )}
+                    {shippingDiscount > 0 && shipping > 0 && (
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Phí vận chuyển gốc</span>
+                        <span>{formatPrice(shipping)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <Separator />

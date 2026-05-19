@@ -11,6 +11,7 @@ import {
   addressApi,
   reviewApi,
   campaignApi,
+  voucherApi,
   flashSaleApi,
   statsApi,
   postApi,
@@ -27,6 +28,7 @@ import type {
   Address,
   Review,
   Campaign,
+  Voucher,
   FlashSale,
   Post,
   Shipment,
@@ -290,6 +292,21 @@ export function useHomepageCampaigns() {
 
 export function useCampaign(id: string) {
   return useApi<Campaign>(() => campaignApi.getById(id), [id]);
+}
+
+// ============================================
+// VOUCHER HOOKS
+// ============================================
+export function useVouchers() {
+  return useApi<Voucher[]>(() => voucherApi.getAll());
+}
+
+export function useAvailableVouchers() {
+  return useApi<Voucher[]>(() => voucherApi.getAvailable());
+}
+
+export function useVoucher(id: string) {
+  return useApi<Voucher>(() => voucherApi.getById(id), [id]);
 }
 
 // ============================================

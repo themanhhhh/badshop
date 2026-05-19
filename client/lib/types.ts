@@ -100,14 +100,23 @@ export interface OrderItem {
 export interface Order {
   id: string;
   orderNumber: string;
+  order_number?: string;
   userId: string;
+  user_id?: string;
   user?: User;
   items: OrderItem[];
+  order_items?: OrderItem[];
   addressId?: string;
   address?: Address;
   subtotal: number;
+  shipping_fee?: number;
   shippingFee: number;
+  voucher_id?: string;
+  voucher?: Voucher;
   discount: number;
+  discount_amount?: number;
+  shipping_discount?: number;
+  promotion_snapshot?: string;
   total: number;
   status:
     | 'pending'
@@ -222,6 +231,31 @@ export interface Campaign {
   display_order: number;
   show_on_homepage: boolean;
   isActive?: boolean; // Keep for backward compatibility if used, but server seems not to return it explicitly unless calculated
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Voucher {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  status: 'draft' | 'active' | 'inactive' | 'expired';
+  discount_type: 'percentage' | 'fixed_amount' | 'free_shipping';
+  discount_value: number;
+  max_discount_amount?: number | null;
+  minimum_spend: number;
+  total_usage_limit?: number | null;
+  usage_count: number;
+  per_user_usage_limit?: number | null;
+  start_date: string;
+  end_date: string;
+  scope_type: 'all' | 'product' | 'category' | 'brand';
+  is_stackable: boolean;
+  is_public: boolean;
+  products?: Product[];
+  categories?: Category[];
+  brands?: Brand[];
   created_at: string;
   updated_at: string;
 }

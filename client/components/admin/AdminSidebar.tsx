@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Package,
-  PackageCheck,
   ShoppingCart,
   Users,
   Settings,
@@ -14,13 +13,10 @@ import {
   LogOut,
   Megaphone,
   ChevronRight,
-  ChevronDown,
   Tags,
-  Boxes,
   FileText,
-  Image,
-  Store,
   Languages,
+  type LucideIcon,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -37,7 +33,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MenuItem {
-  icon: any;
+  icon: LucideIcon;
   label: string;
   href?: string;
   children?: { label: string; href: string }[];
@@ -60,6 +56,7 @@ const menuItems: MenuItem[] = [
   },
   { icon: FileText, label: 'Bài viết', href: '/admin/posts' },
   { icon: Megaphone, label: 'Chiến dịch', href: '/admin/campaigns' },
+  { icon: Tags, label: 'Voucher', href: '/admin/vouchers' },
   { icon: BarChart3, label: 'Báo cáo', href: '/admin/reports' },
 ];
 
