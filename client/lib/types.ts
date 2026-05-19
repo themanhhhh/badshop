@@ -241,7 +241,7 @@ export interface Voucher {
   code: string;
   description?: string;
   status: 'draft' | 'active' | 'inactive' | 'expired';
-  discount_type: 'percentage' | 'fixed_amount' | 'free_shipping';
+  discount_type: 'percentage';
   discount_value: number;
   max_discount_amount?: number | null;
   minimum_spend: number;

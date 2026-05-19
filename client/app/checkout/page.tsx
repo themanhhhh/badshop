@@ -83,9 +83,7 @@ export default function CheckoutPage() {
 
   const shipping = subtotal >= 500000 ? 0 : 30000;
   const discountAmount = voucherResult?.discountAmount || 0;
-  const shippingDiscount = voucherResult?.shippingDiscount || 0;
-  const payableShipping = Math.max(0, shipping - shippingDiscount);
-  const total = Math.max(0, subtotal + shipping - discountAmount - shippingDiscount);
+  const total = Math.max(0, subtotal + shipping - discountAmount);
 
   const voucherPayload = useMemo(() => ({
     userId: user?.id,
@@ -578,7 +576,7 @@ export default function CheckoutPage() {
                       <div className="flex items-start justify-between gap-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800">
                         <div>
                           <p className="font-medium">Đã áp dụng {selectedVoucher.code}</p>
-                          <p className="text-xs">Tiết kiệm {formatPrice(discountAmount + shippingDiscount)}</p>
+                          <p className="text-xs">Tiết kiệm {formatPrice(discountAmount)}</p>
                         </div>
                         <button type="button" onClick={removeVoucher} className="rounded p-1 hover:bg-green-100" aria-label="Gỡ voucher">
                           <X className="h-4 w-4" />
@@ -624,24 +622,12 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Phí vận chuyển</span>
-                      <span>{payableShipping === 0 ? 'Miễn phí' : formatPrice(payableShipping)}</span>
+                      <span>{shipping === 0 ? 'Miễn phí' : formatPrice(shipping)}</span>
                     </div>
                     {discountAmount > 0 && (
                       <div className="flex justify-between text-green-700">
                         <span>Giảm giá voucher</span>
                         <span>-{formatPrice(discountAmount)}</span>
-                      </div>
-                    )}
-                    {shippingDiscount > 0 && (
-                      <div className="flex justify-between text-green-700">
-                        <span>Giảm phí vận chuyển</span>
-                        <span>-{formatPrice(shippingDiscount)}</span>
-                      </div>
-                    )}
-                    {shippingDiscount > 0 && shipping > 0 && (
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Phí vận chuyển gốc</span>
-                        <span>{formatPrice(shipping)}</span>
                       </div>
                     )}
                   </div>

@@ -26,7 +26,6 @@ type VoucherForm = {
   code: string;
   description: string;
   status: Voucher['status'];
-  discount_type: Voucher['discount_type'];
   discount_value: number;
   max_discount_amount: number | '';
   minimum_spend: number;
@@ -49,12 +48,6 @@ const statusLabels: Record<Voucher['status'], string> = {
   expired: 'Hết hạn',
 };
 
-const discountTypeLabels: Record<Voucher['discount_type'], string> = {
-  percentage: 'Giảm theo %',
-  fixed_amount: 'Giảm tiền cố định',
-  free_shipping: 'Miễn phí vận chuyển',
-};
-
 const scopeTypeLabels: Record<Voucher['scope_type'], string> = {
   all: 'Toàn shop',
   product: 'Theo sản phẩm',
@@ -72,7 +65,6 @@ function createDefaultForm(): VoucherForm {
     code: '',
     description: '',
     status: 'draft',
-    discount_type: 'percentage',
     discount_value: 10,
     max_discount_amount: '',
     minimum_spend: 0,
@@ -101,14 +93,8 @@ function getErrorMessage(error: unknown): string {
 }
 
 function getDiscountDisplay(voucher: Voucher): string {
-  if (voucher.discount_type === 'percentage') {
-    const maxDiscount = voucher.max_discount_amount ? `, tối đa ${formatPrice(Number(voucher.max_discount_amount))}` : '';
-    return `${Number(voucher.discount_value)}%${maxDiscount}`;
-  }
-  if (voucher.discount_type === 'free_shipping') {
-    return voucher.max_discount_amount ? `Freeship tối đa ${formatPrice(Number(voucher.max_discount_amount))}` : 'Freeship';
-  }
-  return formatPrice(Number(voucher.discount_value));
+  const maxDiscount = voucher.max_discount_amount ? `, tối đa ${formatPrice(Number(voucher.max_discount_amount))}` : '';
+  return `${Number(voucher.discount_value)}%${maxDiscount}`;
 }
 
 function toggleId(ids: string[], id: string): string[] {
@@ -148,7 +134,6 @@ export default function AdminVouchersPage() {
       code: voucher.code,
       description: voucher.description || '',
       status: voucher.status,
-      discount_type: voucher.discount_type,
       discount_value: Number(voucher.discount_value || 0),
       max_discount_amount: voucher.max_discount_amount ? Number(voucher.max_discount_amount) : '',
       minimum_spend: Number(voucher.minimum_spend || 0),
@@ -170,8 +155,8 @@ export default function AdminVouchersPage() {
     code: form.code.trim(),
     description: form.description.trim(),
     status: form.status,
-    discount_type: form.discount_type,
-    discount_value: form.discount_type === 'free_shipping' ? 0 : Number(form.discount_value || 0),
+    discount_type: 'percentage' as const,
+    discount_value: Number(form.discount_value || 0),
     max_discount_amount: form.max_discount_amount === '' ? null : Number(form.max_discount_amount),
     minimum_spend: Number(form.minimum_spend || 0),
     total_usage_limit: form.total_usage_limit === '' ? null : Number(form.total_usage_limit),
@@ -294,25 +279,18 @@ export default function AdminVouchersPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Loại giảm giá</Label>
-                  <Select value={form.discount_type} onValueChange={(value) => setForm({ ...form, discount_type: value as Voucher['discount_type'] })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="percentage">Giảm theo %</SelectItem>
-                      <SelectItem value="fixed_amount">Giảm tiền cố định</SelectItem>
-                      <SelectItem value="free_shipping">Miễn phí vận chuyển</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>Loại voucher</Label>
+                  <div className="flex h-10 items-center rounded-md border border-input bg-muted/50 px-3 text-sm">
+                    Giảm theo phần trăm (%)
+                  </div>
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                {form.discount_type !== 'free_shipping' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="discount-value">Giá trị giảm *</Label>
-                    <Input id="discount-value" type="number" min="0" value={form.discount_value} onChange={(event) => setForm({ ...form, discount_value: Number(event.target.value) })} required />
-                  </div>
-                )}
+                <div className="space-y-2">
+                  <Label htmlFor="discount-value">Phần trăm giảm (%) *</Label>
+                  <Input id="discount-value" type="number" min="1" max="100" value={form.discount_value} onChange={(event) => setForm({ ...form, discount_value: Number(event.target.value) })} required />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="max-discount">Giảm tối đa</Label>
                   <Input id="max-discount" type="number" min="0" value={form.max_discount_amount} onChange={(event) => setForm({ ...form, max_discount_amount: event.target.value === '' ? '' : Number(event.target.value) })} placeholder="Không giới hạn" />
@@ -429,7 +407,7 @@ export default function AdminVouchersPage() {
                           <p className="mt-1 text-xs text-muted-foreground">{scopeTypeLabels[voucher.scope_type]}</p>
                         </td>
                         <td className="px-4 py-3">
-                          <p>{discountTypeLabels[voucher.discount_type]}</p>
+                          <p>Giảm theo %</p>
                           <p className="mt-1 font-medium">{getDiscountDisplay(voucher)}</p>
                         </td>
                         <td className="px-4 py-3">
