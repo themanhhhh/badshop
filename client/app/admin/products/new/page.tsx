@@ -412,7 +412,7 @@ export default function AddProductPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <Label htmlFor="stock">Số lượng tồn kho</Label>
+                <Label htmlFor="stock">Số lượng nhập</Label>
                 <Input
                   id="stock"
                   type="number"
