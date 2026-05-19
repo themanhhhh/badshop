@@ -82,7 +82,7 @@ const shipmentActions: Array<{
 ] as const;
 
 function getOrderNumber(order: Partial<Order> & Record<string, any>) {
-  return order.orderNumber || order.order_number || order.id;
+  return order.orderNumber || order.order_number || order.id || '';
 }
 
 function parseTrackingHistory(trackingHistory: Shipment['tracking_history']) {
