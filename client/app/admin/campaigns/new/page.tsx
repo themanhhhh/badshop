@@ -14,7 +14,6 @@ import {
   X,
   Check,
   Loader2,
-  Upload,
   Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -39,8 +38,20 @@ interface Product {
   id: string;
   name: string;
   price: number;
-  images?: { url: string }[];
+  images?: { url?: string; image_url?: string; is_primary?: boolean; is_delete?: boolean }[];
+  product_images?: { url?: string; image_url?: string; is_primary?: boolean; is_delete?: boolean }[];
   brand?: { name: string };
+}
+
+function getProductThumbnail(product: Product): string {
+  const images = (product.product_images || product.images || []).filter((image) => !image.is_delete);
+  const primaryImage = images.find((image) => image.is_primary) || images[0];
+
+  return primaryImage?.image_url || primaryImage?.url || '/products/placeholder.jpg';
+}
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
 }
 
 const campaignTypes = [
@@ -78,13 +89,21 @@ export default function NewCampaignPage() {
     status: 'draft',
   });
 
+  const products = useMemo(() => {
+    if (Array.isArray(allProducts)) {
+      return allProducts;
+    }
+
+    return [];
+  }, [allProducts]);
+
   // Filter products by search
   const filteredProducts = useMemo(() => {
-    return (allProducts || []).filter((p: Product) => 
+    return products.filter((p: Product) => 
       p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
       p.brand?.name?.toLowerCase().includes(productSearch.toLowerCase())
     );
-  }, [allProducts, productSearch]);
+  }, [products, productSearch]);
 
   const toggleProduct = (productId: string) => {
     setSelectedProducts(prev => 
@@ -107,19 +126,9 @@ export default function NewCampaignPage() {
     setError('');
 
     try {
-      // Use the generic uploadImage method we added
-      // Note: direct usage of api imported from lib/api
-      // We need to make sure we import 'api' correctly or use the right object. 
-      // In my previous step I exported `api` from `lib/api.ts` which includes `campaigns`, `users` etc.
-      // But `uploadImage` was added to `uploadApi` inside `lib/api.ts` but `api` export might not expose it directly if it wasn't added to the exported `api` object.
-      // Let's re-read api.ts. It exports `uploadApi` separately too? 
-      // Re-reading step 176: Yes, `uploadApi` is exported.
-      // I should import `uploadApi` from `lib/api`.
-      const { uploadApi } = require('@/lib/api'); // Dynamic import to avoid issues or just expect it to be there if I add import above.
-      
       const result = await uploadApi.uploadImage(file);
       setFormData(prev => ({ ...prev, image_url: result.url }));
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('Không thể tải ảnh banner. Vui lòng thử lại.');
       console.error('Upload error:', err);
     } finally {
@@ -172,7 +181,7 @@ export default function NewCampaignPage() {
 
       // Add products to campaign if any selected
       if (selectedProducts.length > 0) {
-        await fetch(`${API_BASE_URL}/campaigns/${campaignId}/products`, {
+        const productsResponse = await fetch(`${API_BASE_URL}/campaigns/${campaignId}/products`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -180,11 +189,16 @@ export default function NewCampaignPage() {
           },
           body: JSON.stringify({ productIds: selectedProducts }),
         });
+
+        if (!productsResponse.ok) {
+          const errData = await productsResponse.json().catch(() => null);
+          throw new Error(errData?.error?.message || 'Không thể thêm sản phẩm vào chiến dịch');
+        }
       }
 
       router.push('/admin/campaigns');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Không thể tạo chiến dịch'));
     } finally {
       setIsSubmitting(false);
     }
@@ -386,7 +400,7 @@ export default function NewCampaignPage() {
                 {selectedProducts.length > 0 && (
                   <div className="flex flex-wrap gap-2 rounded-lg bg-gray-100 p-3 dark:bg-slate-900">
                     {selectedProducts.map(id => {
-                      const product = (allProducts || []).find((p: Product) => p.id === id);
+                      const product = products.find((p: Product) => p.id === id);
                       if (!product) return null;
                       return (
                         <div key={id} className="flex items-center gap-1 rounded-full border border-gray-300 bg-white px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-950">
@@ -413,10 +427,12 @@ export default function NewCampaignPage() {
                     </div>
                   ) : (
                     filteredProducts.slice(0, 100).map((product: Product) => (
-                      <div
+                      <button
                         key={product.id}
+                        type="button"
                         onClick={() => toggleProduct(product.id)}
-                        className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+                        aria-pressed={selectedProducts.includes(product.id)}
+                        className={`flex w-full items-center gap-3 p-3 text-left cursor-pointer hover:bg-gray-50 transition-colors ${
                           selectedProducts.includes(product.id) ? 'bg-gray-100 dark:bg-slate-900' : ''
                         }`}
                       >
@@ -428,7 +444,7 @@ export default function NewCampaignPage() {
                           {selectedProducts.includes(product.id) && <Check className="h-3 w-3" />}
                         </div>
                         <img
-                          src={product.images?.[0]?.url || '/products/placeholder.jpg'}
+                          src={getProductThumbnail(product)}
                           alt={product.name}
                           className="w-12 h-12 object-cover rounded"
                         />
@@ -439,7 +455,7 @@ export default function NewCampaignPage() {
                         <span className="text-sm font-semibold text-gray-700">
                           {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
                         </span>
-                      </div>
+                      </button>
                     ))
                   )}
                 </div>
