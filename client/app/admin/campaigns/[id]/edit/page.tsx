@@ -44,22 +44,16 @@ import {
 import { useProducts, useCampaign } from '@/hooks/useApi';
 import { uploadApi } from '@/lib/api';
 import { getToken } from '@/lib/auth';
+import type { Product } from '@/lib/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  images?: { url: string }[];
-  product_images?: { image_url?: string; url?: string; is_primary?: boolean; is_delete?: boolean }[];
-  brand?: { name: string };
-}
+type ProductImage = NonNullable<Product['product_images']>[number];
 
 function getProductThumbnail(product: Product): string {
-  const rawImages = (product.product_images || product.images || []) as Array<{ image_url?: string; url?: string; is_primary?: boolean; is_delete?: boolean }>;
-  const images = rawImages.filter((image: any) => !image.is_delete);
-  const primaryImage = images.find((image: any) => image.is_primary) || images[0];
+  const rawImages = (product.product_images || product.images || []) as ProductImage[];
+  const images = rawImages.filter((image) => !image.is_delete);
+  const primaryImage = images.find((image) => image.is_primary) || images[0];
 
   return primaryImage?.image_url || primaryImage?.url || '/products/placeholder.jpg';
 }
@@ -125,19 +119,28 @@ export default function EditCampaignPage() {
       });
       setSelectedType(campaign.type || 'collection');
       
-      if ((campaign as any).products) {
-         setSelectedProducts((campaign as any).products.map((p: any) => p.id));
+      if (campaign.products) {
+         setSelectedProducts(campaign.products.map((p) => p.id));
       }
     }
   }, [campaign]);
 
   // Filter products by search
   const filteredProducts = useMemo(() => {
-    return (allProducts || []).filter((p: Product) => 
+    return (allProducts || []).filter((p: Product) =>
       p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
       p.brand?.name?.toLowerCase().includes(productSearch.toLowerCase())
     );
   }, [allProducts, productSearch]);
+
+  const selectedProductDetails = useMemo(() => {
+    return selectedProducts
+      .map((id) => {
+        return (allProducts || []).find((p: Product) => p.id === id)
+          || campaign?.products?.find((p) => p.id === id);
+      })
+      .filter((product): product is Product => Boolean(product));
+  }, [allProducts, campaign?.products, selectedProducts]);
 
   const toggleProduct = (productId: string) => {
     setSelectedProducts(prev => 
@@ -211,30 +214,38 @@ export default function EditCampaignPage() {
       }
 
       // Sync products logic
-       if ((campaign as any)?.products || selectedProducts.length > 0) {
+       if (campaign?.products || selectedProducts.length > 0) {
         // Since we don't have a sync endpoint, we will just try to add all selected.
         // It might fail if already exists depending on API, or we can clear and add if we had clear endpoint.
         // A safer way without sync endpoint is to just use 'POST /products' which usually handles "add if not exists" or similar, 
         // OR we should be explicit. 
         // Given earlier analysis: API has addProducts and removeProducts.
         // Let's TRY to compute diff if we have initial products.
-        const currentIds = (campaign as any)?.products?.map((p: any) => p.id) || [];
+        const currentIds = campaign?.products?.map((p) => p.id) || [];
         const toAdd = selectedProducts.filter(id => !currentIds.includes(id));
         const toRemove = currentIds.filter((id: string) => !selectedProducts.includes(id));
 
         if (toAdd.length > 0) {
-            await fetch(`${API_BASE_URL}/campaigns/${id}/products`, {
+            const addResponse = await fetch(`${API_BASE_URL}/campaigns/${id}/products`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ productIds: toAdd }),
             });
+            if (!addResponse.ok) {
+              const errData = await addResponse.json().catch(() => null);
+              throw new Error(errData?.error?.message || 'Không thể thêm sản phẩm vào chiến dịch');
+            }
         }
         if (toRemove.length > 0) {
-            await fetch(`${API_BASE_URL}/campaigns/${id}/products`, {
+            const removeResponse = await fetch(`${API_BASE_URL}/campaigns/${id}/products`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ productIds: toRemove }),
             });
+            if (!removeResponse.ok) {
+              const errData = await removeResponse.json().catch(() => null);
+              throw new Error(errData?.error?.message || 'Không thể gỡ sản phẩm khỏi chiến dịch');
+            }
         }
       }
 
@@ -501,26 +512,28 @@ export default function EditCampaignPage() {
                   />
                 </div>
 
-                {/* Selected Products Tags */}
-                {selectedProducts.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-3 bg-blue-50 rounded-lg">
-                    {selectedProducts.map(id => {
-                      const product = (allProducts || []).find((p: Product) => p.id === id);
-                      // If product is not in allProducts (maybe not loaded yet or pagination issue), try to find in initial campaign products if available
-                      const productDisplay = product || ((campaign as any)?.products || []).find((p: any) => p.id === id);
-                      
-                      if (!productDisplay) return null;
-                      return (
-                        <div key={id} className="flex items-center gap-1 px-2 py-1 bg-white border border-blue-200 rounded-full text-sm">
-                          <span className="max-w-40 truncate">{productDisplay.name}</span>
-                          <button type="button" onClick={() => toggleProduct(id)} className="text-gray-400 hover:text-red-600">
+                <div className="rounded-lg border border-blue-100 bg-blue-50 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-blue-900">Sản phẩm đang trong chiến dịch</p>
+                    <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-blue-700">
+                      {selectedProducts.length} sản phẩm
+                    </span>
+                  </div>
+                  {selectedProductDetails.length > 0 ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {selectedProductDetails.map((product) => (
+                        <div key={product.id} className="flex items-center gap-1 px-2 py-1 bg-white border border-blue-200 rounded-full text-sm">
+                          <span className="max-w-40 truncate">{product.name}</span>
+                          <button type="button" onClick={() => toggleProduct(product.id)} className="text-gray-400 hover:text-red-600">
                             <X className="h-3 w-3" />
                           </button>
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-sm text-blue-700">Chưa có sản phẩm nào được gán.</p>
+                  )}
+                </div>
 
                 {/* Product List */}
                 <div className="max-h-96 overflow-y-auto border rounded-lg divide-y">
@@ -535,10 +548,11 @@ export default function EditCampaignPage() {
                     </div>
                   ) : (
                     filteredProducts.slice(0, 100).map((product: Product) => (
-                      <div
+                      <button
+                        type="button"
                         key={product.id}
                         onClick={() => toggleProduct(product.id)}
-                        className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+                        className={`flex w-full items-center gap-3 p-3 text-left hover:bg-gray-50 transition-colors ${
                           selectedProducts.includes(product.id) ? 'bg-blue-50' : ''
                         }`}
                       >
@@ -561,7 +575,7 @@ export default function EditCampaignPage() {
                         <span className="text-sm font-semibold text-gray-700">
                           {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
                         </span>
-                      </div>
+                      </button>
                     ))
                   )}
                 </div>

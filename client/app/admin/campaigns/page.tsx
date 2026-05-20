@@ -25,6 +25,7 @@ import {
 import { toast } from 'sonner';
 import { useCampaigns } from '@/hooks/useApi';
 import { formatPrice } from '@/lib/productMapper';
+import { Campaign, Product } from '@/lib/types';
 import { AdminSelect } from '@/components/admin/AdminSelect';
 import { AdminLoading } from '@/components/admin/AdminLoading';
 import {
@@ -38,21 +39,33 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+type AdminCampaign = Omit<Campaign, 'type' | 'status'> & {
+  type: string;
+  status: string;
+  products?: Product[];
+  budget?: number;
+  spent?: number;
+  clicks?: number;
+  conversions?: number;
+  impressions?: number;
+  revenue?: number;
+};
+
 export default function AdminCampaignsPage() {
   const { data: campaigns, loading } = useCampaigns();
   const [typeFilter, setTypeFilter] = useState('all');
-  const [deletingCampaign, setDeletingCampaign] = useState<any | null>(null);
+  const [deletingCampaign, setDeletingCampaign] = useState<AdminCampaign | null>(null);
   const [isDeletingCampaign, setIsDeletingCampaign] = useState(false);
 
   // Use API data directly
-  const displayCampaigns = campaigns || [];
+  const displayCampaigns = (campaigns || []) as AdminCampaign[];
 
   // Calculate dynamic stats
   const dynamicStats = {
     totalCampaigns: displayCampaigns.length,
-    activeCampaigns: displayCampaigns.filter((c: any) => c.status === 'active' || c.isActive).length,
-    totalBudget: (displayCampaigns as any[]).reduce((sum, c) => sum + (c.budget || 0), 0),
-    totalRevenue: (displayCampaigns as any[]).reduce((sum, c) => sum + (c.revenue || 0), 0),
+    activeCampaigns: displayCampaigns.filter((c) => c.status === 'active' || c.isActive).length,
+    totalBudget: displayCampaigns.reduce((sum, c) => sum + (c.budget || 0), 0),
+    totalRevenue: displayCampaigns.reduce((sum, c) => sum + (c.revenue || 0), 0),
   };
 
   const statusColors: Record<string, string> = {
@@ -241,6 +254,7 @@ export default function AdminCampaignsPage() {
                 </th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Chiến dịch</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Loại</th>
+                <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Sản phẩm</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Thời gian</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Ngân sách</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Hiệu suất</th>
@@ -249,8 +263,10 @@ export default function AdminCampaignsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {displayCampaigns.map((campaign: any) => {
+              {displayCampaigns.map((campaign) => {
                 const TypeIcon = typeIcons[campaign.type] || Ticket;
+                const campaignProducts = campaign.products || [];
+                const previewProducts = campaignProducts.slice(0, 2).map((product) => product.name).join(', ');
                 
                 // Fields might be undefined or different based on type usage
                 const budget = campaign.budget || 0;
@@ -285,6 +301,15 @@ export default function AdminCampaignsPage() {
                       <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${typeColors[campaign.type] || 'bg-muted text-muted-foreground'}`}>
                         {typeLabels[campaign.type] || campaign.type}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="max-w-56">
+                        <p className="text-sm font-medium">{campaignProducts.length} sản phẩm</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {previewProducts || 'Chưa gán sản phẩm'}
+                          {campaignProducts.length > 2 ? ` +${campaignProducts.length - 2}` : ''}
+                        </p>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div>

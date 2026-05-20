@@ -230,6 +230,7 @@ export interface Campaign {
   image_url?: string;
   display_order: number;
   show_on_homepage: boolean;
+  products?: Product[];
   isActive?: boolean; // Keep for backward compatibility if used, but server seems not to return it explicitly unless calculated
   created_at: string;
   updated_at: string;
