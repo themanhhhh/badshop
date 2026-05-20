@@ -4,29 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Zap, Calendar, Tag, Package } from 'lucide-react';
 import { ProductCard } from './ProductCard';
-import { mapProductsForDisplay } from '@/lib/productMapper';
-
-interface CampaignProduct {
-  id: string;
-  name: string;
-  slug?: string;
-  price: number;
-  images?: { url: string }[];
-  brand?: { name: string };
-  category?: { name: string };
-}
-
-interface Campaign {
-  id: string;
-  name: string;
-  title?: string;
-  description?: string;
-  image_url?: string;
-  type: 'collection' | 'flash_sale' | 'promotion' | 'seasonal';
-  discount_type: 'percentage' | 'fixed';
-  discount_value: number;
-  products?: CampaignProduct[];
-}
+import { mapCampaignProductsForDisplay } from '@/lib/productMapper';
+import type { Campaign } from '@/lib/types';
 
 interface CampaignSectionProps {
   campaign: Campaign;
@@ -59,8 +38,8 @@ export function CampaignSection({ campaign }: CampaignSectionProps) {
   const bgColor = typeColors[campaign.type] || 'bg-black';
 
   // Map products for display
-  const displayProducts = campaign.products 
-    ? mapProductsForDisplay(campaign.products as any) 
+  const displayProducts = campaign.products
+    ? mapCampaignProductsForDisplay(campaign.products, campaign)
     : [];
 
   if (displayProducts.length === 0) {

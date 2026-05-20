@@ -1,4 +1,4 @@
-import { Product as ApiProduct } from './types';
+import type { Campaign, Product as ApiProduct } from './types';
 
 // Display product interface matching what components expect
 export interface DisplayProduct {
@@ -86,6 +86,24 @@ export function mapProductsForDisplay(products: ApiProduct[]): DisplayProduct[] 
     return [];
   }
   return products.map(mapProductForDisplay);
+}
+
+export function mapCampaignProductsForDisplay(products: ApiProduct[], campaign: Pick<Campaign, 'discount_type' | 'discount_value'>): DisplayProduct[] {
+  const discountValue = Number(campaign.discount_value) || 0;
+
+  return mapProductsForDisplay(products).map((product) => {
+    const originalPrice = product.price;
+    const discountedPrice = campaign.discount_type === 'percentage'
+      ? originalPrice * (1 - discountValue / 100)
+      : originalPrice - discountValue;
+
+    return {
+      ...product,
+      price: discountValue > 0 ? Math.max(0, Math.round(discountedPrice)) : originalPrice,
+      originalPrice: discountValue > 0 ? originalPrice : undefined,
+      badge: undefined,
+    };
+  });
 }
 
 // Format price in VND
