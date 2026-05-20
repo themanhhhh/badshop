@@ -38,14 +38,6 @@ const categories = [
     image: '/img/accessoriescate.png',
   },
   {
-    id: 'cau-long',
-    title: 'CẦU LÔNG',
-    subtitle: 'Shuttlecocks',
-    description: 'Ổn định và bền bỉ',
-    href: '/products?category=cau-long',
-    image: '/img/racketcate.jpg',
-  },
-  {
     id: 'ao-cau-long',
     title: 'ÁO CẦU LÔNG',
     subtitle: 'Apparel',

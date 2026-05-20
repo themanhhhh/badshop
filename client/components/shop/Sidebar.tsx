@@ -78,8 +78,12 @@ const menuItems: MenuItem[] = [
     label: 'ÁO CẦU LÔNG',
     href: '/products?category=ao-cau-long',
   },
-  { 
-    label: 'SALE OFF', 
+  {
+    label: 'XEM BLOG',
+    href: '/blog',
+  },
+  {
+    label: 'SALE OFF',
     href: '/products?sale=true',
     highlight: true,
   },

@@ -56,9 +56,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           <div className="max-w-md text-center">
             <h1 className="text-2xl font-bold mb-2">Không tìm thấy chiến dịch</h1>
             <p className="text-muted-foreground mb-6">Chiến dịch này không tồn tại hoặc đã ngừng hiển thị.</p>
-            <Button asChild>
-              <Link href="/">Quay về trang chủ</Link>
-            </Button>
+            
           </div>
         </main>
         <Footer />
@@ -94,10 +92,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           )}
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/25" />
           <div className="container relative mx-auto px-4 py-16 sm:py-20 lg:py-28">
-            <Link href="/" className="mb-8 inline-flex items-center gap-2 text-sm text-white/80 hover:text-white">
-              <ChevronLeft className="h-4 w-4" />
-              Về trang chủ
-            </Link>
+           
 
             <div className="max-w-3xl">
               <div className="mb-5 flex flex-wrap items-center gap-3">
