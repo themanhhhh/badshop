@@ -12,9 +12,17 @@ export interface CartItem {
   name: string;
   brand: string;
   price: number;
+  originalPrice?: number;
+  campaignName?: string;
   image: string;
   quantity: number;
 }
+
+type CampaignProductPrice = {
+  price: number;
+  originalPrice: number;
+  campaignName: string;
+};
 
 interface CartContextType {
   items: CartItem[];
@@ -34,7 +42,7 @@ interface CartProviderProps {
 }
 
 // Map API cart response to CartItem[]
-function mapCartItems(cart: any): CartItem[] {
+function mapCartItems(cart: any, campaignPrices: Map<string, CampaignProductPrice> = new Map()): CartItem[] {
   if (!cart?.cart_items) return [];
   return cart.cart_items
     .filter((item: any) => !item.is_delete)
@@ -44,16 +52,72 @@ function mapCartItems(cart: any): CartItem[] {
       const primaryImage = images.find((img: any) => img.is_primary) || images[0];
       const imageUrl = primaryImage?.image_url || primaryImage?.url || '/products/placeholder.jpg';
 
+      const productPrice = Number(product.price) || 0;
+      const campaignPrice = campaignPrices.get(item.product_id);
+
       return {
         id: item.id,
         productId: item.product_id,
         name: product.name || 'Sản phẩm',
         brand: product.brand?.name || '',
-        price: Number(product.price) || 0,
+        price: campaignPrice?.price ?? productPrice,
+        originalPrice: campaignPrice?.originalPrice,
+        campaignName: campaignPrice?.campaignName,
         image: imageUrl,
         quantity: item.quantity,
       };
     });
+}
+
+async function fetchActiveCampaignPrices(productIds: string[]): Promise<Map<string, CampaignProductPrice>> {
+  const uniqueProductIds = [...new Set(productIds)];
+  if (uniqueProductIds.length === 0) return new Map();
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/campaigns/active`);
+    if (!response.ok) return new Map();
+
+    const json = await response.json();
+    const campaigns = Array.isArray(json?.data) ? json.data : [];
+    const productSet = new Set(uniqueProductIds);
+    const prices = new Map<string, CampaignProductPrice>();
+
+    campaigns.forEach((campaign: any) => {
+      (campaign.products || []).forEach((product: any) => {
+        if (!productSet.has(product.id)) return;
+
+        const originalPrice = Number(product.price || 0);
+        const discountValue = Number(campaign.discount_value || 0);
+        const discountedPrice = campaign.discount_type === 'percentage'
+          ? originalPrice * (1 - discountValue / 100)
+          : originalPrice - discountValue;
+        const price = discountValue > 0 ? Math.max(0, Math.round(discountedPrice)) : originalPrice;
+        const current = prices.get(product.id);
+
+        if (!current || price < current.price) {
+          prices.set(product.id, {
+            price,
+            originalPrice,
+            campaignName: campaign.title || campaign.name || 'Chiến dịch',
+          });
+        }
+      });
+    });
+
+    return prices;
+  } catch (error) {
+    console.warn('Failed to load campaign prices:', error);
+    return new Map();
+  }
+}
+
+async function mapCartItemsWithCampaignPrices(cart: any): Promise<CartItem[]> {
+  const productIds = (cart?.cart_items || [])
+    .filter((item: any) => !item.is_delete)
+    .map((item: any) => item.product_id)
+    .filter(Boolean);
+  const campaignPrices = await fetchActiveCampaignPrices(productIds);
+  return mapCartItems(cart, campaignPrices);
 }
 
 // Helper for authenticated API calls
@@ -102,7 +166,7 @@ export function CartProvider({ children }: CartProviderProps) {
           const result = await cartFetch(`/carts/user/${user.id}`, { method: 'POST' });
           if (result.data) {
             setCartId(result.data.id);
-            setItems(mapCartItems(result.data));
+            setItems(await mapCartItemsWithCampaignPrices(result.data));
           }
         } catch (error) {
           console.warn('Failed to load cart:', error);
@@ -147,14 +211,14 @@ export function CartProvider({ children }: CartProviderProps) {
       });
       // Sync with server response
       if (result.data) {
-        setItems(mapCartItems(result.data));
+        setItems(await mapCartItemsWithCampaignPrices(result.data));
       }
     } catch (error) {
       console.error('Failed to add to cart:', error);
       // Revert on error — reload cart
       try {
         const result = await cartFetch(`/carts/user/${user?.id}`, { method: 'POST' });
-        if (result.data) setItems(mapCartItems(result.data));
+        if (result.data) setItems(await mapCartItemsWithCampaignPrices(result.data));
       } catch { /* ignore */ }
     }
   }, [cartId, user?.id]);
@@ -171,7 +235,7 @@ export function CartProvider({ children }: CartProviderProps) {
         method: 'DELETE',
       });
       if (result.data) {
-        setItems(mapCartItems(result.data));
+        setItems(await mapCartItemsWithCampaignPrices(result.data));
       }
     } catch (error) {
       console.error('Failed to remove from cart:', error);
@@ -200,7 +264,7 @@ export function CartProvider({ children }: CartProviderProps) {
         body: JSON.stringify({ quantity }),
       });
       if (result.data) {
-        setItems(mapCartItems(result.data));
+        setItems(await mapCartItemsWithCampaignPrices(result.data));
       }
     } catch (error) {
       console.error('Failed to update quantity:', error);
@@ -219,7 +283,7 @@ export function CartProvider({ children }: CartProviderProps) {
         method: 'DELETE',
       });
       if (result.data) {
-        setItems(mapCartItems(result.data));
+        setItems(await mapCartItemsWithCampaignPrices(result.data));
       }
     } catch (error) {
       console.error('Failed to clear cart:', error);

@@ -143,7 +143,8 @@ export default function NewCampaignPage() {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
-    
+    let createdCampaignId: string | null = null;
+
     try {
       const token = getToken();
       
@@ -178,6 +179,7 @@ export default function NewCampaignPage() {
 
       const result = await response.json();
       const campaignId = result.data.id;
+      createdCampaignId = campaignId;
 
       // Add products to campaign if any selected
       if (selectedProducts.length > 0) {
@@ -198,6 +200,12 @@ export default function NewCampaignPage() {
 
       router.push('/admin/campaigns');
     } catch (err: unknown) {
+      if (createdCampaignId) {
+        await fetch(`${API_BASE_URL}/campaigns/${createdCampaignId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${getToken()}` },
+        }).catch(() => null);
+      }
       setError(getErrorMessage(err, 'Không thể tạo chiến dịch'));
     } finally {
       setIsSubmitting(false);

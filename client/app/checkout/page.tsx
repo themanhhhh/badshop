@@ -539,9 +539,17 @@ export default function CheckoutPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium line-clamp-2">{item.name}</p>
                           <p className="text-xs text-muted-foreground mt-1">SL: {item.quantity}</p>
+                          {item.campaignName && (
+                            <p className="mt-1 text-xs font-medium text-red-600">Ưu đãi: {item.campaignName}</p>
+                          )}
                         </div>
-                        <div className="text-sm font-medium shrink-0">
-                          {formatPrice(item.price * item.quantity)}
+                        <div className="shrink-0 text-right text-sm font-medium">
+                          <span>{formatPrice(item.price * item.quantity)}</span>
+                          {item.originalPrice && item.originalPrice > item.price && (
+                            <span className="block text-xs font-normal text-muted-foreground line-through">
+                              {formatPrice(item.originalPrice * item.quantity)}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}

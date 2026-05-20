@@ -109,7 +109,10 @@ export default function CartPage() {
                           <Link href={`/products/${item.productId}`} className="text-sm font-medium hover:underline">
                             {item.name}
                           </Link>
-                          <Button 
+                          {item.campaignName && (
+                            <p className="mt-1 text-xs font-medium text-red-600">Ưu đãi: {item.campaignName}</p>
+                          )}
+                          <Button
                             variant="ghost" 
                             size="sm" 
                             className="mt-2 h-auto p-0 text-xs text-muted-foreground hover:text-foreground md:hidden"
@@ -123,7 +126,14 @@ export default function CartPage() {
 
                       {/* Price */}
                       <div className="md:col-span-2 text-center">
-                        <span className="text-sm">{formatPrice(item.price)}</span>
+                        <div className="text-sm">
+                          <span>{formatPrice(item.price)}</span>
+                          {item.originalPrice && item.originalPrice > item.price && (
+                            <span className="block text-xs text-muted-foreground line-through">
+                              {formatPrice(item.originalPrice)}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Quantity */}
