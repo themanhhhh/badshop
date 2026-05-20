@@ -25,6 +25,7 @@ const categoryNameMapping: Record<string, string> = {
   'phu-kien': 'Phụ kiện',
   'tui-dung-vot': 'Túi đựng vợt',
   'cau-long': 'Cầu lông',
+  'ao-cau-long': 'Áo cầu lông',
   'quan-ao-cau-long': 'Quần áo cầu lông',
   // Legacy English slugs
   'racket': 'Vợt cầu lông',
@@ -34,6 +35,10 @@ const categoryNameMapping: Record<string, string> = {
   'accessories': 'Phụ kiện',
   'shuttlecock': 'Cầu lông',
   'bags': 'Túi đựng vợt',
+  'bag': 'Túi đựng vợt',
+  'backpack': 'Túi đựng vợt',
+  'grip': 'Phụ kiện',
+  'string': 'Phụ kiện',
   'clothing': 'Quần áo cầu lông',
 };
 

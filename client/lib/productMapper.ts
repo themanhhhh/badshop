@@ -58,7 +58,7 @@ export function mapProductForDisplay(product: ApiProduct): DisplayProduct {
       imageUrl = '/img/racketcate.jpg';
     } else if (categorySlug.includes('giay') || categorySlug.includes('shoes') || categorySlug.includes('footwear')) {
       imageUrl = '/img/footwearercate.jpg';
-    } else if (categorySlug.includes('phu-kien') || categorySlug.includes('accessories')) {
+    } else if (categorySlug.includes('phu-kien') || categorySlug.includes('tui') || categorySlug.includes('ao') || categorySlug.includes('cau-long') || categorySlug.includes('accessories')) {
       imageUrl = '/img/accessoriescate.png';
     }
   }

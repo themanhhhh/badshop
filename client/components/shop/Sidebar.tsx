@@ -21,58 +21,62 @@ const menuItems: MenuItem[] = [
     label: 'ALL PRODUCT', 
     href: '/products',
   },
-  { 
-    label: 'VỢT CẦU LÔNG', 
-    href: '/products?category=racket',
+  {
+    label: 'VỢT CẦU LÔNG',
+    href: '/products?category=vot-cau-long',
     submenu: [
-      { label: 'Tất cả vợt', href: '/products?category=racket' },
-      { label: 'Yonex', href: '/products?category=racket&brand=yonex' },
-      { label: 'Victor', href: '/products?category=racket&brand=victor' },
-      { label: 'Li-Ning', href: '/products?category=racket&brand=lining' },
-      { label: 'Mizuno', href: '/products?category=racket&brand=mizuno' },
+      { label: 'Tất cả vợt', href: '/products?category=vot-cau-long' },
+      { label: 'Yonex', href: '/products?category=vot-cau-long&brand=yonex' },
+      { label: 'Victor', href: '/products?category=vot-cau-long&brand=victor' },
+      { label: 'Li-Ning', href: '/products?category=vot-cau-long&brand=lining' },
+      { label: 'Mizuno', href: '/products?category=vot-cau-long&brand=mizuno' },
     ]
   },
-  { 
-    label: 'QUẤN CÁN', 
-    href: '/products?category=grip',
+  {
+    label: 'GIÀY CẦU LÔNG',
+    href: '/products?category=giay-cau-long',
     submenu: [
-      { label: 'Tất cả quấn cán', href: '/products?category=grip' },
-      { label: 'Yonex', href: '/products?category=grip&brand=yonex' },
-      { label: 'Victor', href: '/products?category=grip&brand=victor' },
-      { label: 'Li-Ning', href: '/products?category=grip&brand=lining' },
-      { label: 'Kawasaki', href: '/products?category=grip&brand=kawasaki' },
+      { label: 'Tất cả giày', href: '/products?category=giay-cau-long' },
+      { label: 'Yonex', href: '/products?category=giay-cau-long&brand=yonex' },
+      { label: 'Victor', href: '/products?category=giay-cau-long&brand=victor' },
+      { label: 'Li-Ning', href: '/products?category=giay-cau-long&brand=lining' },
+      { label: 'Mizuno', href: '/products?category=giay-cau-long&brand=mizuno' },
     ]
   },
-  { 
-    label: 'CƯỚC', 
-    href: '/products?category=string',
+  {
+    label: 'PHỤ KIỆN',
+    href: '/products?category=phu-kien',
     submenu: [
-      { label: 'Tất cả cước', href: '/products?category=string' },
-      { label: 'Yonex', href: '/products?category=string&brand=yonex' },
-      { label: 'Victor', href: '/products?category=string&brand=victor' },
-      { label: 'Li-Ning', href: '/products?category=string&brand=lining' },
-      { label: 'Mizuno', href: '/products?category=string&brand=mizuno' },
+      { label: 'Tất cả phụ kiện', href: '/products?category=phu-kien' },
+      { label: 'Yonex', href: '/products?category=phu-kien&brand=yonex' },
+      { label: 'Victor', href: '/products?category=phu-kien&brand=victor' },
+      { label: 'Li-Ning', href: '/products?category=phu-kien&brand=lining' },
+      { label: 'Mizuno', href: '/products?category=phu-kien&brand=mizuno' },
     ]
   },
-  { 
-    label: 'BALO', 
-    href: '/products?category=backpack',
+  {
+    label: 'TÚI ĐỰNG VỢT',
+    href: '/products?category=tui-dung-vot',
     submenu: [
-      { label: 'Tất cả balo', href: '/products?category=backpack' },
-      { label: 'Yonex', href: '/products?category=backpack&brand=yonex' },
-      { label: 'Victor', href: '/products?category=backpack&brand=victor' },
-      { label: 'Li-Ning', href: '/products?category=backpack&brand=lining' },
+      { label: 'Tất cả túi', href: '/products?category=tui-dung-vot' },
+      { label: 'Yonex', href: '/products?category=tui-dung-vot&brand=yonex' },
+      { label: 'Victor', href: '/products?category=tui-dung-vot&brand=victor' },
+      { label: 'Li-Ning', href: '/products?category=tui-dung-vot&brand=lining' },
     ]
   },
-  { 
-    label: 'TÚI', 
-    href: '/products?category=bag',
+  {
+    label: 'CẦU LÔNG',
+    href: '/products?category=cau-long',
     submenu: [
-      { label: 'Tất cả túi', href: '/products?category=bag' },
-      { label: 'Yonex', href: '/products?category=bag&brand=yonex' },
-      { label: 'Victor', href: '/products?category=bag&brand=victor' },
-      { label: 'Li-Ning', href: '/products?category=bag&brand=lining' },
+      { label: 'Tất cả cầu lông', href: '/products?category=cau-long' },
+      { label: 'Yonex', href: '/products?category=cau-long&brand=yonex' },
+      { label: 'Victor', href: '/products?category=cau-long&brand=victor' },
+      { label: 'Li-Ning', href: '/products?category=cau-long&brand=lining' },
     ]
+  },
+  {
+    label: 'ÁO CẦU LÔNG',
+    href: '/products?category=ao-cau-long',
   },
   { 
     label: 'SALE OFF', 

@@ -6,28 +6,52 @@ import { ArrowUpRight } from 'lucide-react';
 
 const categories = [
   {
-    id: 'rackets',
+    id: 'vot-cau-long',
     title: 'VỢT CẦU LÔNG',
     subtitle: 'Rackets',
     description: 'Công nghệ hàng đầu',
-    href: '/products?category=racket',
+    href: '/products?category=vot-cau-long',
     image: '/img/racketcate.jpg',
   },
   {
-    id: 'shoes',
+    id: 'giay-cau-long',
     title: 'GIÀY CẦU LÔNG',
     subtitle: 'Footwear',
     description: 'Power Cushion',
-    href: '/products?category=shoes',
+    href: '/products?category=giay-cau-long',
     image: '/img/footwearercate.jpg',
   },
   {
-    id: 'accessories',
+    id: 'phu-kien',
     title: 'PHỤ KIỆN',
     subtitle: 'Accessories',
     description: 'Cước, quấn cán, balo',
-    href: '/products?category=accessories',
+    href: '/products?category=phu-kien',
     image: '/img/accessoriescate.png',
+  },
+  {
+    id: 'tui-dung-vot',
+    title: 'TÚI ĐỰNG VỢT',
+    subtitle: 'Bags',
+    description: 'Bảo vệ vợt khi di chuyển',
+    href: '/products?category=tui-dung-vot',
+    image: '/img/accessoriescate.png',
+  },
+  {
+    id: 'cau-long',
+    title: 'CẦU LÔNG',
+    subtitle: 'Shuttlecocks',
+    description: 'Ổn định và bền bỉ',
+    href: '/products?category=cau-long',
+    image: '/img/racketcate.jpg',
+  },
+  {
+    id: 'ao-cau-long',
+    title: 'ÁO CẦU LÔNG',
+    subtitle: 'Apparel',
+    description: 'Thoáng khí khi thi đấu',
+    href: '/products?category=ao-cau-long',
+    image: '/img/footwearercate.jpg',
   },
 ];
 
@@ -46,7 +70,7 @@ export function CategoryGrid() {
         </div>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-3 gap-4 lg:gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           {categories.map((category) => (
             <Link
               key={category.id}

@@ -19,11 +19,12 @@ export function Header() {
 
   const navLinks = [
     { href: '/products', label: 'ALL PRODUCT' },
-    { href: '/products?category=racket', label: 'VỢT CẦU LÔNG' },
-    { href: '/products?category=grip', label: 'QUẤN CÁN' },
-    { href: '/products?category=string', label: 'CƯỚC' },
-    { href: '/products?category=backpack', label: 'BALO' },
-    { href: '/products?category=bag', label: 'TÚI' },
+    { href: '/products?category=vot-cau-long', label: 'VỢT CẦU LÔNG' },
+    { href: '/products?category=giay-cau-long', label: 'GIÀY CẦU LÔNG' },
+    { href: '/products?category=phu-kien', label: 'PHỤ KIỆN' },
+    { href: '/products?category=tui-dung-vot', label: 'TÚI ĐỰNG VỢT' },
+    { href: '/products?category=cau-long', label: 'CẦU LÔNG' },
+    { href: '/products?category=ao-cau-long', label: 'ÁO CẦU LÔNG' },
     { href: '/products?sale=true', label: 'SALE OFF' },
   ];
 

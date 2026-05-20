@@ -43,6 +43,7 @@ function getCategoryIcon(slug: string): string {
     'tui-balo': 'backpack',
     'clothing': 'backpack',
     'quan-ao-cau-long': 'backpack',
+    'ao-cau-long': 'backpack',
   };
   return iconMap[slug] || 'circle-dot';
 }
